@@ -1,0 +1,18 @@
+[package]
+name = "openvx-sys"
+version = "0.1.0"
+authors = ["Markus Mayer <widemeadows@gmail.com>"]
+edition = "2018"
+description = "Native bindings to the OpenVX library"
+keywords = ["openvx"]
+build = "build.rs"
+links = "openvx"
+
+[lib]
+name = "libopenvx_sys"
+path = "src/lib.rs"
+
+[dependencies]
+
+[build-dependencies]
+bindgen = "0.55.1"

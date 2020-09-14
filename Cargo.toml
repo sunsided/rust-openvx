@@ -1,4 +1,6 @@
 [workspace]
 members = [
-    "openvx-sys"
+    "openvx-sys",
+    "openvx",
+    "canny-edge-detector"
 ]

@@ -3,7 +3,6 @@ extern crate bindgen;
 use std::path::PathBuf;
 
 fn main() {
-    // Tell cargo to tell rustc to link the system `magic` shared library.
     println!("cargo:rustc-link-lib=openvx");
 
     // Tell cargo to invalidate the built crate whenever the wrapper changes
@@ -23,9 +22,10 @@ fn main() {
         .header("wrapper.h")
         .detect_include_paths(true)
         // Create bindings for everything magical.
-        .whitelist_function("vx_.*")
-        .whitelist_var("VX_.*")
-        .whitelist_type("vx_.*")
+        .whitelist_function("vx.*")
+        .whitelist_var("VX.*")
+        .whitelist_type("vx.*")
+        .whitelist_type("vxu.*")
         .whitelist_recursively(true)
         // Doesn't appear to work right now, but maybe some day ...
         .generate_comments(true)

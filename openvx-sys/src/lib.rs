@@ -2915,3 +2915,6231 @@ pub const vx_kernel_e_VX_KERNEL_WEIGHTED_AVERAGE: vx_kernel_e = 64;
 #[doc = " \\arg <tt>\\ref VX_TYPE_IMAGE</tt> for a <tt>\\ref vx_image</tt> in the size field of <tt>\\ref vxGetParameterByIndex</tt> or <tt>\\ref vxSetParameterByIndex</tt>  * \\arg <tt>\\ref VX_TYPE_ARRAY</tt> for a <tt>\\ref vx_array</tt> in the size field of <tt>\\ref vxGetParameterByIndex</tt> or <tt>\\ref vxSetParameterByIndex</tt>  * \\arg or other appropriate types in \\ref vx_type_e."]
 #[doc = " \\ingroup group_kernel"]
 pub type vx_kernel_e = ::std::os::raw::c_uint;
+extern "C" {
+    #[doc = " \\brief Creates a <tt>\\ref vx_context</tt>."]
+    #[doc = " \\details This creates a top-level object context for OpenVX."]
+    #[doc = " \\note This is required to do anything else."]
+    #[doc = " \\returns The reference to the implementation context <tt>\\ref vx_context</tt>. Any possible errors"]
+    #[doc = " preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_context"]
+    #[doc = " \\post <tt>\\ref vxReleaseContext</tt>"]
+    pub fn vxCreateContext() -> vx_context;
+}
+extern "C" {
+    #[doc = " \\brief Releases the OpenVX object context."]
+    #[doc = " \\details All reference counted objects are garbage-collected by the return of this call."]
+    #[doc = " No calls are possible using the parameter context after the context has been"]
+    #[doc = " released until a new reference from <tt>\\ref vxCreateContext</tt> is returned."]
+    #[doc = " All outstanding references to OpenVX objects from this context are invalid"]
+    #[doc = " after this call."]
+    #[doc = " \\param [in] context The pointer to the reference to the context."]
+    #[doc = " \\post After returning from this function the reference is zeroed."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE context is not a valid <tt>\\ref vx_context</tt> reference."]
+    #[doc = " \\ingroup group_context"]
+    #[doc = " \\pre <tt>\\ref vxCreateContext</tt>"]
+    pub fn vxReleaseContext(context: *mut vx_context) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Retrieves the context from any reference from within a context."]
+    #[doc = " \\param [in] reference The reference from which to extract the context."]
+    #[doc = " \\ingroup group_context"]
+    #[doc = " \\return The overall context that created the particular"]
+    #[doc = " reference. Any possible errors preventing a successful completion of this function"]
+    #[doc = " should be checked using <tt>\\ref vxGetStatus</tt>."]
+    pub fn vxGetContext(reference: vx_reference) -> vx_context;
+}
+extern "C" {
+    #[doc = " \\brief Queries the context for some specific information."]
+    #[doc = " \\param [in] context The reference to the context."]
+    #[doc = " \\param [in] attribute The attribute to query. Use a <tt>\\ref vx_context_attribute_e</tt>."]
+    #[doc = " \\param [out] ptr The location at which to store the resulting value."]
+    #[doc = " \\param [in] size The size in bytes of the container to which \\a ptr points."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE context is not a valid <tt>\\ref vx_context</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS If any of the other parameters are incorrect."]
+    #[doc = " \\retval VX_ERROR_NOT_SUPPORTED If the attribute is not supported on this implementation."]
+    #[doc = " \\ingroup group_context"]
+    pub fn vxQueryContext(
+        context: vx_context,
+        attribute: vx_enum,
+        ptr: *mut ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Sets an attribute on the context."]
+    #[doc = " \\param [in] context The handle to the overall context."]
+    #[doc = " \\param [in] attribute The attribute to set from <tt>\\ref vx_context_attribute_e</tt>."]
+    #[doc = " \\param [in] ptr The pointer to the data to which to set the attribute."]
+    #[doc = " \\param [in] size The size in bytes of the data to which \\a ptr points."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE context is not a valid <tt>\\ref vx_context</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS If any of the other parameters are incorrect."]
+    #[doc = " \\retval VX_ERROR_NOT_SUPPORTED If the attribute is not settable."]
+    #[doc = " \\ingroup group_context"]
+    pub fn vxSetContextAttribute(
+        context: vx_context,
+        attribute: vx_enum,
+        ptr: *const ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Provides a generic API to give platform-specific hints to the implementation."]
+    #[doc = " \\param [in] reference The reference to the object to hint at."]
+    #[doc = " This could be <tt>\\ref vx_context</tt>, <tt>\\ref vx_graph</tt>, <tt>\\ref vx_node</tt>, <tt>\\ref vx_image</tt>, <tt>\\ref vx_array</tt>, or any other reference."]
+    #[doc = " \\param [in] hint A <tt>\\ref vx_hint_e</tt> \\a hint to give to a \\ref vx_context. This is a platform-specific optimization or implementation mechanism."]
+    #[doc = " \\param [in] data Optional vendor specific data."]
+    #[doc = " \\param [in] data_size Size of the data structure \\p data."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE reference is not a valid <tt>\\ref vx_reference</tt> reference."]
+    #[doc = " \\retval VX_ERROR_NOT_SUPPORTED If the hint is not supported."]
+    #[doc = " \\ingroup group_hint"]
+    pub fn vxHint(
+        reference: vx_reference,
+        hint: vx_enum,
+        data: *const ::std::os::raw::c_void,
+        data_size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Provides a generic API to give platform-specific directives to the implementations."]
+    #[doc = " \\param [in] reference The reference to the object to set the directive on."]
+    #[doc = " This could be <tt>\\ref vx_context</tt>, <tt>\\ref vx_graph</tt>, <tt>\\ref vx_node</tt>, <tt>\\ref vx_image</tt>, <tt>\\ref vx_array</tt>, or any other reference."]
+    #[doc = " \\param [in] directive The directive to set. See <tt>\\ref vx_directive_e</tt>."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE reference is not a valid <tt>\\ref vx_reference</tt> reference."]
+    #[doc = " \\retval VX_ERROR_NOT_SUPPORTED If the directive is not supported."]
+    #[doc = " \\note The performance counter directives are only available for the reference \\ref vx_context."]
+    #[doc = "       Error VX_ERROR_NOT_SUPPORTED is returned when used with any other reference."]
+    #[doc = " \\ingroup group_directive"]
+    pub fn vxDirective(reference: vx_reference, directive: vx_enum) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Provides a generic API to return status values from Object constructors if they"]
+    #[doc = " fail."]
+    #[doc = " \\note Users do not need to strictly check every object creator as the errors"]
+    #[doc = " should properly propagate and be detected during verification time or run-time."]
+    #[doc = " \\code"]
+    #[doc = " vx_image img = vxCreateImage(context, 639, 480, VX_DF_IMAGE_UYVY);"]
+    #[doc = " vx_status status = vxGetStatus((vx_reference)img);"]
+    #[doc = " // status == VX_ERROR_INVALID_DIMENSIONS"]
+    #[doc = " vxReleaseImage(&img);"]
+    #[doc = " \\endcode"]
+    #[doc = " \\pre Appropriate Object Creator function."]
+    #[doc = " \\post Appropriate Object Release function."]
+    #[doc = " \\param [in] reference The reference to check for construction errors."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval * Some error occurred, please check enumeration list and constructor."]
+    #[doc = " \\ingroup group_basic_features"]
+    pub fn vxGetStatus(reference: vx_reference) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Registers user-defined structures to the context."]
+    #[doc = " \\param [in] context  The reference to the implementation context."]
+    #[doc = " \\param [in] size     The size of user struct in bytes."]
+    #[doc = " \\return A <tt>\\ref vx_enum</tt> value that is a type given to the User"]
+    #[doc = " to refer to their custom structure when declaring a <tt>\\ref vx_array</tt>"]
+    #[doc = " of that structure."]
+    #[doc = " \\retval VX_TYPE_INVALID If the namespace of types has been exhausted."]
+    #[doc = " \\note This call should only be used once within the lifetime of a context for"]
+    #[doc = " a specific structure."]
+    #[doc = " \\ingroup group_adv_array"]
+    pub fn vxRegisterUserStruct(context: vx_context, size: vx_size) -> vx_enum;
+}
+extern "C" {
+    #[doc = " \\brief Registers user-defined structures to the context, and associates a name to it."]
+    #[doc = " \\param [in] context     The reference to the implementation context."]
+    #[doc = " \\param [in] size        The size of user struct in bytes."]
+    #[doc = " \\param [in] *type_name  Pointer to the '\\0' terminated string that identifies the"]
+    #[doc = "                         user struct type. The string is copied by the function so"]
+    #[doc = "                         that it stays the property of the caller. NULL means that"]
+    #[doc = "                         the user struct is not named. The length of the string"]
+    #[doc = "                         shall be lower than VX_MAX_REFERENCE_NAME bytes."]
+    #[doc = " \\return A <tt>\\ref vx_enum</tt> value that is a type given to the User"]
+    #[doc = " to refer to their custom structure when declaring a <tt>\\ref vx_array</tt>"]
+    #[doc = " of that structure."]
+    #[doc = " \\retval VX_TYPE_INVALID If the namespace of types has been exhausted."]
+    #[doc = " \\note This call should only be used once within the lifetime of a context for"]
+    #[doc = " a specific structure."]
+    #[doc = " \\ingroup group_adv_array"]
+    pub fn vxRegisterUserStructWithName(
+        context: vx_context,
+        size: vx_size,
+        type_name: *const vx_char,
+    ) -> vx_enum;
+}
+extern "C" {
+    #[doc = " \\brief Returns the name of the user-defined structure associated with the enumeration given."]
+    #[doc = " \\param [in] context     The reference to the implementation context."]
+    #[doc = " \\param [in] type_name   The enumeration value of the user struct"]
+    #[doc = " \\param [out] name_size  Name of the user struct"]
+    #[doc = " \\param [in] name_size   The size of allocated buffer pointed to by type_name"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS user_struct_type was valid, and name was found and returned"]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS user_struct_type was not a valid user struct enumeration."]
+    #[doc = " \\retval VX_ERROR_NO_MEMORY name_size is too small to hold the name of the user struct type."]
+    #[doc = " \\retval VX_FAILURE user_struct_type does not have an associated type name."]
+    #[doc = " \\pre <tt>\\ref vxRegisterUserStructWithName</tt> should be called for this user struct."]
+    #[doc = " \\ingroup group_adv_array"]
+    pub fn vxGetUserStructNameByEnum(
+        context: vx_context,
+        user_struct_type: vx_enum,
+        type_name: *mut vx_char,
+        name_size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Returns the enum of the user-defined structure associated with the name given"]
+    #[doc = " \\param [in] context           The reference to the implementation context."]
+    #[doc = " \\param [in] type_name         Pointer to the '\\0' terminated string that identifies the user"]
+    #[doc = "                               struct type. The length of the string shall be lower than VX_MAX_REFERENCE_NAME bytes."]
+    #[doc = " \\param [out] user_struct_type The enumeration value of the user struct"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS type_name was valid, and enumeration was found and returned"]
+    #[doc = " \\retval VX_FAILURE type_name does not match any user struct enumeration."]
+    #[doc = " \\pre <tt>\\ref vxRegisterUserStructWithName</tt> should be called for this user struct."]
+    #[doc = " \\ingroup group_adv_array"]
+    pub fn vxGetUserStructEnumByName(
+        context: vx_context,
+        type_name: *const vx_char,
+        user_struct_type: *mut vx_enum,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allocates and registers user-defined kernel enumeration to a context."]
+    #[doc = " The allocated enumeration is from available pool of 4096 enumerations reserved"]
+    #[doc = " for dynamic allocation from VX_KERNEL_BASE(VX_ID_USER,0)."]
+    #[doc = " \\param [in] context  The reference to the implementation context."]
+    #[doc = " \\param [out] pKernelEnumId  pointer to return <tt>\\ref vx_enum</tt> for user-defined kernel."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE If the context is not a valid <tt>\\ref vx_context</tt> reference."]
+    #[doc = " \\retval VX_ERROR_NO_RESOURCES The enumerations has been exhausted."]
+    #[doc = " \\ingroup group_user_kernels"]
+    pub fn vxAllocateUserKernelId(context: vx_context, pKernelEnumId: *mut vx_enum) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allocates and registers user-defined kernel library ID to a context."]
+    #[doc = ""]
+    #[doc = " The allocated library ID is from available pool of library IDs (1..255)"]
+    #[doc = " reserved for dynamic allocation. The returned libraryId can be used by"]
+    #[doc = " user-kernel library developer to specify individual kernel enum IDs in"]
+    #[doc = " a header file, shown below:"]
+    #[doc = " \\code"]
+    #[doc = " #define MY_KERNEL_ID1(libraryId) (VX_KERNEL_BASE(VX_ID_USER,libraryId) + 0);"]
+    #[doc = " #define MY_KERNEL_ID2(libraryId) (VX_KERNEL_BASE(VX_ID_USER,libraryId) + 1);"]
+    #[doc = " #define MY_KERNEL_ID3(libraryId) (VX_KERNEL_BASE(VX_ID_USER,libraryId) + 2);"]
+    #[doc = " \\endcode"]
+    #[doc = " \\param [in] context  The reference to the implementation context."]
+    #[doc = " \\param [out] pLibraryId  pointer to <tt>\\ref vx_enum</tt> for user-kernel libraryId."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_NO_RESOURCES The enumerations has been exhausted."]
+    #[doc = " \\ingroup group_user_kernels"]
+    pub fn vxAllocateUserKernelLibraryId(
+        context: vx_context,
+        pLibraryId: *mut vx_enum,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Sets the default target of the immediate mode. Upon successful execution of this"]
+    #[doc = " function any future execution of immediate mode function is attempted on the new default"]
+    #[doc = " target of the context."]
+    #[doc = " \\param [in] context  The reference to the implementation context."]
+    #[doc = " \\param [in] target_enum  The default immediate mode target enum to be set"]
+    #[doc = " to the <tt>\\ref vx_context</tt> object. Use a <tt>\\ref vx_target_e</tt>."]
+    #[doc = " \\param [in] target_string  The target name ASCII string. This contains a valid value"]
+    #[doc = " when target_enum is set to <tt>\\ref VX_TARGET_STRING</tt>, otherwise it is ignored."]
+    #[doc = " \\ingroup group_context"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Default target set; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE If the context is not a valid <tt>\\ref vx_context</tt> reference."]
+    #[doc = " \\retval VX_ERROR_NOT_SUPPORTED If the specified target is not supported in this context."]
+    pub fn vxSetImmediateModeTarget(
+        context: vx_context,
+        target_enum: vx_enum,
+        target_string: *const ::std::os::raw::c_char,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Creates an opaque reference to an image buffer."]
+    #[doc = " \\details Not guaranteed to exist until the <tt>\\ref vx_graph</tt> containing it has been verified."]
+    #[doc = " \\param [in] context The reference to the implementation context."]
+    #[doc = " \\param [in] width The image width in pixels. The image in the formats of"]
+    #[doc = " <tt>\\ref VX_DF_IMAGE_NV12</tt>, <tt>\\ref VX_DF_IMAGE_NV21</tt>, <tt>\\ref VX_DF_IMAGE_IYUV</tt>,"]
+    #[doc = " <tt>\\ref VX_DF_IMAGE_UYVY</tt>, <tt>\\ref VX_DF_IMAGE_YUYV</tt> must have even width."]
+    #[doc = " \\param [in] height The image height in pixels. The image in the formats of"]
+    #[doc = " <tt>\\ref VX_DF_IMAGE_NV12</tt>, <tt>\\ref VX_DF_IMAGE_NV21</tt>, <tt>\\ref VX_DF_IMAGE_IYUV</tt>"]
+    #[doc = " must have even height."]
+    #[doc = " \\param [in] color The VX_DF_IMAGE (<tt>\\ref vx_df_image_e</tt>) code that represents the format"]
+    #[doc = " of the image and the color space."]
+    #[doc = " \\returns An image reference <tt>\\ref vx_image</tt>. Any possible errors preventing a successful"]
+    #[doc = " creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\see vxMapImagePatch to obtain direct memory access to the image data."]
+    #[doc = " \\ingroup group_image"]
+    pub fn vxCreateImage(
+        context: vx_context,
+        width: vx_uint32,
+        height: vx_uint32,
+        color: vx_df_image,
+    ) -> vx_image;
+}
+extern "C" {
+    #[doc = " \\brief Creates an image from another image given a rectangle. This second"]
+    #[doc = " reference refers to the data in the original image. Updates to this image"]
+    #[doc = " updates the parent image. The rectangle must be defined within the pixel space"]
+    #[doc = " of the parent image."]
+    #[doc = " \\param [in] img The reference to the parent image."]
+    #[doc = " \\param [in] rect The region of interest rectangle. Must contain points within"]
+    #[doc = " the parent image pixel space."]
+    #[doc = " \\returns An image reference <tt>\\ref vx_image</tt> to the sub-image. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_image"]
+    pub fn vxCreateImageFromROI(img: vx_image, rect: *const vx_rectangle_t) -> vx_image;
+}
+extern "C" {
+    #[doc = " \\brief Creates a reference to an image object that has a singular,"]
+    #[doc = " uniform value in all pixels. The uniform image created is read-only."]
+    #[doc = " \\param [in] context The reference to the implementation context."]
+    #[doc = " \\param [in] width The image width in pixels. The image in the formats of"]
+    #[doc = " <tt>\\ref VX_DF_IMAGE_NV12</tt>, <tt>\\ref VX_DF_IMAGE_NV21</tt>, <tt>\\ref VX_DF_IMAGE_IYUV</tt>,"]
+    #[doc = " <tt>\\ref VX_DF_IMAGE_UYVY</tt>, <tt>\\ref VX_DF_IMAGE_YUYV</tt> must have even width."]
+    #[doc = " \\param [in] height The image height in pixels. The image in the formats of"]
+    #[doc = " <tt>\\ref VX_DF_IMAGE_NV12</tt>, <tt>\\ref VX_DF_IMAGE_NV21</tt>,"]
+    #[doc = " <tt>\\ref VX_DF_IMAGE_IYUV</tt> must have even height."]
+    #[doc = " \\param [in] color The VX_DF_IMAGE (\\ref vx_df_image_e) code that represents the format of the image and the color space."]
+    #[doc = " \\param [in] value The pointer to the pixel value to which to set all pixels. See <tt>\\ref vx_pixel_value_t</tt>."]
+    #[doc = " \\returns An image reference <tt>\\ref vx_image</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " <tt>\\see vxMapImagePatch</tt> to obtain direct memory access to the image data."]
+    #[doc = " \\note <tt>\\ref vxMapImagePatch</tt> and <tt>\\ref vxUnmapImagePatch</tt> may be called with"]
+    #[doc = " a uniform image reference."]
+    #[doc = " \\ingroup group_image"]
+    pub fn vxCreateUniformImage(
+        context: vx_context,
+        width: vx_uint32,
+        height: vx_uint32,
+        color: vx_df_image,
+        value: *const vx_pixel_value_t,
+    ) -> vx_image;
+}
+extern "C" {
+    #[doc = " \\brief Creates an opaque reference to an image buffer with no direct"]
+    #[doc = " user access. This function allows setting the image width, height, or format."]
+    #[doc = " \\details Virtual data objects allow users to connect various nodes within a"]
+    #[doc = " graph via data references without access to that data, but they also permit the"]
+    #[doc = " implementation to take maximum advantage of possible optimizations. Use this"]
+    #[doc = " API to create a data reference to link two or more nodes together when the"]
+    #[doc = " intermediate data are not required to be accessed by outside entities. This API"]
+    #[doc = " in particular allows the user to define the image format of the data without"]
+    #[doc = " requiring the exact dimensions. Virtual objects are scoped within the graph"]
+    #[doc = " they are declared a part of, and can't be shared outside of this scope."]
+    #[doc = " All of the following constructions of virtual images are valid."]
+    #[doc = " \\code"]
+    #[doc = " vx_context context = vxCreateContext();"]
+    #[doc = " vx_graph graph = vxCreateGraph(context);"]
+    #[doc = " vx_image virt[] = {"]
+    #[doc = "     vxCreateVirtualImage(graph, 0, 0, VX_DF_IMAGE_U8), // no specified dimension"]
+    #[doc = "     vxCreateVirtualImage(graph, 320, 240, VX_DF_IMAGE_VIRT), // no specified format"]
+    #[doc = "     vxCreateVirtualImage(graph, 640, 480, VX_DF_IMAGE_U8), // no user access"]
+    #[doc = " };"]
+    #[doc = " \\endcode"]
+    #[doc = " \\param [in] graph The reference to the parent graph."]
+    #[doc = " \\param [in] width The width of the image in pixels. A value of zero informs the interface"]
+    #[doc = " that the value is unspecified. The image in the formats of <tt>\\ref VX_DF_IMAGE_NV12</tt>,"]
+    #[doc = " <tt>\\ref VX_DF_IMAGE_NV21</tt>, <tt>\\ref VX_DF_IMAGE_IYUV</tt>, <tt>\\ref VX_DF_IMAGE_UYVY</tt>,"]
+    #[doc = " <tt>\\ref VX_DF_IMAGE_YUYV</tt> must have even width."]
+    #[doc = " \\param [in] height The height of the image in pixels. A value of zero informs the interface"]
+    #[doc = " that the value is unspecified. The image in the formats of <tt>\\ref VX_DF_IMAGE_NV12</tt>,"]
+    #[doc = " <tt>\\ref VX_DF_IMAGE_NV21</tt>, <tt>\\ref VX_DF_IMAGE_IYUV</tt> must have even height."]
+    #[doc = " \\param [in] color The VX_DF_IMAGE (<tt>\\ref vx_df_image_e</tt>) code that represents the format"]
+    #[doc = " of the image and the color space. A value of <tt>\\ref VX_DF_IMAGE_VIRT</tt> informs the"]
+    #[doc = " interface that the format is unspecified."]
+    #[doc = " \\returns An image reference <tt>\\ref vx_image</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\note Passing this reference to <tt>\\ref vxMapImagePatch</tt> will return an error."]
+    #[doc = " \\ingroup group_image"]
+    pub fn vxCreateVirtualImage(
+        graph: vx_graph,
+        width: vx_uint32,
+        height: vx_uint32,
+        color: vx_df_image,
+    ) -> vx_image;
+}
+extern "C" {
+    #[doc = " \\brief Creates a reference to an image object that was externally allocated."]
+    #[doc = " \\param [in] context The reference to the implementation context."]
+    #[doc = " \\param [in] color See the <tt>\\ref vx_df_image_e</tt> codes. This mandates the"]
+    #[doc = " number of planes needed to be valid in the \\a addrs and \\a ptrs arrays based on the format given."]
+    #[doc = " \\param [in] addrs[] The array of image patch addressing structures that"]
+    #[doc = " define the dimension and stride of the array of pointers. See note below."]
+    #[doc = " \\param [in] ptrs[] The array of platform-defined references to each plane. See note below."]
+    #[doc = " \\param [in] memory_type <tt>\\ref vx_memory_type_e</tt>. When giving <tt>\\ref VX_MEMORY_TYPE_HOST</tt>"]
+    #[doc = " the \\a ptrs array is assumed to be HOST accessible pointers to memory."]
+    #[doc = " \\returns An image reference <tt>\\ref vx_image</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\note The user must call vxMapImagePatch prior to accessing the pixels of an image, even if the"]
+    #[doc = " image was created via <tt>\\ref vxCreateImageFromHandle</tt>. Reads or writes to memory referenced"]
+    #[doc = " by ptrs[ ] after calling <tt>\\ref vxCreateImageFromHandle</tt> without first calling"]
+    #[doc = " <tt>\\ref vxMapImagePatch</tt> will result in undefined behavior."]
+    #[doc = " The property of addr[] and ptrs[] arrays is kept by the caller (It means that the implementation will"]
+    #[doc = " make an internal copy of the provided information. \\a addr and \\a ptrs can then simply be application's"]
+    #[doc = " local variables)."]
+    #[doc = " Only \\a dim_x, \\a dim_y, \\a stride_x and \\a stride_y fields of the <tt>\\ref vx_imagepatch_addressing_t</tt> need to be"]
+    #[doc = " provided by the application. Other fields (\\a step_x, \\a step_y, \\a scale_x & \\a scale_y) are ignored by this function."]
+    #[doc = " The layout of the imported memory must follow a row-major order. In other words, \\a stride_x should be"]
+    #[doc = " sufficiently large so that there is no overlap between data elements corresponding to different"]
+    #[doc = " pixels, and \\a stride_y >= \\a stride_x * \\a dim_x."]
+    #[doc = ""]
+    #[doc = " In order to release the image back to the application we should use <tt>\\ref vxSwapImageHandle</tt>."]
+    #[doc = " An exception is for <tt>\\ref VX_DF_IMAGE_U1</tt> images where \\a stride_x == 0 and instead"]
+    #[doc = " \\a stride_y >= &lceil;\\a dim_x / 8&rceil;."]
+    #[doc = ""]
+    #[doc = " Import type of the created image is available via the image attribute <tt>\\ref vx_image_attribute_e</tt> parameter."]
+    #[doc = ""]
+    #[doc = " \\ingroup group_image"]
+    pub fn vxCreateImageFromHandle(
+        context: vx_context,
+        color: vx_df_image,
+        addrs: *const vx_imagepatch_addressing_t,
+        ptrs: *const *mut ::std::os::raw::c_void,
+        memory_type: vx_enum,
+    ) -> vx_image;
+}
+extern "C" {
+    #[doc = " \\brief Swaps the image handle of an image previously created from handle."]
+    #[doc = ""]
+    #[doc = " This function sets the new image handle (i.e. pointer to all image planes)"]
+    #[doc = " and returns the previous one."]
+    #[doc = ""]
+    #[doc = " Once this function call has completed, the application gets back the"]
+    #[doc = " ownership of the memory referenced by the previous handle. This memory"]
+    #[doc = " contains up-to-date pixel data, and the application can safely reuse or"]
+    #[doc = " release it."]
+    #[doc = ""]
+    #[doc = " The memory referenced by the new handle must have been allocated"]
+    #[doc = " consistently with the image properties since the import type,"]
+    #[doc = " memory layout and dimensions are unchanged (see addrs, color, and"]
+    #[doc = " memory_type in <tt>\\ref vxCreateImageFromHandle</tt>)."]
+    #[doc = ""]
+    #[doc = " All images created from ROI or channel with this image as parent or ancestor"]
+    #[doc = " will automatically use the memory referenced by the new handle."]
+    #[doc = ""]
+    #[doc = " The behavior of <tt>\\ref vxSwapImageHandle</tt> when called from a user node is undefined."]
+    #[doc = " \\param [in] image The reference to an image created from handle"]
+    #[doc = " \\param [in] new_ptrs[] pointer to a caller owned array that contains"]
+    #[doc = " the new image handle (image plane pointers)"]
+    #[doc = " \\arg new_ptrs is non NULL. new_ptrs[i] must be non NULL for each i such as"]
+    #[doc = " 0 < i < nbPlanes, otherwise, this is an error. The address of the storage memory"]
+    #[doc = " for image plane i is set to new_ptrs[i]"]
+    #[doc = " \\arg new_ptrs is NULL: the previous image storage memory is reclaimed by the"]
+    #[doc = " caller, while no new handle is provided."]
+    #[doc = " \\param [out] prev_ptrs[] pointer to a caller owned array in which"]
+    #[doc = " the application returns the previous image handle"]
+    #[doc = " \\arg prev_ptrs is non NULL. prev_ptrs must have at least as many"]
+    #[doc = " elements as the number of image planes. For each i such as"]
+    #[doc = " 0 < i < nbPlanes , prev_ptrs[i] is set to the address of the previous storage"]
+    #[doc = " memory for plane i."]
+    #[doc = " \\arg prev_ptrs NULL: the previous handle is not returned."]
+    #[doc = " \\param [in] num_planes Number of planes in the image. This must be set equal to the number of planes of the input image."]
+    #[doc = "  The number of elements in new_ptrs and prev_ptrs arrays must be equal to or greater than num_planes."]
+    #[doc = " If either array has more than num_planes elements, the extra elements are ignored. If either array is smaller"]
+    #[doc = " than num_planes, the results are undefined."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE image is not a valid <tt>\\ref vx_image</tt> reference."]
+    #[doc = " reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS The image was not created from handle or"]
+    #[doc = " the content of new_ptrs is not valid."]
+    #[doc = " \\retval VX_FAILURE The image was already being accessed."]
+    #[doc = " \\ingroup group_image"]
+    pub fn vxSwapImageHandle(
+        image: vx_image,
+        new_ptrs: *const *mut ::std::os::raw::c_void,
+        prev_ptrs: *mut *mut ::std::os::raw::c_void,
+        num_planes: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Retrieves various attributes of an image."]
+    #[doc = " \\param [in] image The reference to the image to query."]
+    #[doc = " \\param [in] attribute The attribute to query. Use a <tt>\\ref vx_image_attribute_e</tt>."]
+    #[doc = " \\param [out] ptr The location at which to store the resulting value."]
+    #[doc = " \\param [in] size The size in bytes of the container to which \\a ptr points."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE image is not a valid <tt>\\ref vx_image</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS If any of the other parameters are incorrect."]
+    #[doc = " \\retval VX_ERROR_NOT_SUPPORTED If the attribute is not supported on this implementation."]
+    #[doc = " \\ingroup group_image"]
+    pub fn vxQueryImage(
+        image: vx_image,
+        attribute: vx_enum,
+        ptr: *mut ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allows setting attributes on the image."]
+    #[doc = " \\param [in] image The reference to the image on which to set the attribute."]
+    #[doc = " \\param [in] attribute The attribute to set. Use a <tt>\\ref vx_image_attribute_e</tt> enumeration."]
+    #[doc = " \\param [in] ptr The pointer to the location from which to read the value."]
+    #[doc = " \\param [in] size The size in bytes of the object pointed to by \\a ptr."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE image is not a valid <tt>\\ref vx_image</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS If any of the other parameters are incorrect."]
+    #[doc = " \\ingroup group_image"]
+    pub fn vxSetImageAttribute(
+        image: vx_image,
+        attribute: vx_enum,
+        ptr: *const ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Initialize an image with the given pixel value."]
+    #[doc = " \\param [in] image The reference to the image to initialize."]
+    #[doc = " \\param [in] pixel_value The pointer to the constant pixel value to initialize all image pixels. See <tt>\\ref vx_pixel_value_t</tt>."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE If the image is a uniform image, a virtual image, or not a <tt>\\ref vx_image</tt>."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS If any of the other parameters are incorrect."]
+    #[doc = " \\note All pixels of the entire image are initialized to the indicated pixel value, independently from the valid region."]
+    #[doc = " The valid region of the image is unaffected by this function. The image remains mutable after the call to this function,"]
+    #[doc = " so its pixels and mutable attributes may be changed by subsequent functions."]
+    #[doc = " \\ingroup group_image"]
+    pub fn vxSetImagePixelValues(
+        image: vx_image,
+        pixel_value: *const vx_pixel_value_t,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Releases a reference to an image object."]
+    #[doc = " The object may not be garbage collected until its total reference count is zero."]
+    #[doc = ""]
+    #[doc = " An implementation may defer the actual object destruction after its total"]
+    #[doc = " reference count is zero (potentially until context destruction). Thus,"]
+    #[doc = " releasing an image created from handle"]
+    #[doc = " (see <tt>\\ref vxCreateImageFromHandle</tt>) and all others objects that may"]
+    #[doc = " reference it (nodes, ROI, or channel for instance) are not sufficient to get back the"]
+    #[doc = " ownership of the memory referenced by the current image handle. The only way"]
+    #[doc = " for this is to call <tt>\\ref vxSwapImageHandle</tt>) before releasing the"]
+    #[doc = " image."]
+    #[doc = ""]
+    #[doc = " \\param [in] image The pointer to the image to release."]
+    #[doc = " \\post After returning from this function the reference is zeroed."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE image is not a valid <tt>\\ref vx_image</tt> reference."]
+    #[doc = " \\ingroup group_image"]
+    pub fn vxReleaseImage(image: *mut vx_image) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Accesses a specific indexed pixel in an image patch."]
+    #[doc = " \\param [in] ptr The base pointer of the patch as returned from <tt>\\ref vxMapImagePatch</tt>."]
+    #[doc = " \\param [in] index The 0 based index of the pixel count in the patch. Indexes increase horizontally by 1 then wrap around to the next row."]
+    #[doc = " \\param [in] addr The pointer to the addressing mode information returned from <tt>\\ref vxMapImagePatch</tt>."]
+    #[doc = " \\return void * Returns the pointer to the specified pixel."]
+    #[doc = " \\pre <tt>\\ref vxMapImagePatch</tt>"]
+    #[doc = " \\note Some special restrictions apply to <tt>\\ref VX_DF_IMAGE_U1</tt> images."]
+    #[doc = " \\ingroup group_image"]
+    pub fn vxFormatImagePatchAddress1d(
+        ptr: *mut ::std::os::raw::c_void,
+        index: vx_uint32,
+        addr: *const vx_imagepatch_addressing_t,
+    ) -> *mut ::std::os::raw::c_void;
+}
+extern "C" {
+    #[doc = " \\brief Accesses a specific pixel at a 2d coordinate in an image patch."]
+    #[doc = " \\param [in] ptr The base pointer of the patch as returned from <tt>\\ref vxMapImagePatch</tt>."]
+    #[doc = " \\param [in] x The x dimension within the patch."]
+    #[doc = " \\param [in] y The y dimension within the patch."]
+    #[doc = " \\param [in] addr The pointer to the addressing mode information returned from <tt>\\ref vxMapImagePatch</tt>."]
+    #[doc = " \\return void * Returns the pointer to the specified pixel."]
+    #[doc = " \\pre <tt>\\ref vxMapImagePatch</tt>"]
+    #[doc = " \\note Some special restrictions apply to <tt>\\ref VX_DF_IMAGE_U1</tt> images."]
+    #[doc = " \\ingroup group_image"]
+    pub fn vxFormatImagePatchAddress2d(
+        ptr: *mut ::std::os::raw::c_void,
+        x: vx_uint32,
+        y: vx_uint32,
+        addr: *const vx_imagepatch_addressing_t,
+    ) -> *mut ::std::os::raw::c_void;
+}
+extern "C" {
+    #[doc = " \\brief Retrieves the valid region of the image as a rectangle."]
+    #[doc = " \\param [in] image The image from which to retrieve the valid region."]
+    #[doc = " \\param [out] rect The destination rectangle."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE image is not a valid <tt>\\ref vx_image</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS Invalid rect."]
+    #[doc = " \\note This rectangle can be passed directly to <tt>\\ref vxMapImagePatch</tt> to get"]
+    #[doc = " the full valid region of the image."]
+    #[doc = " \\note Some special restrictions apply to <tt>\\ref VX_DF_IMAGE_U1</tt> images."]
+    #[doc = " \\ingroup group_image"]
+    pub fn vxGetValidRegionImage(image: vx_image, rect: *mut vx_rectangle_t) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allows the application to copy a rectangular patch from/into an image object plane."]
+    #[doc = " \\param [in] image The reference to the image object that is the source or the"]
+    #[doc = " destination of the copy."]
+    #[doc = " \\param [in] image_rect The coordinates of the image patch. The patch must be within"]
+    #[doc = " the bounds of the image. (start_x, start_y) gives the coordinates of the topleft"]
+    #[doc = " pixel inside the patch, while (end_x, end_y) gives the coordinates of the bottomright"]
+    #[doc = " element out of the patch. Must be 0 <= start < end <= number of pixels in the image dimension."]
+    #[doc = " \\param [in] image_plane_index The plane index of the image object that is the source or the"]
+    #[doc = " destination of the patch copy."]
+    #[doc = " \\param [in] user_addr The address of a structure describing the layout of the"]
+    #[doc = " user memory location pointed by user_ptr. In the structure, only dim_x, dim_y,"]
+    #[doc = " stride_x and stride_y fields must be provided, other fields are ignored by the function."]
+    #[doc = " The layout of the user memory must follow a row major order:"]
+    #[doc = " stride_x >= pixel size in bytes, and stride_y >= stride_x * dim_x."]
+    #[doc = " \\param [in] user_ptr The address of the memory location where to store the requested data"]
+    #[doc = " if the copy was requested in read mode, or from where to get the data to store into the image"]
+    #[doc = " object if the copy was requested in write mode. The accessible memory must be large enough"]
+    #[doc = " to contain the specified patch with the specified layout:"]
+    #[doc = " accessible memory in bytes >= (end_y - start_y) * stride_y."]
+    #[doc = " \\param [in] usage This declares the effect of the copy with regard to the image object"]
+    #[doc = " using the <tt>\\ref vx_accessor_e</tt> enumeration. For uniform images, only VX_READ_ONLY"]
+    #[doc = " is supported. For other images, Only <tt>\\ref VX_READ_ONLY</tt> and <tt>\\ref VX_WRITE_ONLY</tt> are supported:"]
+    #[doc = " \\arg <tt>\\ref VX_READ_ONLY</tt> means that data is copied from the image object into the application memory"]
+    #[doc = " \\arg <tt>\\ref VX_WRITE_ONLY</tt> means that data is copied into the image object from the application memory"]
+    #[doc = " \\param [in] user_mem_type A <tt>\\ref vx_memory_type_e</tt> enumeration that specifies"]
+    #[doc = " the memory type of the memory referenced by the user_addr."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_OPTIMIZED_AWAY This is a reference to a virtual image that cannot be"]
+    #[doc = " accessed by the application."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE image is not a valid <tt>\\ref vx_image</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS An other parameter is incorrect."]
+    #[doc = " \\note The application may ask for data outside the bounds of the valid region, but"]
+    #[doc = " such data has an undefined value."]
+    #[doc = " \\note Some special restrictions apply to <tt>\\ref VX_DF_IMAGE_U1</tt> images."]
+    #[doc = " \\ingroup group_image"]
+    pub fn vxCopyImagePatch(
+        image: vx_image,
+        image_rect: *const vx_rectangle_t,
+        image_plane_index: vx_uint32,
+        user_addr: *const vx_imagepatch_addressing_t,
+        user_ptr: *mut ::std::os::raw::c_void,
+        usage: vx_enum,
+        user_mem_type: vx_enum,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allows the application to get direct access to a rectangular patch of an image object plane."]
+    #[doc = " \\param [in] image The reference to the image object that contains the patch to map."]
+    #[doc = " \\param [in] rect The coordinates of image patch. The patch must be within the"]
+    #[doc = " bounds of the image. (start_x, start_y) gives the coordinate of the topleft"]
+    #[doc = " element inside the patch, while (end_x, end_y) give the coordinate of"]
+    #[doc = " the bottomright element out of the patch. Must be 0 <= start < end."]
+    #[doc = " \\param [in] plane_index The plane index of the image object to be accessed."]
+    #[doc = " \\param [out] map_id The address of a <tt>\\ref vx_map_id</tt> variable where the function"]
+    #[doc = " returns a map identifier."]
+    #[doc = " \\arg (*map_id) must eventually be provided as the map_id parameter of a call to"]
+    #[doc = " <tt>\\ref vxUnmapImagePatch</tt>."]
+    #[doc = " \\param [out] addr The address of a <tt>\\ref vx_imagepatch_addressing_t</tt> structure"]
+    #[doc = " describing the memory layout of the image patch to access. The function fills the"]
+    #[doc = " structure pointed by addr with the layout information that the application must"]
+    #[doc = " consult to access the pixel data at address (*ptr). The layout of the mapped memory"]
+    #[doc = " follows a row-major order: stride_x>0, stride_y>0 and stride_y >= stride_x * dim_x."]
+    #[doc = " An exception is for <tt>\\ref VX_DF_IMAGE_U1</tt> where \\a stride_x == 0,"]
+    #[doc = " _stride_x_bits_ > 0 and _stride_y_ {geq} (_stride_x_bits_ * _dim_x_ + 7) / 8"]
+    #[doc = " (i.e., at least the number of bytes needed to hold _dim_x_ pixels)."]
+    #[doc = " If the image object being accessed was created via"]
+    #[doc = " <tt>\\ref vxCreateImageFromHandle</tt>, then the returned memory layout will be"]
+    #[doc = " the identical to that of the addressing structure provided when"]
+    #[doc = " <tt>\\ref vxCreateImageFromHandle</tt> was called."]
+    #[doc = " \\param [out] ptr The address of a pointer that the function sets to the"]
+    #[doc = " address where the requested data can be accessed. This returned (*ptr) address"]
+    #[doc = " is only valid between the call to this function and the corresponding call to"]
+    #[doc = " <tt>\\ref vxUnmapImagePatch</tt>."]
+    #[doc = " If image was created via <tt>\\ref vxCreateImageFromHandle</tt> then the returned"]
+    #[doc = " address (*ptr) will be the address of the patch in the original pixel buffer"]
+    #[doc = " provided when image was created."]
+    #[doc = " \\param [in] usage This declares the access mode for the image patch, using"]
+    #[doc = " the <tt>\\ref vx_accessor_e</tt> enumeration. For uniform images, only VX_READ_ONLY"]
+    #[doc = " is supported."]
+    #[doc = " \\arg <tt>\\ref VX_READ_ONLY</tt>: after the function call, the content of the memory location"]
+    #[doc = " pointed by (*ptr) contains the image patch data. Writing into this memory location"]
+    #[doc = " is forbidden and its behavior is undefined."]
+    #[doc = " \\arg <tt>\\ref VX_READ_AND_WRITE</tt>: after the function call, the content of the memory"]
+    #[doc = " location pointed by (*ptr) contains the image patch data; writing into this memory"]
+    #[doc = " is allowed only for the location of pixels only and will result in a modification"]
+    #[doc = " of the written pixels in the image object once the patch is unmapped. Writing into"]
+    #[doc = " a gap between pixels (when addr->stride_x > pixel size in bytes or addr->stride_y > addr->stride_x*addr->dim_x)"]
+    #[doc = " is forbidden and its behavior is undefined."]
+    #[doc = " \\arg <tt>\\ref VX_WRITE_ONLY</tt>: after the function call, the memory location pointed by (*ptr)"]
+    #[doc = " contains undefined data; writing each pixel of the patch is required prior to"]
+    #[doc = " unmapping. Pixels not written by the application before unmap will become"]
+    #[doc = " undefined after unmap, even if they were well defined before map. Like for"]
+    #[doc = " VX_READ_AND_WRITE, writing into a gap between pixels is forbidden and its behavior"]
+    #[doc = " is undefined."]
+    #[doc = " \\param [in] mem_type A <tt>\\ref vx_memory_type_e</tt> enumeration that"]
+    #[doc = " specifies the type of the memory where the image patch is requested to be mapped."]
+    #[doc = " \\param [in] flags An integer that allows passing options to the map operation."]
+    #[doc = " Use the <tt>\\ref vx_map_flag_e</tt> enumeration."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_OPTIMIZED_AWAY This is a reference to a virtual image that cannot be"]
+    #[doc = " accessed by the application."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE image is not a valid <tt>\\ref vx_image</tt> reference."]
+    #[doc = " reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS An other parameter is incorrect."]
+    #[doc = " \\note The user may ask for data outside the bounds of the valid region, but"]
+    #[doc = " such data has an undefined value."]
+    #[doc = " \\ingroup group_image"]
+    #[doc = " \\post <tt>\\ref vxUnmapImagePatch </tt> with same (*map_id) value."]
+    pub fn vxMapImagePatch(
+        image: vx_image,
+        rect: *const vx_rectangle_t,
+        plane_index: vx_uint32,
+        map_id: *mut vx_map_id,
+        addr: *mut vx_imagepatch_addressing_t,
+        ptr: *mut *mut ::std::os::raw::c_void,
+        usage: vx_enum,
+        mem_type: vx_enum,
+        flags: vx_uint32,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Unmap and commit potential changes to a image object patch that were previously mapped."]
+    #[doc = " Unmapping an image patch invalidates the memory location from which the patch could"]
+    #[doc = " be accessed by the application. Accessing this memory location after the unmap function"]
+    #[doc = " completes has an undefined behavior."]
+    #[doc = " \\param [in] image The reference to the image object to unmap."]
+    #[doc = " \\param [out] map_id The unique map identifier that was returned by <tt>\\ref vxMapImagePatch</tt> ."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE image is not a valid <tt>\\ref vx_image</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS An other parameter is incorrect."]
+    #[doc = " \\ingroup group_image"]
+    #[doc = " \\pre <tt>\\ref vxMapImagePatch</tt> with same map_id value"]
+    pub fn vxUnmapImagePatch(image: vx_image, map_id: vx_map_id) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Create a sub-image from a single plane channel of another image."]
+    #[doc = ""]
+    #[doc = " The sub-image refers to the data in the original image. Updates to this image"]
+    #[doc = " update the parent image and reversely."]
+    #[doc = ""]
+    #[doc = " The function supports only channels that occupy an entire plane of a multi-planar"]
+    #[doc = " images, as listed below. Other cases are not supported."]
+    #[doc = "     VX_CHANNEL_Y from YUV4, IYUV, NV12, NV21"]
+    #[doc = "     VX_CHANNEL_U from YUV4, IYUV"]
+    #[doc = "     VX_CHANNEL_V from YUV4, IYUV"]
+    #[doc = ""]
+    #[doc = " \\param [in] img          The reference to the parent image."]
+    #[doc = " \\param [in] channel      The <tt>\\ref vx_channel_e</tt> channel to use."]
+    #[doc = ""]
+    #[doc = " \\returns An image reference <tt>\\ref vx_image</tt> to the sub-image. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_image"]
+    pub fn vxCreateImageFromChannel(img: vx_image, channel: vx_enum) -> vx_image;
+}
+extern "C" {
+    #[doc = " \\brief Sets the valid rectangle for an image according to a supplied rectangle."]
+    #[doc = " \\note Setting or changing the valid region from within a user node by means other than the call-back, for"]
+    #[doc = " example by calling <tt>\\ref vxSetImageValidRectangle</tt>, might result in an incorrect valid region calculation"]
+    #[doc = " by the framework."]
+    #[doc = " \\param [in] image  The reference to the image."]
+    #[doc = " \\param [in] rect   The value to be set to the image valid rectangle. A NULL indicates that the valid region is the entire image."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE image is not a valid <tt>\\ref vx_image</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS The rect does not define a proper valid rectangle."]
+    #[doc = " \\ingroup group_image"]
+    pub fn vxSetImageValidRectangle(image: vx_image, rect: *const vx_rectangle_t) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Registers a module with kernels in a context."]
+    #[doc = " \\details This function registers the appropriate publish and unpublish functions"]
+    #[doc = " with the module name if the module is not a dynamic library, so <tt>\\ref vxLoadKernels</tt> and"]
+    #[doc = " <tt>\\ref vxUnloadKernels</tt> can be called."]
+    #[doc = " \\param [in] context The reference to the context the kernels must be added to."]
+    #[doc = " \\param [in] module The short name of the module to load."]
+    #[doc = " \\param [in] publish must add kernels to the context by calling <tt>\\ref vxAddUserKernel</tt>"]
+    #[doc = " for each new kernel. It is called by <tt>\\ref vxLoadKernels</tt>."]
+    #[doc = " \\param [in] unpublish must remove kernels from the context by calling <tt>\\ref vxRemoveKernel</tt>"]
+    #[doc = " for each kernel the <tt>vxPublishKernels</tt> has added. It is called by <tt>\\ref vxUnloadKernels</tt>."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE context is not a valid <tt>\\ref vx_context</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS If any of the other parameters are incorrect."]
+    #[doc = " \\ingroup group_user_kernels"]
+    #[doc = " \\see vxLoadKernels"]
+    pub fn vxRegisterKernelLibrary(
+        context: vx_context,
+        module: *const vx_char,
+        publish: vx_publish_kernels_f,
+        unpublish: vx_unpublish_kernels_f,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Loads a library of kernels, called module, into a context."]
+    #[doc = ""]
+    #[doc = " The module must be registered by <tt>vxRegisterKernelLibrary</tt> if it is not"]
+    #[doc = " a dynamic library or the module must be a dynamic library with by convention, two exported functions"]
+    #[doc = " named <tt>vxPublishKernels</tt> and <tt>vxUnpublishKernels</tt>."]
+    #[doc = ""]
+    #[doc = " <tt>vxPublishKernels</tt> must have type <tt>\\ref vx_publish_kernels_f</tt>,"]
+    #[doc = " and must add kernels to the context by calling <tt>\\ref vxAddUserKernel</tt>"]
+    #[doc = " for each new kernel. <tt>vxPublishKernels</tt> is called by <tt>\\ref vxLoadKernels</tt>."]
+    #[doc = ""]
+    #[doc = " <tt>vxUnpublishKernels</tt> must have type <tt>\\ref vx_unpublish_kernels_f</tt>,"]
+    #[doc = " and must remove kernels from the context by calling <tt>\\ref vxRemoveKernel</tt>"]
+    #[doc = " for each kernel the <tt>vxPublishKernels</tt> has added."]
+    #[doc = " <tt>vxUnpublishKernels</tt> is called by <tt>\\ref vxUnloadKernels</tt>."]
+    #[doc = ""]
+    #[doc = " \\note When all references to loaded kernels are released, the module"]
+    #[doc = " may be automatically unloaded."]
+    #[doc = " \\param [in] context The reference to the context the kernels must be added to."]
+    #[doc = " \\param [in] module The short name of the module to load. On systems where"]
+    #[doc = " there are specific naming conventions for modules, the name passed"]
+    #[doc = " should ignore such conventions. For example: \\c libxyz.so should be"]
+    #[doc = " passed as just \\c xyz and the implementation will <i>do the right thing</i> that"]
+    #[doc = " the platform requires."]
+    #[doc = " \\note This API uses the system pre-defined paths for modules."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE context is not a valid <tt>\\ref vx_context</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS If any of the other parameters are incorrect."]
+    #[doc = " \\ingroup group_user_kernels"]
+    #[doc = " \\pre <tt>\\ref vxRegisterKernelLibrary</tt> if the module is not a dynamic library"]
+    #[doc = " \\see vxGetKernelByName"]
+    pub fn vxLoadKernels(context: vx_context, module: *const vx_char) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Unloads all kernels from the OpenVX context that had been loaded from"]
+    #[doc = " the module using the \\ref vxLoadKernels function."]
+    #[doc = ""]
+    #[doc = " The kernel unloading is performed by calling the <tt>vxUnpublishKernels</tt>"]
+    #[doc = " exported function of the module."]
+    #[doc = " \\note <tt>vxUnpublishKernels</tt> is defined in the description of"]
+    #[doc = " <tt>\\ref vxLoadKernels</tt>."]
+    #[doc = ""]
+    #[doc = " \\param [in] context The reference to the context the kernels must be removed from."]
+    #[doc = " \\param [in] module The short name of the module to unload. On systems where"]
+    #[doc = " there are specific naming conventions for modules, the name passed"]
+    #[doc = " should ignore such conventions. For example: \\c libxyz.so should be"]
+    #[doc = " passed as just \\c xyz and the implementation will <i>do the right thing</i>"]
+    #[doc = " that the platform requires."]
+    #[doc = " \\note This API uses the system pre-defined paths for modules."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE context is not a valid <tt>\\ref vx_context</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS If any of the other parameters are"]
+    #[doc = "incorrect."]
+    #[doc = " \\ingroup group_user_kernels"]
+    #[doc = " \\see vxLoadKernels"]
+    pub fn vxUnloadKernels(context: vx_context, module: *const vx_char) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Obtains a reference to a kernel using a string to specify the name."]
+    #[doc = " \\details User Kernels follow a \"dotted\" heirarchical syntax. For example:"]
+    #[doc = " \"com.company.example.xyz\". The following are strings specifying the kernel names:"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.color_convert"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.channel_extract"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.channel_combine"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.sobel_3x3"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.magnitude"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.phase"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.scale_image"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.table_lookup"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.histogram"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.equalize_histogram"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.absdiff"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.mean_stddev"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.threshold"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.integral_image"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.dilate_3x3"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.erode_3x3"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.median_3x3"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.box_3x3"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.gaussian_3x3"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.custom_convolution"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.gaussian_pyramid"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.minmaxloc"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.convertdepth"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.canny_edge_detector"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.and"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.or"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.xor"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.not"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.multiply"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.add"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.subtract"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.warp_affine"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.warp_perspective"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.harris_corners"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.fast_corners"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.optical_flow_pyr_lk"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.remap"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.halfscale_gaussian"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.laplacian_pyramid"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.laplacian_reconstruct"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.non_linear_filter"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.match_template"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.lbp"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.hough_lines_p"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.tensor_multiply"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.tensor_add"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.tensor_subtract"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.tensor_table_lookup"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.tensor_transpose"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.tensor_convert_depth"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.tensor_matrix_multiply"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.copy"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.non_max_suppression"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.scalar_operation"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.hog_features"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.hog_cells"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.bilateral_filter"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.select"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.min"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.max"]
+    #[doc = ""]
+    #[doc = " org.khronos.openvx.weighted_average"]
+    #[doc = ""]
+    #[doc = " \\param [in] context The reference to the implementation context."]
+    #[doc = " \\param [in] name The string of the name of the kernel to get."]
+    #[doc = " \\return A kernel reference. Any possible errors preventing a successful"]
+    #[doc = " completion of the function should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_kernel"]
+    #[doc = " \\pre <tt>\\ref vxLoadKernels</tt> if the kernel is not provided by the"]
+    #[doc = " OpenVX implementation."]
+    #[doc = " \\note User Kernels should follow a \"dotted\" hierarchical syntax. For example:"]
+    #[doc = " \"com.company.example.xyz\"."]
+    pub fn vxGetKernelByName(context: vx_context, name: *const vx_char) -> vx_kernel;
+}
+extern "C" {
+    #[doc = " \\brief Obtains a reference to the kernel using the <tt>\\ref vx_kernel_e</tt> enumeration."]
+    #[doc = " \\details Enum values above the standard set are assumed to apply to"]
+    #[doc = " loaded libraries."]
+    #[doc = " \\param [in] context The reference to the implementation context."]
+    #[doc = " \\param [in] kernel A value from <tt>\\ref vx_kernel_e</tt> or a vendor or client-defined value."]
+    #[doc = " \\return A <tt>\\ref vx_kernel</tt> reference. Any possible errors preventing a successful completion"]
+    #[doc = " of the function should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_kernel"]
+    #[doc = " \\pre <tt>\\ref vxLoadKernels</tt> if the kernel is not provided by the"]
+    #[doc = " OpenVX implementation."]
+    pub fn vxGetKernelByEnum(context: vx_context, kernel: vx_enum) -> vx_kernel;
+}
+extern "C" {
+    #[doc = " \\brief This allows the client to query the kernel to get information about"]
+    #[doc = " the number of parameters, enum values, etc."]
+    #[doc = " \\param [in] kernel The kernel reference to query."]
+    #[doc = " \\param [in] attribute The attribute to query. Use a <tt>\\ref vx_kernel_attribute_e</tt>."]
+    #[doc = " \\param [out] ptr The pointer to the location at which to store the resulting value."]
+    #[doc = " \\param [in] size The size of the container to which \\a ptr points."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE kernel is not a valid <tt>\\ref vx_kernel</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS If any of the other parameters are incorrect."]
+    #[doc = " \\retval VX_ERROR_NOT_SUPPORTED If the attribute value is not supported in this implementation."]
+    #[doc = " \\ingroup group_kernel"]
+    pub fn vxQueryKernel(
+        kernel: vx_kernel,
+        attribute: vx_enum,
+        ptr: *mut ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Release the reference to the kernel."]
+    #[doc = " The object may not be garbage collected until its total reference count is zero."]
+    #[doc = " \\param [in] kernel The pointer to the kernel reference to release."]
+    #[doc = " \\post After returning from this function the reference is zeroed."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE kernel is not a valid <tt>\\ref vx_kernel</tt> reference."]
+    #[doc = " \\ingroup group_kernel"]
+    pub fn vxReleaseKernel(kernel: *mut vx_kernel) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allows users to add custom kernels to a context at run-time."]
+    #[doc = " \\param [in] context The reference to the context the kernel must be added to."]
+    #[doc = " \\param [in] name The string to use to match the kernel."]
+    #[doc = " \\param [in] enumeration The enumerated value of the kernel to be used by clients."]
+    #[doc = " \\param [in] func_ptr The process-local function pointer to be invoked."]
+    #[doc = " \\param [in] numParams The number of parameters for this kernel."]
+    #[doc = " \\param [in] validate The pointer to <tt>\\ref vx_kernel_validate_f</tt>, which validates"]
+    #[doc = " parameters to this kernel."]
+    #[doc = " \\param [in] init The kernel initialization function."]
+    #[doc = " \\param [in] deinit The kernel de-initialization function."]
+    #[doc = " \\return A <tt>\\ref vx_kernel</tt> reference. Any possible errors"]
+    #[doc = " preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_user_kernels"]
+    pub fn vxAddUserKernel(
+        context: vx_context,
+        name: *const vx_char,
+        enumeration: vx_enum,
+        func_ptr: vx_kernel_f,
+        numParams: vx_uint32,
+        validate: vx_kernel_validate_f,
+        init: vx_kernel_initialize_f,
+        deinit: vx_kernel_deinitialize_f,
+    ) -> vx_kernel;
+}
+extern "C" {
+    #[doc = " \\brief This API is called after all parameters have been added to the"]
+    #[doc = " kernel and the kernel is \\e ready to be used. Notice that the reference to the kernel created"]
+    #[doc = " by vxAddUserKernel is still valid after the call to vxFinalizeKernel."]
+    #[doc = " If an error occurs, the kernel is not available for usage by the clients of OpenVX. Typically"]
+    #[doc = " this is due to a mismatch between the number of parameters requested and given."]
+    #[doc = " \\param [in] kernel The reference to the loaded kernel from <tt>\\ref vxAddUserKernel</tt>."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE kernel is not a valid <tt>\\ref vx_kernel</tt> reference."]
+    #[doc = " \\pre <tt>\\ref vxAddUserKernel</tt> and <tt>\\ref vxAddParameterToKernel</tt>"]
+    #[doc = " \\ingroup group_user_kernels"]
+    pub fn vxFinalizeKernel(kernel: vx_kernel) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allows users to set the signatures of the custom kernel."]
+    #[doc = " \\param [in] kernel The reference to the kernel added with <tt>\\ref vxAddUserKernel</tt>."]
+    #[doc = " \\param [in] index The index of the parameter to add."]
+    #[doc = " \\param [in] dir The direction of the parameter. This must be either <tt>\\ref VX_INPUT</tt> or"]
+    #[doc = " <tt>\\ref VX_OUTPUT</tt>."]
+    #[doc = " \\param [in] data_type The type of parameter. This must be a value from <tt>\\ref vx_type_e</tt>."]
+    #[doc = " \\param [in] state The state of the parameter (required or not). This must be a value from <tt>\\ref vx_parameter_state_e</tt>."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumerated value."]
+    #[doc = " \\retval VX_SUCCESS Parameter is successfully set on kernel; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE kernel is not a valid <tt>\\ref vx_kernel</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS If the parameter is not valid for any reason."]
+    #[doc = " \\pre <tt>\\ref vxAddUserKernel</tt>"]
+    #[doc = " \\ingroup group_user_kernels"]
+    pub fn vxAddParameterToKernel(
+        kernel: vx_kernel,
+        index: vx_uint32,
+        dir: vx_enum,
+        data_type: vx_enum,
+        state: vx_enum,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Removes a custom kernel from its context and releases it."]
+    #[doc = " \\param [in] kernel The reference to the kernel to remove. Returned from <tt>\\ref vxAddUserKernel</tt>."]
+    #[doc = " \\note Any kernel enumerated in the base standard"]
+    #[doc = " cannot be removed; only kernels added through <tt>\\ref vxAddUserKernel</tt> can"]
+    #[doc = " be removed."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration. The function returns to the"]
+    #[doc = " application full control over the memory resources provided at the kernel creation time."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE kernel is not a valid <tt>\\ref vx_kernel</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS If a base kernel is passed in."]
+    #[doc = " \\retval VX_FAILURE If the application has not released all references to the kernel"]
+    #[doc = " object OR if the application has not released all references to a node that is using"]
+    #[doc = " this kernel OR if the application has not released all references to a graph which"]
+    #[doc = " has nodes that is using this kernel."]
+    #[doc = " \\ingroup group_user_kernels"]
+    pub fn vxRemoveKernel(kernel: vx_kernel) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Sets kernel attributes."]
+    #[doc = " \\param [in] kernel The reference to the kernel."]
+    #[doc = " \\param [in] attribute The enumeration of the attributes. See <tt>\\ref vx_kernel_attribute_e</tt>."]
+    #[doc = " \\param [in] ptr The pointer to the location from which to read the attribute."]
+    #[doc = " \\param [in] size The size in bytes of the data area indicated by \\a ptr in bytes."]
+    #[doc = " \\note After a kernel has been passed to <tt>\\ref vxFinalizeKernel</tt>, no attributes"]
+    #[doc = " can be altered."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE kernel is not a valid <tt>\\ref vx_kernel</tt> reference."]
+    #[doc = " \\ingroup group_user_kernels"]
+    pub fn vxSetKernelAttribute(
+        kernel: vx_kernel,
+        attribute: vx_enum,
+        ptr: *const ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Retrieves a <tt>\\ref vx_parameter</tt> from a <tt>\\ref vx_kernel</tt>."]
+    #[doc = " \\param [in] kernel The reference to the kernel."]
+    #[doc = " \\param [in] index The index of the parameter."]
+    #[doc = " \\return A <tt>\\ref vx_parameter</tt> reference. Any possible errors preventing a"]
+    #[doc = " successful completion of the function should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_parameter"]
+    pub fn vxGetKernelParameterByIndex(kernel: vx_kernel, index: vx_uint32) -> vx_parameter;
+}
+extern "C" {
+    #[doc = " \\brief Creates an empty graph."]
+    #[doc = " \\param [in] context The reference to the implementation context."]
+    #[doc = " \\returns A graph reference <tt>\\ref vx_graph</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_graph"]
+    pub fn vxCreateGraph(context: vx_context) -> vx_graph;
+}
+extern "C" {
+    #[doc = " \\brief Releases a reference to a graph."]
+    #[doc = " The object may not be garbage collected until its total reference count is zero."]
+    #[doc = " Once the reference count is zero, all node references in the graph are automatically"]
+    #[doc = " released as well. Releasing the graph will only release the nodes if the nodes were"]
+    #[doc = " not previously released by the application. Data referenced by those nodes may not"]
+    #[doc = " be released as the user may still have references to the data."]
+    #[doc = " \\param [in] graph The pointer to the graph to release."]
+    #[doc = " \\post After returning from this function the reference is zeroed."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE graph is not a valid <tt>\\ref vx_graph</tt> reference."]
+    #[doc = " \\ingroup group_graph"]
+    pub fn vxReleaseGraph(graph: *mut vx_graph) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Verifies the state of the graph before it is executed."]
+    #[doc = " This is useful to catch programmer errors and contract errors. If not verified,"]
+    #[doc = " the graph verifies before being processed."]
+    #[doc = " \\pre Memory for data objects is not guarenteed to exist before"]
+    #[doc = " this call. \\post After this call data objects exist unless"]
+    #[doc = " the implementation optimized them out."]
+    #[doc = " \\param [in] graph The reference to the graph to verify."]
+    #[doc = " \\return A status code for graphs with more than one error; it is"]
+    #[doc = " undefined which error will be returned. Register a log callback using <tt>\\ref vxRegisterLogCallback</tt>"]
+    #[doc = " to receive each specific error in the graph."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE graph is not a valid <tt>\\ref vx_graph</tt> reference."]
+    #[doc = " \\retval VX_ERROR_MULTIPLE_WRITERS If the graph contains more than one writer"]
+    #[doc = " to any data object."]
+    #[doc = " \\retval VX_ERROR_INVALID_NODE If a node in the graph is invalid or failed be created."]
+    #[doc = " \\retval VX_ERROR_INVALID_GRAPH If the graph contains cycles or some other invalid topology."]
+    #[doc = " \\retval VX_ERROR_INVALID_TYPE If any parameter on a node is given the wrong type."]
+    #[doc = " \\retval VX_ERROR_INVALID_VALUE If any value of any parameter is out of bounds of specification."]
+    #[doc = " \\retval VX_ERROR_INVALID_FORMAT If the image format is not compatible."]
+    #[doc = " \\ingroup group_graph"]
+    #[doc = " \\see vxProcessGraph"]
+    pub fn vxVerifyGraph(graph: vx_graph) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief This function causes the synchronous processing of a graph. If the graph"]
+    #[doc = " has not been verified, then the implementation verifies the graph"]
+    #[doc = " immediately. If verification fails this function returns a status"]
+    #[doc = " identical to what <tt>\\ref vxVerifyGraph</tt> would return. After"]
+    #[doc = " the graph verfies successfully then processing occurs. If the graph was"]
+    #[doc = " previously verified via <tt>\\ref vxVerifyGraph</tt> or <tt>\\ref vxProcessGraph</tt>"]
+    #[doc = " then the graph is processed. This function blocks until the graph is completed."]
+    #[doc = " \\param [in] graph The graph to execute."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Graph has been processed; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE graph is not a valid <tt>\\ref vx_graph</tt> reference."]
+    #[doc = " \\retval VX_FAILURE A catastrophic error occurred during processing."]
+    #[doc = " \\ingroup group_graph"]
+    pub fn vxProcessGraph(graph: vx_graph) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Schedules a graph for future execution. If the graph"]
+    #[doc = " has not been verified, then the implementation verifies the graph"]
+    #[doc = " immediately. If verification fails this function returns a status"]
+    #[doc = " identical to what <tt>\\ref vxVerifyGraph</tt> would return. After"]
+    #[doc = " the graph verfies successfully then processing occurs. If the graph was"]
+    #[doc = " previously verified via <tt>\\ref vxVerifyGraph</tt> or <tt>\\ref vxProcessGraph</tt>"]
+    #[doc = " then the graph is processed."]
+    #[doc = " \\param [in] graph The graph to schedule."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS The graph has been scheduled; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE graph is not a valid <tt>\\ref vx_graph</tt> reference."]
+    #[doc = " \\retval VX_ERROR_NO_RESOURCES The graph cannot be scheduled now."]
+    #[doc = " \\retval VX_ERROR_NOT_SUFFICIENT The graph is not verified and has failed"]
+    #[doc = " forced verification."]
+    #[doc = " \\ingroup group_graph"]
+    pub fn vxScheduleGraph(graph: vx_graph) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Waits for a specific graph to complete. If the graph has been scheduled multiple"]
+    #[doc = " times since the last call to vxWaitGraph, then vxWaitGraph returns only when the last"]
+    #[doc = " scheduled execution completes."]
+    #[doc = " \\param [in] graph The graph to wait on."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS The graph has successfully completed execution and its outputs are the"]
+    #[doc = " valid results of the most recent execution; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE graph is not a valid <tt>\\ref vx_graph</tt> reference."]
+    #[doc = " \\retval VX_FAILURE An error occurred or the graph was never scheduled. Output data of the"]
+    #[doc = " graph is undefined."]
+    #[doc = " \\pre <tt>\\ref vxScheduleGraph</tt>"]
+    #[doc = " \\ingroup group_graph"]
+    pub fn vxWaitGraph(graph: vx_graph) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allows the user to query attributes of the Graph."]
+    #[doc = " \\param [in] graph The reference to the created graph."]
+    #[doc = " \\param [in] attribute The <tt>\\ref vx_graph_attribute_e</tt> type needed."]
+    #[doc = " \\param [out] ptr The location at which to store the resulting value."]
+    #[doc = " \\param [in] size The size in bytes of the container to which \\a ptr points."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE graph is not a valid <tt>\\ref vx_graph</tt> reference."]
+    #[doc = " \\ingroup group_graph"]
+    pub fn vxQueryGraph(
+        graph: vx_graph,
+        attribute: vx_enum,
+        ptr: *mut ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allows the attributes of the Graph to be set to the provided value."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] attribute The <tt>\\ref vx_graph_attribute_e</tt> type needed."]
+    #[doc = " \\param [in] ptr The location from which to read the value."]
+    #[doc = " \\param [in] size The size in bytes of the container to which \\a ptr points."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE graph is not a valid <tt>\\ref vx_graph</tt> reference."]
+    #[doc = " \\ingroup group_graph"]
+    pub fn vxSetGraphAttribute(
+        graph: vx_graph,
+        attribute: vx_enum,
+        ptr: *const ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Adds the given parameter extracted from a <tt>\\ref vx_node</tt> to the graph."]
+    #[doc = " \\param [in] graph The graph reference that contains the node."]
+    #[doc = " \\param [in] parameter The parameter reference to add to the graph from the node."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Parameter added to Graph; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE graph is not a valid <tt>\\ref vx_graph</tt> reference or parameter is not a valid <tt>\\ref vx_parameter</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS The parameter is of a node not in this"]
+    #[doc = " graph."]
+    #[doc = " \\ingroup group_graph_parameters"]
+    pub fn vxAddParameterToGraph(graph: vx_graph, parameter: vx_parameter) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Sets a reference to the parameter on the graph. The implementation"]
+    #[doc = " must set this parameter on the originating node as well."]
+    #[doc = " \\param [in] graph The graph reference."]
+    #[doc = " \\param [in] index The parameter index."]
+    #[doc = " \\param [in] value The reference to set to the parameter."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Parameter set to Graph; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE graph is not a valid <tt>\\ref vx_graph</tt> reference or"]
+    #[doc = " value is not a valid <tt>\\ref vx_reference</tt>."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS The parameter index is out of bounds or the"]
+    #[doc = " dir parameter is incorrect."]
+    #[doc = " \\ingroup group_graph_parameters"]
+    pub fn vxSetGraphParameterByIndex(
+        graph: vx_graph,
+        index: vx_uint32,
+        value: vx_reference,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Retrieves a <tt>\\ref vx_parameter</tt> from a <tt>\\ref vx_graph</tt>."]
+    #[doc = " \\param [in] graph The graph."]
+    #[doc = " \\param [in] index The index of the parameter."]
+    #[doc = " \\return <tt>\\ref vx_parameter</tt> reference. Any possible errors preventing a successful"]
+    #[doc = " function completion should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_graph_parameters"]
+    pub fn vxGetGraphParameterByIndex(graph: vx_graph, index: vx_uint32) -> vx_parameter;
+}
+extern "C" {
+    #[doc = " \\brief Returns a Boolean to indicate the state of graph verification."]
+    #[doc = " \\param [in] graph The reference to the graph to check."]
+    #[doc = " \\return A <tt>\\ref vx_bool</tt> value."]
+    #[doc = " \\retval vx_true_e The graph is verified."]
+    #[doc = " \\retval vx_false_e The graph is not verified. It must be verified before"]
+    #[doc = " execution either through <tt>\\ref vxVerifyGraph</tt> or automatically through"]
+    #[doc = " <tt>\\ref vxProcessGraph</tt> or <tt>\\ref vxScheduleGraph</tt>."]
+    #[doc = " \\ingroup group_graph"]
+    pub fn vxIsGraphVerified(graph: vx_graph) -> vx_bool;
+}
+extern "C" {
+    #[doc = " \\brief Creates a reference to a node object for a given kernel."]
+    #[doc = " \\details This node has no references assigned as parameters after completion."]
+    #[doc = " The client is then required to set these parameters manually by <tt>\\ref vxSetParameterByIndex</tt>."]
+    #[doc = " When clients supply their own node creation functions (for use with User Kernels), this is the API"]
+    #[doc = " to use along with the parameter setting API."]
+    #[doc = " \\param [in] graph The reference to the graph in which this node exists."]
+    #[doc = " \\param [in] kernel The kernel reference to associate with this new node."]
+    #[doc = " \\returns A node reference <tt>\\ref vx_node</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\note A call to this API sets all parameters to NULL."]
+    #[doc = " \\ingroup group_adv_node"]
+    #[doc = " \\post Call <tt>\\ref vxSetParameterByIndex</tt> for as many parameters as needed to be set."]
+    pub fn vxCreateGenericNode(graph: vx_graph, kernel: vx_kernel) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief Allows a user to query information out of a node."]
+    #[doc = " \\param [in] node The reference to the node to query."]
+    #[doc = " \\param [in] attribute Use <tt>\\ref vx_node_attribute_e</tt> value to query for information."]
+    #[doc = " \\param [out] ptr The location at which to store the resulting value."]
+    #[doc = " \\param [in] size The size in bytesin bytes of the container to which \\a ptr points."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE node is not a valid <tt>\\ref vx_node</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS The type or size is incorrect."]
+    #[doc = " \\ingroup group_node"]
+    pub fn vxQueryNode(
+        node: vx_node,
+        attribute: vx_enum,
+        ptr: *mut ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allows a user to set attribute of a node before Graph Validation."]
+    #[doc = " \\param [in] node The reference to the node to set."]
+    #[doc = " \\param [in] attribute Use <tt>\\ref vx_node_attribute_e</tt> value to set the desired attribute."]
+    #[doc = " \\param [in] ptr The pointer to the desired value of the attribute."]
+    #[doc = " \\param [in] size The size in bytes of the objects to which \\a ptr points."]
+    #[doc = " \\note Some attributes are inherited from the <tt>\\ref vx_kernel</tt>, which was used"]
+    #[doc = " to create the node. Some of these can be overridden using this API, notably"]
+    #[doc = " \\ref VX_NODE_LOCAL_DATA_SIZE and \\ref VX_NODE_LOCAL_DATA_PTR."]
+    #[doc = " \\ingroup group_node"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS The attribute was set; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE node is not a valid <tt>\\ref vx_node</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS size is not correct for the type needed."]
+    pub fn vxSetNodeAttribute(
+        node: vx_node,
+        attribute: vx_enum,
+        ptr: *const ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Releases a reference to a Node object."]
+    #[doc = " The object may not be garbage collected until its total reference count is zero."]
+    #[doc = " \\param [in] node The pointer to the reference of the node to release."]
+    #[doc = " \\ingroup group_node"]
+    #[doc = " \\post After returning from this function the reference is zeroed."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE node is not a valid <tt>\\ref vx_node</tt> reference."]
+    pub fn vxReleaseNode(node: *mut vx_node) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Removes a Node from its parent Graph and releases it."]
+    #[doc = " \\param [in] node The pointer to the node to remove and release."]
+    #[doc = " \\ingroup group_node"]
+    #[doc = " \\post After returning from this function the reference is zeroed."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE node is not a valid <tt>\\ref vx_node</tt> reference."]
+    pub fn vxRemoveNode(node: *mut vx_node) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Assigns a callback to a node."]
+    #[doc = " If a callback already exists in this node, this function must return an error"]
+    #[doc = " and the user may clear the callback by passing a NULL pointer as the callback."]
+    #[doc = " \\param [in] node The reference to the node."]
+    #[doc = " \\param [in] callback The callback to associate with completion of this"]
+    #[doc = " specific node."]
+    #[doc = " \\warning This must be used with <b><i>extreme</i></b> caution as it can \\e ruin"]
+    #[doc = " optimizations in the power/performance efficiency of a graph."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Callback assigned; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE node is not a valid <tt>\\ref vx_node</tt> reference."]
+    #[doc = " \\ingroup group_node_callback"]
+    pub fn vxAssignNodeCallback(node: vx_node, callback: vx_nodecomplete_f) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Retrieves the current node callback function pointer set on the node."]
+    #[doc = " \\param [in] node The reference to the <tt>\\ref vx_node</tt> object."]
+    #[doc = " \\ingroup group_node_callback"]
+    #[doc = " \\return vx_nodecomplete_f The pointer to the callback function."]
+    #[doc = " \\retval NULL No callback is set."]
+    #[doc = " \\retval * The node callback function."]
+    pub fn vxRetrieveNodeCallback(node: vx_node) -> vx_nodecomplete_f;
+}
+extern "C" {
+    #[doc = " \\brief Sets the node target to the provided value. A success invalidates the graph"]
+    #[doc = " that the node belongs to (<tt>\\ref vxVerifyGraph</tt> must be called before the next execution)"]
+    #[doc = " \\param [in] node  The reference to the <tt>\\ref vx_node</tt> object."]
+    #[doc = " \\param [in] target_enum  The target enum to be set to the <tt>\\ref vx_node</tt> object."]
+    #[doc = " Use a <tt>\\ref vx_target_e</tt>."]
+    #[doc = " \\param [in] target_string  The target name ASCII string. This contains a valid value"]
+    #[doc = " when target_enum is set to <tt>\\ref VX_TARGET_STRING</tt>, otherwise it is ignored."]
+    #[doc = " \\ingroup group_node"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Node target set; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE node is not a valid <tt>\\ref vx_node</tt> reference."]
+    #[doc = " \\retval VX_ERROR_NOT_SUPPORTED If the node kernel is not supported by the specified target."]
+    pub fn vxSetNodeTarget(
+        node: vx_node,
+        target_enum: vx_enum,
+        target_string: *const ::std::os::raw::c_char,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Creates replicas of the same node first_node to process a set of objects"]
+    #[doc = " stored in <tt>\\ref vx_pyramid</tt> or <tt>\\ref vx_object_array</tt>."]
+    #[doc = " first_node needs to have as parameter levels 0 of a <tt>\\ref vx_pyramid</tt> or the index 0 of a <tt>\\ref vx_object_array</tt>."]
+    #[doc = " Replica nodes are not accessible by the application through any means. An application request for removal of"]
+    #[doc = " first_node from the graph will result in removal of all replicas. Any change of parameter or attribute of"]
+    #[doc = " first_node will be propagated to the replicas. <tt>\\ref vxVerifyGraph</tt> shall enforce consistency of parameters and attributes"]
+    #[doc = " in the replicas."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] first_node The reference to the node in the graph that will be replicated."]
+    #[doc = " \\param [in] replicate an array of size equal to the number of node parameters, vx_true_e for the parameters"]
+    #[doc = " that should be iterated over (should be a reference to a vx_pyramid or a vx_object_array),"]
+    #[doc = " vx_false_e for the parameters that should be the same across replicated nodes and for optional"]
+    #[doc = " parameters that are not used. Should be vx_true_e for all output parameters."]
+    #[doc = " \\param [in] number_of_parameters number of elements in the replicate array"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE graph is not a valid <tt>\\ref vx_graph</tt> reference, or first_node is not a"]
+    #[doc = " valid <tt>\\ref vx_node</tt> reference."]
+    #[doc = " \\retval VX_ERROR_NOT_COMPATIBLE At least one of replicated parameters is not of level 0 of a pyramid or at index 0 of an object array."]
+    #[doc = " \\retval VX_FAILURE If the node does not belong to the graph, or the number of objects in the parent objects of inputs and output are not the same."]
+    #[doc = " \\ingroup group_node"]
+    pub fn vxReplicateNode(
+        graph: vx_graph,
+        first_node: vx_node,
+        replicate: *mut vx_bool,
+        number_of_parameters: vx_uint32,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Retrieves a <tt>\\ref vx_parameter</tt> from a <tt>\\ref vx_node</tt>."]
+    #[doc = " \\param [in] node The node from which to extract the parameter."]
+    #[doc = " \\param [in] index The index of the parameter to which to get a reference."]
+    #[doc = " \\return A parameter reference <tt>\\ref vx_parameter</tt>. Any possible errors preventing a successful"]
+    #[doc = " completion of the function should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_parameter"]
+    pub fn vxGetParameterByIndex(node: vx_node, index: vx_uint32) -> vx_parameter;
+}
+extern "C" {
+    #[doc = " \\brief Releases a reference to a parameter object."]
+    #[doc = " The object may not be garbage collected until its total reference count is zero."]
+    #[doc = " \\param [in] param The pointer to the parameter to release."]
+    #[doc = " \\ingroup group_parameter"]
+    #[doc = " \\post After returning from this function the reference is zeroed."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE param is not a valid <tt>\\ref vx_parameter</tt> reference."]
+    pub fn vxReleaseParameter(param: *mut vx_parameter) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Sets the specified parameter data for a kernel on the node."]
+    #[doc = " \\param [in] node The node that contains the kernel."]
+    #[doc = " \\param [in] index The index of the parameter desired."]
+    #[doc = " \\param [in] value The desired value of the parameter."]
+    #[doc = " \\note A user may not provide a NULL value for a mandatory parameter of this API."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE node is not a valid <tt>\\ref vx_node</tt> reference, or value"]
+    #[doc = " is not a valid <tt>\\ref vx_reference</tt> reference."]
+    #[doc = " \\ingroup group_parameter"]
+    #[doc = " \\see vxSetParameterByReference"]
+    pub fn vxSetParameterByIndex(node: vx_node, index: vx_uint32, value: vx_reference)
+        -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Associates a parameter reference and a data reference with a kernel"]
+    #[doc = " on a node."]
+    #[doc = " \\param [in] parameter The reference to the kernel parameter."]
+    #[doc = " \\param [in] value The value to associate with the kernel parameter."]
+    #[doc = " \\note A user may not provide a NULL value for a mandatory parameter of this API."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE parameter is not a valid <tt>\\ref vx_parameter</tt> reference,"]
+    #[doc = " or value is not a valid <tt>\\ref vx_reference</tt> reference.."]
+    #[doc = " \\ingroup group_parameter"]
+    #[doc = " \\see vxGetParameterByIndex"]
+    pub fn vxSetParameterByReference(parameter: vx_parameter, value: vx_reference) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allows the client to query a parameter to determine its meta-information."]
+    #[doc = " \\param [in] parameter The reference to the parameter."]
+    #[doc = " \\param [in] attribute The attribute to query. Use a <tt>\\ref vx_parameter_attribute_e</tt>."]
+    #[doc = " \\param [out] ptr The location at which to store the resulting value."]
+    #[doc = " \\param [in] size The size in bytes of the container to which \\a ptr points."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE parameter is not a valid <tt>\\ref vx_parameter</tt> reference."]
+    #[doc = " \\ingroup group_parameter"]
+    pub fn vxQueryParameter(
+        parameter: vx_parameter,
+        attribute: vx_enum,
+        ptr: *mut ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Creates a reference to a scalar object. Also see \\ref sub_node_parameters."]
+    #[doc = " \\param [in] context The reference to the system context."]
+    #[doc = " \\param [in] data_type The type of data to hold. Must be greater than"]
+    #[doc = " <tt>\\ref VX_TYPE_INVALID</tt> and less than or equal to <tt>\\ref VX_TYPE_VENDOR_STRUCT_END</tt>."]
+    #[doc = " Or must be a <tt>\\ref vx_enum</tt> returned from <tt>\\ref vxRegisterUserStruct</tt>."]
+    #[doc = " \\param [in] ptr The pointer to the initial value of the scalar or NULL. If NULL,"]
+    #[doc = "             the initial value of the scalar, if any, is implementation dependent."]
+    #[doc = " \\ingroup group_scalar"]
+    #[doc = " \\returns A scalar reference <tt>\\ref vx_scalar</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    pub fn vxCreateScalar(
+        context: vx_context,
+        data_type: vx_enum,
+        ptr: *const ::std::os::raw::c_void,
+    ) -> vx_scalar;
+}
+extern "C" {
+    #[doc = " \\brief Creates a reference to a scalar object. Also see \\ref sub_node_parameters."]
+    #[doc = " \\param [in] context The reference to the system context."]
+    #[doc = " \\param [in] data_type The type of data to hold. Must be greater than"]
+    #[doc = " <tt>\\ref VX_TYPE_INVALID</tt> and less than or equal to <tt>\\ref VX_TYPE_VENDOR_STRUCT_END</tt>."]
+    #[doc = " Or must be a <tt>\\ref vx_enum</tt> returned from <tt>\\ref vxRegisterUserStruct</tt>."]
+    #[doc = " \\param [in] ptr The pointer to the initial value of the scalar."]
+    #[doc = " \\param [in] size Size of data at ptr in bytes."]
+    #[doc = " \\ingroup group_scalar"]
+    #[doc = " \\returns A scalar reference <tt>\\ref vx_scalar</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    pub fn vxCreateScalarWithSize(
+        context: vx_context,
+        data_type: vx_enum,
+        ptr: *const ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_scalar;
+}
+extern "C" {
+    #[doc = " \\brief Creates an opaque reference to a scalar object with no direct user access."]
+    #[doc = " \\param [in] graph The reference to the parent graph."]
+    #[doc = " \\param [in] data_type The type of data to hold. Must be greater than"]
+    #[doc = " <tt>\\ref VX_TYPE_INVALID</tt> and less than or equal to <tt>\\ref VX_TYPE_VENDOR_STRUCT_END</tt>."]
+    #[doc = " Or must be a <tt>\\ref vx_enum</tt> returned from <tt>\\ref vxRegisterUserStruct</tt>."]
+    #[doc = " \\see <tt>\\ref vxCreateScalar</tt>"]
+    #[doc = " \\ingroup group_scalar"]
+    #[doc = " \\returns A scalar reference <tt>\\ref vx_scalar</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    pub fn vxCreateVirtualScalar(graph: vx_graph, data_type: vx_enum) -> vx_scalar;
+}
+extern "C" {
+    #[doc = " \\brief Releases a reference to a scalar object."]
+    #[doc = " The object may not be garbage collected until its total reference count is zero."]
+    #[doc = " \\param [in] scalar The pointer to the scalar to release."]
+    #[doc = " \\ingroup group_scalar"]
+    #[doc = " \\post After returning from this function the reference is zeroed."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE scalar is not a valid <tt>\\ref vx_scalar</tt> reference."]
+    pub fn vxReleaseScalar(scalar: *mut vx_scalar) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Queries attributes from a scalar."]
+    #[doc = " \\param [in] scalar The scalar object."]
+    #[doc = " \\param [in] attribute The enumeration to query. Use a <tt>\\ref vx_scalar_attribute_e</tt> enumeration."]
+    #[doc = " \\param [out] ptr The location at which to store the resulting value."]
+    #[doc = " \\param [in] size The size of the container to which \\a ptr points."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE scalar is not a valid <tt>\\ref vx_scalar</tt> reference."]
+    #[doc = " \\ingroup group_scalar"]
+    pub fn vxQueryScalar(
+        scalar: vx_scalar,
+        attribute: vx_enum,
+        ptr: *mut ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allows the application to copy from/into a scalar object."]
+    #[doc = " \\param [in] scalar The reference to the scalar object that is the source or the"]
+    #[doc = " destination of the copy."]
+    #[doc = " \\param [in] user_ptr The address of the memory location where to store the requested data"]
+    #[doc = " if the copy was requested in read mode, or from where to get the data to store into the"]
+    #[doc = " scalar object if the copy was requested in write mode. In the user memory, the scalar is"]
+    #[doc = " a variable of the type corresponding to <tt>\\ref VX_SCALAR_TYPE</tt>."]
+    #[doc = " The accessible memory must be large enough to contain this variable."]
+    #[doc = " \\param [in] usage This declares the effect of the copy with regard to the scalar object"]
+    #[doc = " using the <tt>\\ref vx_accessor_e</tt> enumeration. Only <tt>\\ref VX_READ_ONLY</tt> and <tt>\\ref VX_WRITE_ONLY</tt>"]
+    #[doc = " are supported:"]
+    #[doc = " \\arg <tt>\\ref VX_READ_ONLY</tt> means that data are copied from the scalar object into the user memory."]
+    #[doc = " \\arg <tt>\\ref VX_WRITE_ONLY</tt> means that data are copied into the scalar object from the user memory."]
+    #[doc = " \\param [in] user_mem_type A <tt>\\ref vx_memory_type_e</tt> enumeration that specifies"]
+    #[doc = " the memory type of the memory referenced by the user_addr."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE scalar is not a valid <tt>\\ref vx_scalar</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS An other parameter is incorrect."]
+    #[doc = " \\ingroup group_scalar"]
+    pub fn vxCopyScalar(
+        scalar: vx_scalar,
+        user_ptr: *mut ::std::os::raw::c_void,
+        usage: vx_enum,
+        user_mem_type: vx_enum,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allows the application to copy from/into a scalar object with size."]
+    #[doc = " \\param [in] scalar The reference to the scalar object that is the source or the"]
+    #[doc = " destination of the copy."]
+    #[doc = " \\param [in] size The size in bytes of the container to which \\a user_ptr points."]
+    #[doc = " \\param [in] user_ptr The address of the memory location where to store the requested data"]
+    #[doc = " if the copy was requested in read mode, or from where to get the data to store into the"]
+    #[doc = " scalar object if the copy was requested in write mode. In the user memory, the scalar is"]
+    #[doc = " a variable of the type corresponding to <tt>\\ref VX_SCALAR_TYPE</tt>."]
+    #[doc = " The accessible memory must be large enough to contain this variable."]
+    #[doc = " \\param [in] usage This declares the effect of the copy with regard to the scalar object"]
+    #[doc = " using the <tt>\\ref vx_accessor_e</tt> enumeration. Only <tt>\\ref VX_READ_ONLY</tt> and <tt>\\ref VX_WRITE_ONLY</tt>"]
+    #[doc = " are supported:"]
+    #[doc = " \\arg <tt>\\ref VX_READ_ONLY</tt> means that data are copied from the scalar object into the user memory."]
+    #[doc = " \\arg <tt>\\ref VX_WRITE_ONLY</tt> means that data are copied into the scalar object from the user memory."]
+    #[doc = " \\param [in] user_mem_type A <tt>\\ref vx_memory_type_e</tt> enumeration that specifies"]
+    #[doc = " the memory type of the memory referenced by the user_addr."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE The scalar reference is not actually a scalar reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS An other parameter is incorrect."]
+    #[doc = " \\ingroup group_scalar"]
+    pub fn vxCopyScalarWithSize(
+        scalar: vx_scalar,
+        size: vx_size,
+        user_ptr: *mut ::std::os::raw::c_void,
+        usage: vx_enum,
+        user_mem_type: vx_enum,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Queries any reference type for some basic information like count or type."]
+    #[doc = " \\param [in] ref The reference to query."]
+    #[doc = " \\param [in] attribute The value for which to query. Use <tt>\\ref vx_reference_attribute_e</tt>."]
+    #[doc = " \\param [out] ptr The location at which to store the resulting value."]
+    #[doc = " \\param [in] size The size in bytes of the container to which ptr points."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE ref is not a valid <tt>\\ref vx_reference</tt> reference."]
+    #[doc = " \\ingroup group_reference"]
+    pub fn vxQueryReference(
+        ref_: vx_reference,
+        attribute: vx_enum,
+        ptr: *mut ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Releases a reference. The reference may potentially refer to multiple OpenVX objects of different types."]
+    #[doc = " This function can be used instead of calling a specific release function for each individual object type"]
+    #[doc = " (e.g. vxRelease<object>). The object will not be destroyed until its total reference count is zero."]
+    #[doc = " \\note After returning from this function the reference is zeroed."]
+    #[doc = " \\param [in] ref_ptr The pointer to the reference of the object to release."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE ref_ptr is not a valid <tt>\\ref vx_reference</tt> reference."]
+    #[doc = " \\ingroup group_reference"]
+    pub fn vxReleaseReference(ref_ptr: *mut vx_reference) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Increments the reference counter of an object"]
+    #[doc = " This function is used to express the fact that the OpenVX object is referenced"]
+    #[doc = " multiple times by an application. Each time this function is called for"]
+    #[doc = " an object, the application will need to release the object one additional"]
+    #[doc = " time before it can be destructed"]
+    #[doc = " \\param [in] ref The reference to retain."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE ref is not a valid <tt>\\ref vx_reference</tt> reference."]
+    #[doc = " \\ingroup group_reference"]
+    pub fn vxRetainReference(ref_: vx_reference) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Name a reference"]
+    #[doc = " \\ingroup group_reference"]
+    #[doc = ""]
+    #[doc = " This function is used to associate a name to a referenced object. This name"]
+    #[doc = " can be used by the OpenVX implementation in log messages and any"]
+    #[doc = " other reporting mechanisms."]
+    #[doc = ""]
+    #[doc = " The OpenVX implementation will not check if the name is unique in"]
+    #[doc = " the reference scope (context or graph). Several references can then"]
+    #[doc = " have the same name."]
+    #[doc = ""]
+    #[doc = " \\param [in] ref The reference to the object to be named."]
+    #[doc = " \\param [in] name Pointer to the '\\0' terminated string that identifies"]
+    #[doc = "             the referenced object."]
+    #[doc = "             The string is copied by the function so that it"]
+    #[doc = "             stays the property of the caller."]
+    #[doc = "             NULL means that the reference is not named."]
+    #[doc = "             The length of the string shall be lower than VX_MAX_REFERENCE_NAME bytes."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE ref is not a valid <tt>\\ref vx_reference</tt> reference."]
+    pub fn vxSetReferenceName(ref_: vx_reference, name: *const vx_char) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Queries a <tt>\\ref vx_delay</tt> object attribute."]
+    #[doc = " \\param [in] delay The reference to a delay object."]
+    #[doc = " \\param [in] attribute The attribute to query. Use a <tt>\\ref vx_delay_attribute_e</tt> enumeration."]
+    #[doc = " \\param [out] ptr The location at which to store the resulting value."]
+    #[doc = " \\param [in] size The size of the container to which \\a ptr points."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE delay is not a valid <tt>\\ref vx_delay</tt> reference."]
+    #[doc = " \\ingroup group_delay"]
+    pub fn vxQueryDelay(
+        delay: vx_delay,
+        attribute: vx_enum,
+        ptr: *mut ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Releases a reference to a delay object."]
+    #[doc = " The object may not be garbage collected until its total reference count is zero."]
+    #[doc = " \\param [in] delay The pointer to the delay object reference to release."]
+    #[doc = " \\post After returning from this function the reference is zeroed."]
+    #[doc = " \\ingroup group_delay"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE delay is not a valid <tt>\\ref vx_delay</tt> reference."]
+    pub fn vxReleaseDelay(delay: *mut vx_delay) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Creates a Delay object."]
+    #[doc = " \\details This function creates a delay object with \\p num_slots slots. Each slot"]
+    #[doc = " contains a clone of the exemplar. The clones only inherit the metadata of the"]
+    #[doc = " exemplar. The data content of the exemplar is ignored and the clones have their"]
+    #[doc = " data undefined at delay creation time."]
+    #[doc = " The function does not alter the exemplar. Also, it doesn't retain or release the"]
+    #[doc = " reference to the exemplar."]
+    #[doc = " \\note For the definition of metadata attributes see \\ref vxSetMetaFormatAttribute."]
+    #[doc = " \\param [in] context The reference to the context."]
+    #[doc = " \\param [in] exemplar The exemplar object. Supported exemplar object types are:<br>"]
+    #[doc = " \\arg \\ref VX_TYPE_ARRAY"]
+    #[doc = " \\arg \\ref VX_TYPE_CONVOLUTION"]
+    #[doc = " \\arg \\ref VX_TYPE_DISTRIBUTION"]
+    #[doc = " \\arg \\ref VX_TYPE_IMAGE"]
+    #[doc = " \\arg \\ref VX_TYPE_LUT"]
+    #[doc = " \\arg \\ref VX_TYPE_MATRIX"]
+    #[doc = " \\arg \\ref VX_TYPE_OBJECT_ARRAY"]
+    #[doc = " \\arg \\ref VX_TYPE_PYRAMID"]
+    #[doc = " \\arg \\ref VX_TYPE_REMAP"]
+    #[doc = " \\arg \\ref VX_TYPE_SCALAR"]
+    #[doc = " \\arg \\ref VX_TYPE_THRESHOLD"]
+    #[doc = " \\arg \\ref VX_TYPE_TENSOR"]
+    #[doc = " \\param [in] num_slots The number of objects in the delay. This value must be greater than zero."]
+    #[doc = " \\returns A delay reference <tt>\\ref vx_delay</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_delay"]
+    pub fn vxCreateDelay(
+        context: vx_context,
+        exemplar: vx_reference,
+        num_slots: vx_size,
+    ) -> vx_delay;
+}
+extern "C" {
+    #[doc = " \\brief Retrieves a reference to a delay slot object."]
+    #[doc = " \\param [in] delay The reference to the delay object."]
+    #[doc = " \\param [in] index The index of the delay slot from which to extract the object reference."]
+    #[doc = " \\return <tt>\\ref vx_reference</tt>. Any possible errors preventing a successful"]
+    #[doc = " completion of the function should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\note The delay index is in the range \\f$ [-count+1,0] \\f$. 0 is always the"]
+    #[doc = " \\e current object."]
+    #[doc = " \\ingroup group_delay"]
+    #[doc = " \\note A reference retrieved with this function must not be given to its associated"]
+    #[doc = " release API (e.g. <tt>\\ref vxReleaseImage</tt>) unless <tt>\\ref vxRetainReference</tt> is used."]
+    pub fn vxGetReferenceFromDelay(delay: vx_delay, index: vx_int32) -> vx_reference;
+}
+extern "C" {
+    #[doc = " \\brief Shifts the internal delay ring by one."]
+    #[doc = ""]
+    #[doc = " This function performs a shift of the internal delay ring by one. This means that,"]
+    #[doc = " the data originally at index 0 move to index -1 and so forth until index"]
+    #[doc = " \\f$ -count+1 \\f$. The data originally at index \\f$ -count+1 \\f$ move to index 0."]
+    #[doc = " Here \\f$ count \\f$ is the number of slots in delay ring."]
+    #[doc = " When a delay is aged, any graph making use of this delay (delay object itself or data"]
+    #[doc = " objects in delay slots) gets its data automatically updated accordingly."]
+    #[doc = " \\param [in] delay"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Delay was aged; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE delay is not a valid <tt>\\ref vx_delay</tt> reference."]
+    #[doc = " \\ingroup group_delay"]
+    pub fn vxAgeDelay(delay: vx_delay) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Register a delay for auto-aging."]
+    #[doc = ""]
+    #[doc = " This function registers a delay object to be auto-aged by the graph."]
+    #[doc = " This delay object will be automatically aged after each successful completion of"]
+    #[doc = " this graph. Aging of a delay object cannot be called during graph execution."]
+    #[doc = " A graph abandoned due to a node callback will trigger an auto-aging."]
+    #[doc = ""]
+    #[doc = " If a delay is registered for auto-aging multiple times in a same graph,"]
+    #[doc = " the delay will be only aged a single time at each graph completion."]
+    #[doc = " If a delay is registered for auto-aging in multiple graphs, this delay will"]
+    #[doc = " aged automatically after each successful completion of any of these graphs."]
+    #[doc = ""]
+    #[doc = " \\param [in] graph The graph to which the delay is registered for auto-aging."]
+    #[doc = " \\param [in] delay The delay to automatically age."]
+    #[doc = ""]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE graph is not a valid <tt>\\ref vx_graph</tt> reference, or"]
+    #[doc = " delay is not a valid <tt>\\ref vx_delay</tt> reference."]
+    #[doc = " \\ingroup group_graph"]
+    pub fn vxRegisterAutoAging(graph: vx_graph, delay: vx_delay) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Adds a line to the log."]
+    #[doc = " \\param [in] ref The reference to add the log entry against. Some valid value must be provided."]
+    #[doc = " \\param [in] status The status code. <tt>\\ref VX_SUCCESS</tt> status entries are ignored and not added."]
+    #[doc = " \\param [in] message The human readable message to add to the log."]
+    #[doc = " \\param [in] ... a list of variable arguments to the message."]
+    #[doc = " \\note Messages may not exceed <tt>\\ref VX_MAX_LOG_MESSAGE_LEN</tt> bytes and will be truncated in the log if they exceed this limit."]
+    #[doc = " \\ingroup group_log"]
+    pub fn vxAddLogEntry(
+        ref_: vx_reference,
+        status: vx_status,
+        message: *const ::std::os::raw::c_char,
+        ...
+    );
+}
+extern "C" {
+    #[doc = " \\brief Registers a callback facility to the OpenVX implementation to receive error logs."]
+    #[doc = " \\param [in] context The overall context to OpenVX."]
+    #[doc = " \\param [in] callback The callback function. If NULL, the previous callback is removed."]
+    #[doc = " \\param [in] reentrant If reentrancy flag is <tt>\\ref vx_true_e</tt>, then the callback may be entered from multiple"]
+    #[doc = " simultaneous tasks or threads (if the host OS supports this)."]
+    #[doc = " \\ingroup group_log"]
+    pub fn vxRegisterLogCallback(
+        context: vx_context,
+        callback: vx_log_callback_f,
+        reentrant: vx_bool,
+    );
+}
+extern "C" {
+    #[doc = " \\brief Creates LUT object of a given type. The value of <tt>\\ref VX_LUT_OFFSET</tt> is equal to 0"]
+    #[doc = " for data_type = <tt>\\ref VX_TYPE_UINT8</tt>, and (vx_uint32)(count/2) for <tt>\\ref VX_TYPE_INT16</tt>."]
+    #[doc = " \\param [in] context The reference to the context."]
+    #[doc = " \\param [in] data_type The type of data stored in the LUT."]
+    #[doc = " \\param [in] count The number of entries desired."]
+    #[doc = " \\note data_type can only be \\ref VX_TYPE_UINT8 or \\ref VX_TYPE_INT16. If data_type"]
+    #[doc = " is \\ref VX_TYPE_UINT8, count should be not greater than 256. If data_type is \\ref VX_TYPE_INT16,"]
+    #[doc = " count should not be greater than 65536."]
+    #[doc = " \\returns An LUT reference <tt>\\ref vx_lut</tt>. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_lut"]
+    pub fn vxCreateLUT(context: vx_context, data_type: vx_enum, count: vx_size) -> vx_lut;
+}
+extern "C" {
+    #[doc = " \\brief Creates an opaque reference to a LUT object with no direct user access."]
+    #[doc = " \\param [in] graph The reference to the parent graph."]
+    #[doc = " \\param [in] data_type The type of data stored in the LUT."]
+    #[doc = " \\param [in] count The number of entries desired."]
+    #[doc = " \\see <tt>\\ref vxCreateLUT</tt>"]
+    #[doc = " \\note data_type can only be \\ref VX_TYPE_UINT8 or \\ref VX_TYPE_INT16. If data_type"]
+    #[doc = " is \\ref VX_TYPE_UINT8, count should be not greater than 256. If data_type is \\ref VX_TYPE_INT16,"]
+    #[doc = " count should not be greater than 65536."]
+    #[doc = " \\returns An LUT reference <tt>\\ref vx_lut</tt>. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_lut"]
+    pub fn vxCreateVirtualLUT(graph: vx_graph, data_type: vx_enum, count: vx_size) -> vx_lut;
+}
+extern "C" {
+    #[doc = " \\brief Releases a reference to a LUT object."]
+    #[doc = " The object may not be garbage collected until its total reference count is zero."]
+    #[doc = " \\param [in] lut The pointer to the LUT to release."]
+    #[doc = " \\post After returning from this function the reference is zeroed."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE lut is not a valid <tt>\\ref vx_lut</tt> reference."]
+    #[doc = " \\ingroup group_lut"]
+    pub fn vxReleaseLUT(lut: *mut vx_lut) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Queries attributes from a LUT."]
+    #[doc = " \\param [in] lut The LUT to query."]
+    #[doc = " \\param [in] attribute The attribute to query. Use a <tt>\\ref vx_lut_attribute_e</tt> enumeration."]
+    #[doc = " \\param [out] ptr The location at which to store the resulting value."]
+    #[doc = " \\param [in] size The size in bytes of the container to which \\a ptr points."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE lut is not a valid <tt>\\ref vx_lut</tt> reference."]
+    #[doc = " \\ingroup group_lut"]
+    pub fn vxQueryLUT(
+        lut: vx_lut,
+        attribute: vx_enum,
+        ptr: *mut ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allows the application to copy from/into a LUT object."]
+    #[doc = " \\param [in] lut The reference to the LUT object that is the source or the"]
+    #[doc = " destination of the copy."]
+    #[doc = " \\param [in] user_ptr The address of the memory location where to store the requested data"]
+    #[doc = " if the copy was requested in read mode, or from where to get the data to store into the LUT"]
+    #[doc = " object if the copy was requested in write mode. In the user memory, the LUT is"]
+    #[doc = " represented as a array with elements of the type corresponding to"]
+    #[doc = " <tt>\\ref VX_LUT_TYPE</tt>, and with a number of elements equal to the value"]
+    #[doc = " returned via <tt>\\ref VX_LUT_COUNT</tt>. The accessible memory must be large enough"]
+    #[doc = " to contain this array:"]
+    #[doc = " accessible memory in bytes >= sizeof(data_element) * count."]
+    #[doc = " \\param [in] usage This declares the effect of the copy with regard to the LUT object"]
+    #[doc = " using the <tt>\\ref vx_accessor_e</tt> enumeration. Only <tt>\\ref VX_READ_ONLY</tt> and <tt>\\ref VX_WRITE_ONLY</tt>"]
+    #[doc = " are supported:"]
+    #[doc = " \\arg <tt>\\ref VX_READ_ONLY</tt> means that data are copied from the LUT object into the user memory."]
+    #[doc = " \\arg <tt>\\ref VX_WRITE_ONLY</tt> means that data are copied into the LUT object from the user memory."]
+    #[doc = " \\param [in] user_mem_type A <tt>\\ref vx_memory_type_e</tt> enumeration that specifies"]
+    #[doc = " the memory type of the memory referenced by the user_addr."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE lut is not a valid <tt>\\ref vx_lut</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS An other parameter is incorrect."]
+    #[doc = " \\ingroup group_lut"]
+    pub fn vxCopyLUT(
+        lut: vx_lut,
+        user_ptr: *mut ::std::os::raw::c_void,
+        usage: vx_enum,
+        user_mem_type: vx_enum,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allows the application to get direct access to LUT object."]
+    #[doc = " \\param [in] lut The reference to the LUT object to map."]
+    #[doc = " \\param [out] map_id The address of a <tt>\\ref vx_map_id</tt> variable where the function"]
+    #[doc = " returns a map identifier."]
+    #[doc = " \\arg (*map_id) must eventually be provided as the map_id parameter of a call to"]
+    #[doc = " <tt>\\ref vxUnmapLUT</tt>."]
+    #[doc = " \\param [out] ptr The address of a pointer that the function sets to the"]
+    #[doc = " address where the requested data can be accessed. In the mapped memory area,"]
+    #[doc = " the LUT data are structured as an array with elements of the type corresponding"]
+    #[doc = " to <tt>\\ref VX_LUT_TYPE</tt>, with a number of elements equal to"]
+    #[doc = " the value returned via <tt>\\ref VX_LUT_COUNT</tt>. Accessing the"]
+    #[doc = " memory out of the bound of this array is forbidden and has an undefined behavior."]
+    #[doc = " The returned (*ptr) address is only valid between the call to the function and"]
+    #[doc = " the corresponding call to <tt>\\ref vxUnmapLUT</tt>."]
+    #[doc = " \\param [in] usage This declares the access mode for the LUT, using"]
+    #[doc = " the <tt>\\ref vx_accessor_e</tt> enumeration."]
+    #[doc = " \\arg <tt>\\ref VX_READ_ONLY</tt>: after the function call, the content of the memory location"]
+    #[doc = " pointed by (*ptr) contains the LUT data. Writing into this memory location"]
+    #[doc = " is forbidden and its behavior is undefined."]
+    #[doc = " \\arg <tt>\\ref VX_READ_AND_WRITE</tt>: after the function call, the content of the memory"]
+    #[doc = " location pointed by (*ptr) contains the LUT data; writing into this memory"]
+    #[doc = " is allowed only for the location of entries and will result in a modification"]
+    #[doc = " of the affected entries in the LUT object once the LUT is unmapped."]
+    #[doc = " \\arg <tt>\\ref VX_WRITE_ONLY</tt>: after the function call, the memory location pointed by(*ptr)"]
+    #[doc = " contains undefined data; writing each entry of LUT is required prior to"]
+    #[doc = " unmapping. Entries not written by the application before unmap will become"]
+    #[doc = " undefined after unmap, even if they were well defined before map."]
+    #[doc = " \\param [in] mem_type A <tt>\\ref vx_memory_type_e</tt> enumeration that"]
+    #[doc = " specifies the type of the memory where the LUT is requested to be mapped."]
+    #[doc = " \\param [in] flags An integer that allows passing options to the map operation."]
+    #[doc = " Use 0 for this option."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE lut is not a valid <tt>\\ref vx_lut</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS An other parameter is incorrect."]
+    #[doc = " \\ingroup group_lut"]
+    #[doc = " \\post <tt>\\ref vxUnmapLUT </tt> with same (*map_id) value."]
+    pub fn vxMapLUT(
+        lut: vx_lut,
+        map_id: *mut vx_map_id,
+        ptr: *mut *mut ::std::os::raw::c_void,
+        usage: vx_enum,
+        mem_type: vx_enum,
+        flags: vx_bitfield,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Unmap and commit potential changes to LUT object that was previously mapped."]
+    #[doc = " Unmapping a LUT invalidates the memory location from which the LUT data could"]
+    #[doc = " be accessed by the application. Accessing this memory location after the unmap function"]
+    #[doc = " completes has an undefined behavior."]
+    #[doc = " \\param [in] lut The reference to the LUT object to unmap."]
+    #[doc = " \\param [out] map_id The unique map identifier that was returned when calling"]
+    #[doc = " <tt>\\ref vxMapLUT</tt> ."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE lut is not a valid <tt>\\ref vx_lut</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS An other parameter is incorrect."]
+    #[doc = " \\ingroup group_lut"]
+    #[doc = " \\pre <tt>\\ref vxMapLUT</tt> returning the same map_id value"]
+    pub fn vxUnmapLUT(lut: vx_lut, map_id: vx_map_id) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Creates a reference to a 1D Distribution of a consecutive interval [offset, offset + range - 1]"]
+    #[doc = " defined by a start offset and valid range, divided equally into numBins parts."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] numBins The number of bins in the distribution."]
+    #[doc = " \\param [in] offset The start offset into the range value that marks the begining of the 1D Distribution."]
+    #[doc = " \\param [in] range  The total number of the consecutive values of the distribution interval."]
+    #[doc = " \\returns A distribution reference <tt>\\ref vx_distribution</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_distribution"]
+    pub fn vxCreateDistribution(
+        context: vx_context,
+        numBins: vx_size,
+        offset: vx_int32,
+        range: vx_uint32,
+    ) -> vx_distribution;
+}
+extern "C" {
+    #[doc = " \\brief Creates an opaque reference to a 1D Distribution object without direct user access."]
+    #[doc = " \\param [in] graph The reference to the parent graph."]
+    #[doc = " \\param [in] numBins The number of bins in the distribution."]
+    #[doc = " \\param [in] offset The start offset into the range value that marks the begining of the 1D Distribution."]
+    #[doc = " \\param [in] range  The total number of the consecutive values of the distribution interval."]
+    #[doc = " \\see <tt>\\ref vxCreateDistribution</tt>"]
+    #[doc = " \\returns A distribution reference <tt>\\ref vx_distribution</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_distribution"]
+    pub fn vxCreateVirtualDistribution(
+        graph: vx_graph,
+        numBins: vx_size,
+        offset: vx_int32,
+        range: vx_uint32,
+    ) -> vx_distribution;
+}
+extern "C" {
+    #[doc = " \\brief Releases a reference to a distribution object."]
+    #[doc = " The object may not be garbage collected until its total reference count is zero."]
+    #[doc = " \\param [in] distribution The reference to the distribution to release."]
+    #[doc = " \\post After returning from this function the reference is zeroed."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE distribution is not a valid <tt>\\ref vx_distribution</tt> reference."]
+    #[doc = " \\ingroup group_distribution"]
+    pub fn vxReleaseDistribution(distribution: *mut vx_distribution) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Queries a Distribution object."]
+    #[doc = " \\param [in] distribution The reference to the distribution to query."]
+    #[doc = " \\param [in] attribute The attribute to query. Use a <tt>\\ref vx_distribution_attribute_e</tt> enumeration."]
+    #[doc = " \\param [out] ptr The location at which to store the resulting value."]
+    #[doc = " \\param [in] size The size in bytes of the container to which \\a ptr points."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE distribution is not a valid <tt>\\ref vx_distribution</tt> reference."]
+    #[doc = " \\ingroup group_distribution"]
+    pub fn vxQueryDistribution(
+        distribution: vx_distribution,
+        attribute: vx_enum,
+        ptr: *mut ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allows the application to copy from/into a distribution object."]
+    #[doc = " \\param [in] distribution The reference to the distribution object that is the source or the"]
+    #[doc = " destination of the copy."]
+    #[doc = " \\param [in] user_ptr The address of the memory location where to store the requested data"]
+    #[doc = " if the copy was requested in read mode, or from where to get the data to store into the distribution"]
+    #[doc = " object if the copy was requested in write mode. In the user memory, the distribution is"]
+    #[doc = " represented as a <tt>\\ref vx_uint32</tt> array with a number of elements equal to the value returned via"]
+    #[doc = " <tt>\\ref VX_DISTRIBUTION_BINS</tt>. The accessible memory must be large enough"]
+    #[doc = " to contain this vx_uint32 array:"]
+    #[doc = " accessible memory in bytes >= sizeof(vx_uint32) * num_bins."]
+    #[doc = " \\param [in] usage This declares the effect of the copy with regard to the distribution object"]
+    #[doc = " using the <tt>\\ref vx_accessor_e</tt> enumeration. Only <tt>\\ref VX_READ_ONLY</tt> and <tt>\\ref VX_WRITE_ONLY</tt>"]
+    #[doc = " are supported:"]
+    #[doc = " \\arg <tt>\\ref VX_READ_ONLY</tt> means that data are copied from the distribution object into the user memory."]
+    #[doc = " \\arg <tt>\\ref VX_WRITE_ONLY</tt> means that data are copied into the distribution object from the user memory."]
+    #[doc = " \\param [in] user_mem_type A <tt>\\ref vx_memory_type_e</tt> enumeration that specifies"]
+    #[doc = " the memory type of the memory referenced by the user_addr."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE distribution is not a valid <tt>\\ref vx_distribution</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS An other parameter is incorrect."]
+    #[doc = " \\ingroup group_distribution"]
+    pub fn vxCopyDistribution(
+        distribution: vx_distribution,
+        user_ptr: *mut ::std::os::raw::c_void,
+        usage: vx_enum,
+        user_mem_type: vx_enum,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allows the application to get direct access to distribution object."]
+    #[doc = " \\param [in] distribution The reference to the distribution object to map."]
+    #[doc = " \\param [out] map_id The address of a <tt>\\ref vx_map_id</tt> variable where the function"]
+    #[doc = " returns a map identifier."]
+    #[doc = " \\arg (*map_id) must eventually be provided as the map_id parameter of a call to"]
+    #[doc = " <tt>\\ref vxUnmapDistribution</tt>."]
+    #[doc = " \\param [out] ptr The address of a pointer that the function sets to the"]
+    #[doc = " address where the requested data can be accessed. In the mapped memory area,"]
+    #[doc = " data are structured as a vx_uint32 array with a number of elements equal to"]
+    #[doc = " the value returned via <tt>\\ref VX_DISTRIBUTION_BINS</tt>. Each"]
+    #[doc = " element of this array corresponds to a bin of the distribution, with a range-major"]
+    #[doc = " ordering. Accessing the memory out of the bound of this array"]
+    #[doc = " is forbidden and has an undefined behavior. The returned (*ptr) address"]
+    #[doc = " is only valid between the call to the function and the corresponding call to"]
+    #[doc = " <tt>\\ref vxUnmapDistribution</tt>."]
+    #[doc = " \\param [in] usage This declares the access mode for the distribution, using"]
+    #[doc = " the <tt>\\ref vx_accessor_e</tt> enumeration."]
+    #[doc = " \\arg <tt>\\ref VX_READ_ONLY</tt>: after the function call, the content of the memory location"]
+    #[doc = " pointed by (*ptr) contains the distribution data. Writing into this memory location"]
+    #[doc = " is forbidden and its behavior is undefined."]
+    #[doc = " \\arg <tt>\\ref VX_READ_AND_WRITE</tt>: after the function call, the content of the memory"]
+    #[doc = " location pointed by (*ptr) contains the distribution data; writing into this memory"]
+    #[doc = " is allowed only for the location of bins and will result in a modification of the"]
+    #[doc = " affected bins in the distribution object once the distribution is unmapped."]
+    #[doc = " \\arg <tt>\\ref VX_WRITE_ONLY</tt>: after the function call, the memory location pointed by (*ptr)"]
+    #[doc = " contains undefined data; writing each bin of distribution is required prior to"]
+    #[doc = " unmapping. Bins not written by the application before unmap will become"]
+    #[doc = " undefined after unmap, even if they were well defined before map."]
+    #[doc = " \\param [in] mem_type A <tt>\\ref vx_memory_type_e</tt> enumeration that"]
+    #[doc = " specifies the type of the memory where the distribution is requested to be mapped."]
+    #[doc = " \\param [in] flags An integer that allows passing options to the map operation."]
+    #[doc = " Use 0 for this option."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE distribution is not a valid <tt>\\ref vx_distribution</tt> reference."]
+    #[doc = " reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS An other parameter is incorrect."]
+    #[doc = " \\ingroup group_distribution"]
+    #[doc = " \\post <tt>\\ref vxUnmapDistribution </tt> with same (*map_id) value."]
+    pub fn vxMapDistribution(
+        distribution: vx_distribution,
+        map_id: *mut vx_map_id,
+        ptr: *mut *mut ::std::os::raw::c_void,
+        usage: vx_enum,
+        mem_type: vx_enum,
+        flags: vx_bitfield,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Unmap and commit potential changes to distribution object that was previously mapped."]
+    #[doc = " Unmapping a distribution invalidates the memory location from which the distribution data"]
+    #[doc = " could be accessed by the application. Accessing this memory location after the unmap"]
+    #[doc = " function completes has an undefined behavior."]
+    #[doc = " \\param [in] distribution The reference to the distribution object to unmap."]
+    #[doc = " \\param [out] map_id The unique map identifier that was returned when calling"]
+    #[doc = " <tt>\\ref vxMapDistribution</tt> ."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE distribution is not a valid <tt>\\ref vx_distribution</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS An other parameter is incorrect."]
+    #[doc = " \\ingroup group_distribution"]
+    #[doc = " \\pre <tt>\\ref vxMapDistribution</tt> returning the same map_id value"]
+    pub fn vxUnmapDistribution(distribution: vx_distribution, map_id: vx_map_id) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Creates a threshold object and returns a reference to it."]
+    #[doc = ""]
+    #[doc = " The threshold object defines the parameters of a thresholding operation"]
+    #[doc = " to an input image, that generates an output image that can have a different"]
+    #[doc = " format. The thresholding 'false' or 'true' output values are specified per"]
+    #[doc = " pixel channels of the output format and can be modified with"]
+    #[doc = " <tt>\\ref vxCopyThresholdOutput</tt>. The default 'false' output value of"]
+    #[doc = " pixels channels should be 0, and the default 'true' value should be non-zero."]
+    #[doc = " For standard image formats, default output pixel values are defined as"]
+    #[doc = " following:"]
+    #[doc = "  \\arg \\ref VX_DF_IMAGE_RGB : false={0, 0, 0}, true={255,255,255}"]
+    #[doc = "  \\arg \\ref VX_DF_IMAGE_RGBX : false={0, 0, 0, 0}, true={255,255,255,255}"]
+    #[doc = "  \\arg \\ref VX_DF_IMAGE_NV12 : false={0, 0, 0}, true={255,255,255}"]
+    #[doc = "  \\arg \\ref VX_DF_IMAGE_NV21 : false={0, 0, 0}, true={255,255,255}"]
+    #[doc = "  \\arg \\ref VX_DF_IMAGE_UYVY : false={0, 0, 0}, true={255,255,255}"]
+    #[doc = "  \\arg \\ref VX_DF_IMAGE_YUYV : false={0, 0, 0}, true={255,255,255}"]
+    #[doc = "  \\arg \\ref VX_DF_IMAGE_IYUV : false={0, 0, 0}, true={255,255,255}"]
+    #[doc = "  \\arg \\ref VX_DF_IMAGE_YUV4 : false={0, 0, 0}, true={255,255,255}"]
+    #[doc = "  \\arg \\ref VX_DF_IMAGE_U8 : false=0, true=0xFF"]
+    #[doc = "  \\arg \\ref VX_DF_IMAGE_S16 : false=0, true=-1"]
+    #[doc = "  \\arg \\ref VX_DF_IMAGE_U16 : false=0, true=0xFFFF"]
+    #[doc = "  \\arg \\ref VX_DF_IMAGE_S32 : false=0, true=-1"]
+    #[doc = "  \\arg \\ref VX_DF_IMAGE_U32 : false=0, true=0xFFFFFFFF"]
+    #[doc = " \\param [in] context The reference to the context in which the object is"]
+    #[doc = " created."]
+    #[doc = " \\param [in] thresh_type The type of thresholding operation."]
+    #[doc = " \\param [in] input_format The format of images that will be used as input of"]
+    #[doc = " the thresholding operation."]
+    #[doc = " \\param [in] output_format The format of images that will be generated by the"]
+    #[doc = " thresholding operation."]
+    #[doc = " \\returns A threshold reference <tt>\\ref vx_threshold</tt>. Any possible"]
+    #[doc = " errors preventing a successful creation should be checked using"]
+    #[doc = " <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_threshold"]
+    pub fn vxCreateThresholdForImage(
+        context: vx_context,
+        thresh_type: vx_enum,
+        input_format: vx_df_image,
+        output_format: vx_df_image,
+    ) -> vx_threshold;
+}
+extern "C" {
+    #[doc = " \\brief Creates an opaque reference to a threshold object without direct user access."]
+    #[doc = ""]
+    #[doc = " \\param [in] graph The reference to the parent graph."]
+    #[doc = " \\param [in] thresh_type The type of thresholding operation."]
+    #[doc = " \\param [in] input_format The format of images that will be used as input of"]
+    #[doc = " the thresholding operation."]
+    #[doc = " \\param [in] output_format The format of images that will be generated by the"]
+    #[doc = " thresholding operation."]
+    #[doc = " \\see <tt>\\ref vxCreateThresholdForImage</tt>"]
+    #[doc = " \\returns A threshold reference <tt>\\ref vx_threshold</tt>. Any possible"]
+    #[doc = " errors preventing a successful creation should be checked using"]
+    #[doc = " <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_threshold"]
+    pub fn vxCreateVirtualThresholdForImage(
+        graph: vx_graph,
+        thresh_type: vx_enum,
+        input_format: vx_df_image,
+        output_format: vx_df_image,
+    ) -> vx_threshold;
+}
+extern "C" {
+    #[doc = " \\brief Allows the application to copy the thresholding value from/into a"]
+    #[doc = " threshold object with type <tt>\\ref VX_THRESHOLD_TYPE_BINARY</tt>."]
+    #[doc = " \\param [in] thresh The reference to the threshold object that is the source"]
+    #[doc = " or the destination of the copy."]
+    #[doc = " \\param [in,out] value_ptr The address of the memory location where to store"]
+    #[doc = " the thresholding value if the copy was requested in read mode, or from where"]
+    #[doc = " to get the thresholding value to store into the threshold object if the copy"]
+    #[doc = " was requested in write mode."]
+    #[doc = " \\param [in] usage This declares the effect of the copy with regard to the"]
+    #[doc = " threshold object using the <tt>\\ref vx_accessor_e</tt> enumeration. Only"]
+    #[doc = " <tt>\\ref VX_READ_ONLY</tt> and <tt>\\ref VX_WRITE_ONLY</tt> are supported:"]
+    #[doc = " \\arg <tt>\\ref VX_READ_ONLY</tt> means that the thresholding value is copied"]
+    #[doc = " from the threshold object into the user memory. After the copy, only the"]
+    #[doc = " field of the (*value_ptr) union that corresponds to the input image format"]
+    #[doc = " of the threshold object is meaningful."]
+    #[doc = " \\arg <tt>\\ref VX_WRITE_ONLY</tt> means the field of the (*value_ptr) union"]
+    #[doc = " corresponding  to the input format of the threshold object is copied into"]
+    #[doc = " the threshold object."]
+    #[doc = " \\param [in] user_mem_type A <tt>\\ref vx_memory_type_e</tt> enumeration that"]
+    #[doc = " specifies the type of the memory referenced by \\p value_ptr."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE The threshold reference is not actually a"]
+    #[doc = " threshold reference."]
+    #[doc = " \\retval VX_ERROR_NOT_COMPATIBLE The threshold object doesn't have type"]
+    #[doc = " <tt>\\ref VX_THRESHOLD_TYPE_BINARY</tt>"]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS An other parameter is incorrect."]
+    #[doc = " \\ingroup group_threshold"]
+    pub fn vxCopyThresholdValue(
+        thresh: vx_threshold,
+        value_ptr: *mut vx_pixel_value_t,
+        usage: vx_enum,
+        user_mem_type: vx_enum,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allows the application to copy thresholding values from/into a"]
+    #[doc = " threshold object with type <tt>\\ref VX_THRESHOLD_TYPE_RANGE</tt>."]
+    #[doc = " \\param [in] thresh The reference to the threshold object that is the source"]
+    #[doc = " or the destination of the copy."]
+    #[doc = " \\param [in,out] lower_value_ptr The address of the memory location where to"]
+    #[doc = " store the lower thresholding value if the copy was requested in read mode,"]
+    #[doc = " or from where to get the lower thresholding value to store into the threshold"]
+    #[doc = " object if the copy was requested in write mode."]
+    #[doc = " \\param [in,out] upper_value_ptr The address of the memory location where to"]
+    #[doc = " store the upper thresholding value if the copy was requested in read mode, or"]
+    #[doc = " from where to get the upper thresholding value to store into the threshold"]
+    #[doc = " object if the copy was requested in write mode."]
+    #[doc = " \\param [in] usage This declares the effect of the copy with regard to the"]
+    #[doc = " threshold object using the <tt>\\ref vx_accessor_e</tt> enumeration. Only"]
+    #[doc = " <tt>\\ref VX_READ_ONLY</tt> and <tt>\\ref VX_WRITE_ONLY</tt> are supported:"]
+    #[doc = " \\arg <tt>\\ref VX_READ_ONLY</tt> means that thresholding values are copied"]
+    #[doc = " from the threshold object into the user memory. After the copy, only the"]
+    #[doc = " field of (*lower_value_ptr) and (*upper_value_ptr) unions that corresponds"]
+    #[doc = " to the input image format of the threshold object is meaningful."]
+    #[doc = " \\arg <tt>\\ref VX_WRITE_ONLY</tt> means the field of the (*lower_value_ptr)"]
+    #[doc = " and (*upper_value_ptr) unions corresponding to the input format of the"]
+    #[doc = " threshold object is copied into the threshold object."]
+    #[doc = " \\param [in] user_mem_type A <tt>\\ref vx_memory_type_e</tt> enumeration that"]
+    #[doc = " specifies the type of the memory referenced by \\p lower_value_ptr and"]
+    #[doc = " \\p upper_value_ptr."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE The threshold reference is not actually"]
+    #[doc = " a threshold reference."]
+    #[doc = " \\retval VX_ERROR_NOT_COMPATIBLE The threshold object doesn't have type"]
+    #[doc = " <tt>\\ref VX_THRESHOLD_TYPE_RANGE</tt>"]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS An other parameter is incorrect."]
+    #[doc = " \\ingroup group_threshold"]
+    pub fn vxCopyThresholdRange(
+        thresh: vx_threshold,
+        lower_value_ptr: *mut vx_pixel_value_t,
+        upper_value_ptr: *mut vx_pixel_value_t,
+        usage: vx_enum,
+        user_mem_type: vx_enum,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allows the application to copy the true and false output values"]
+    #[doc = " from/into a threshold object."]
+    #[doc = " \\param [in] thresh The reference to the threshold object that is the source"]
+    #[doc = " or the destination of the copy."]
+    #[doc = " \\param [in,out] true_value_ptr The address of the memory location where to"]
+    #[doc = " store the true output value if the copy was requested in read mode,"]
+    #[doc = " or from where to get the true output value to store into the threshold"]
+    #[doc = " object if the copy was requested in write mode."]
+    #[doc = " \\param [in,out] false_value_ptr The address of the memory location where to"]
+    #[doc = " store the false output value if the copy was requested in read mode, or"]
+    #[doc = " from where to get the false output value to store into the threshold"]
+    #[doc = " object if the copy was requested in write mode."]
+    #[doc = " \\param [in] usage This declares the effect of the copy with regard to the"]
+    #[doc = " threshold object using the <tt>\\ref vx_accessor_e</tt> enumeration. Only"]
+    #[doc = " <tt>\\ref VX_READ_ONLY</tt> and <tt>\\ref VX_WRITE_ONLY</tt> are supported:"]
+    #[doc = " \\arg <tt>\\ref VX_READ_ONLY</tt> means that true and false output values"]
+    #[doc = " are copied from the threshold object into the user memory. After the copy,"]
+    #[doc = " only the field of (*true_value_ptr) and (*false_value_ptr) unions that"]
+    #[doc = " corresponds to the output image format of the threshold object is meaningful."]
+    #[doc = " \\arg <tt>\\ref VX_WRITE_ONLY</tt> means the field of the (*true_value_ptr)"]
+    #[doc = " and (*false_value_ptr) unions corresponding to the output format of the"]
+    #[doc = " threshold object is copied into the threshold object."]
+    #[doc = " \\param [in] user_mem_type A <tt>\\ref vx_memory_type_e</tt> enumeration that"]
+    #[doc = " specifies the type of the memory referenced by \\p true_value_ptr and"]
+    #[doc = " \\p false_value_ptr."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE The threshold reference is not actually"]
+    #[doc = " a threshold reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS An other parameter is incorrect."]
+    #[doc = " \\ingroup group_threshold"]
+    pub fn vxCopyThresholdOutput(
+        thresh: vx_threshold,
+        true_value_ptr: *mut vx_pixel_value_t,
+        false_value_ptr: *mut vx_pixel_value_t,
+        usage: vx_enum,
+        user_mem_type: vx_enum,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Releases a reference to a threshold object."]
+    #[doc = " The object may not be garbage collected until its total reference count is zero."]
+    #[doc = " \\param [in] thresh The pointer to the threshold to release."]
+    #[doc = " \\post After returning from this function the reference is zeroed."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE thresh is not a valid <tt>\\ref vx_threshold</tt> reference."]
+    #[doc = " \\ingroup group_threshold"]
+    pub fn vxReleaseThreshold(thresh: *mut vx_threshold) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Sets attributes on the threshold object."]
+    #[doc = " \\param [in] thresh The threshold object to set."]
+    #[doc = " \\param [in] attribute The attribute to modify. Use a <tt>\\ref vx_threshold_attribute_e</tt> enumeration."]
+    #[doc = " \\param [in] ptr The pointer to the value to which to set the attribute."]
+    #[doc = " \\param [in] size The size of the data pointed to by \\a ptr."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE thresh is not a valid <tt>\\ref vx_threshold</tt> reference."]
+    #[doc = " \\ingroup group_threshold"]
+    pub fn vxSetThresholdAttribute(
+        thresh: vx_threshold,
+        attribute: vx_enum,
+        ptr: *const ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Queries an attribute on the threshold object."]
+    #[doc = " \\param [in] thresh The threshold object to set."]
+    #[doc = " \\param [in] attribute The attribute to query. Use a <tt>\\ref vx_threshold_attribute_e</tt> enumeration."]
+    #[doc = " \\param [out] ptr The location at which to store the resulting value."]
+    #[doc = " \\param [in] size The size of the container to which \\a ptr points."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE thresh is not a valid <tt>\\ref vx_threshold</tt> reference."]
+    #[doc = " \\ingroup group_threshold"]
+    pub fn vxQueryThreshold(
+        thresh: vx_threshold,
+        attribute: vx_enum,
+        ptr: *mut ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Creates a reference to a matrix object."]
+    #[doc = " \\param [in] c The reference to the overall context."]
+    #[doc = " \\param [in] data_type The vx_type_e that represents the data type of the matrix data elements."]
+    #[doc = " \\param [in] columns The first dimensionality."]
+    #[doc = " \\param [in] rows The second dimensionality."]
+    #[doc = " \\returns An matrix reference <tt>\\ref vx_matrix</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_matrix"]
+    pub fn vxCreateMatrix(
+        c: vx_context,
+        data_type: vx_enum,
+        columns: vx_size,
+        rows: vx_size,
+    ) -> vx_matrix;
+}
+extern "C" {
+    #[doc = " \\brief Creates an opaque reference to a matrix object without direct user access."]
+    #[doc = " \\param [in] graph The reference to the parent graph."]
+    #[doc = " \\param [in] data_type The vx_type_e that represents the data type of the matrix data elements."]
+    #[doc = " \\param [in] columns The first dimensionality."]
+    #[doc = " \\param [in] rows The second dimensionality."]
+    #[doc = " \\see <tt>\\ref vxCreateMatrix</tt>"]
+    #[doc = " \\returns An matrix reference <tt>\\ref vx_matrix</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_matrix"]
+    pub fn vxCreateVirtualMatrix(
+        graph: vx_graph,
+        data_type: vx_enum,
+        columns: vx_size,
+        rows: vx_size,
+    ) -> vx_matrix;
+}
+extern "C" {
+    #[doc = " \\brief Releases a reference to a matrix object."]
+    #[doc = " The object may not be garbage collected until its total reference count is zero."]
+    #[doc = " \\param [in] mat The matrix reference to release."]
+    #[doc = " \\post After returning from this function the reference is zeroed."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE mat is not a valid <tt>\\ref vx_matrix</tt> reference."]
+    #[doc = " \\ingroup group_matrix"]
+    pub fn vxReleaseMatrix(mat: *mut vx_matrix) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Queries an attribute on the matrix object."]
+    #[doc = " \\param [in] mat The matrix object to set."]
+    #[doc = " \\param [in] attribute The attribute to query. Use a <tt>\\ref vx_matrix_attribute_e</tt> enumeration."]
+    #[doc = " \\param [out] ptr The location at which to store the resulting value."]
+    #[doc = " \\param [in] size The size in bytes of the container to which \\a ptr points."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE mat is not a valid <tt>\\ref vx_matrix</tt> reference."]
+    #[doc = " \\ingroup group_matrix"]
+    pub fn vxQueryMatrix(
+        mat: vx_matrix,
+        attribute: vx_enum,
+        ptr: *mut ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allows the application to copy from/into a matrix object."]
+    #[doc = " \\param [in] matrix The reference to the matrix object that is the source or the"]
+    #[doc = " destination of the copy."]
+    #[doc = " \\param [in] user_ptr The address of the memory location where to store the requested data"]
+    #[doc = " if the copy was requested in read mode, or from where to get the data to store into the matrix"]
+    #[doc = " object if the copy was requested in write mode. In the user memory, the matrix is"]
+    #[doc = " structured as a row-major 2D array with elements of the type corresponding to"]
+    #[doc = " <tt>\\ref VX_MATRIX_TYPE</tt>, with a number of rows corresponding to"]
+    #[doc = " <tt>\\ref VX_MATRIX_ROWS</tt> and a number of columns corresponding to"]
+    #[doc = " <tt>\\ref VX_MATRIX_COLUMNS</tt>. The accessible memory must be large"]
+    #[doc = " enough to contain this 2D array:"]
+    #[doc = " accessible memory in bytes >= sizeof(data_element) * rows * columns."]
+    #[doc = " \\param [in] usage This declares the effect of the copy with regard to the matrix object"]
+    #[doc = " using the <tt>\\ref vx_accessor_e</tt> enumeration. Only <tt>\\ref VX_READ_ONLY</tt> and <tt>\\ref VX_WRITE_ONLY</tt>"]
+    #[doc = " are supported:"]
+    #[doc = " \\arg <tt>\\ref VX_READ_ONLY</tt> means that data are copied from the matrix object into the user memory."]
+    #[doc = " \\arg <tt>\\ref VX_WRITE_ONLY</tt> means that data are copied into the matrix object from the user memory."]
+    #[doc = " \\param [in] user_mem_type A <tt>\\ref vx_memory_type_e</tt> enumeration that specifies"]
+    #[doc = " the memory type of the memory referenced by the user_addr."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE matrix is not a valid <tt>\\ref vx_matrix</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS An other parameter is incorrect."]
+    #[doc = " \\ingroup group_matrix"]
+    pub fn vxCopyMatrix(
+        matrix: vx_matrix,
+        user_ptr: *mut ::std::os::raw::c_void,
+        usage: vx_enum,
+        user_mem_type: vx_enum,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Creates a reference to a matrix object from a boolean pattern."]
+    #[doc = " \\see <tt>\\ref vxCreateMatrixFromPatternAndOrigin</tt> for a description of the matrix patterns."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] pattern The pattern of the matrix. See <tt>\\ref VX_MATRIX_PATTERN</tt>."]
+    #[doc = " \\param [in] columns The first dimensionality."]
+    #[doc = " \\param [in] rows The second dimensionality."]
+    #[doc = " \\returns A matrix reference <tt>\\ref vx_matrix</tt> of type <tt>\\ref VX_TYPE_UINT8</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_matrix"]
+    pub fn vxCreateMatrixFromPattern(
+        context: vx_context,
+        pattern: vx_enum,
+        columns: vx_size,
+        rows: vx_size,
+    ) -> vx_matrix;
+}
+extern "C" {
+    #[doc = " \\brief Creates a reference to a matrix object from a boolean pattern, with a user-specified origin."]
+    #[doc = ""]
+    #[doc = " The matrix created by this function is of type <tt>\\ref VX_TYPE_UINT8</tt>, with the value 0 representing False,"]
+    #[doc = " and the value 255 representing True. It supports the patterns as described below:"]
+    #[doc = " - VX_PATTERN_BOX is a matrix with dimensions equal to the given number of rows and columns, and all cells equal to 255."]
+    #[doc = "   Dimensions of 3x3 and 5x5 must be supported."]
+    #[doc = " - VX_PATTERN_CROSS is a matrix with dimensions equal to the given number of rows and columns, which both must be odd numbers."]
+    #[doc = "   All cells in the center row and center column are equal to 255, and the rest are equal to zero."]
+    #[doc = "   Dimensions of 3x3 and 5x5 must be supported."]
+    #[doc = " - VX_PATTERN_DISK is a matrix with dimensions equal to the given number of rows (R) and columns (C),"]
+    #[doc = "   where R and C are odd and cell (c, r) is 255 if: \\n"]
+    #[doc = "   (r-R/2 + 0.5)^2 / (R/2)^2 + (c-C/2 + 0.5)^2/(C/2)^2 is less than or equal to 1,\\n and 0 otherwise."]
+    #[doc = ""]
+    #[doc = " A matrix created from pattern is read-only. The behavior when attempting to modify such a matrix is undefined."]
+    #[doc = ""]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] pattern The pattern of the matrix. See <tt>\\ref VX_MATRIX_PATTERN</tt>."]
+    #[doc = " \\param [in] columns The first dimensionality."]
+    #[doc = " \\param [in] rows The second dimensionality."]
+    #[doc = " \\param [in] origin_col The origin (first dimensionality)."]
+    #[doc = " \\param [in] origin_row The origin (second dimensionality)."]
+    #[doc = " \\returns A matrix reference <tt>\\ref vx_matrix</tt> of type <tt>\\ref VX_TYPE_UINT8</tt>. Any possible errors"]
+    #[doc = " preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_matrix"]
+    pub fn vxCreateMatrixFromPatternAndOrigin(
+        context: vx_context,
+        pattern: vx_enum,
+        columns: vx_size,
+        rows: vx_size,
+        origin_col: vx_size,
+        origin_row: vx_size,
+    ) -> vx_matrix;
+}
+extern "C" {
+    #[doc = " \\brief Creates a reference to a convolution matrix object."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] columns The columns dimension of the convolution."]
+    #[doc = " Must be odd and greater than or equal to 3 and less than the value returned"]
+    #[doc = " from <tt>\\ref VX_CONTEXT_CONVOLUTION_MAX_DIMENSION</tt>."]
+    #[doc = " \\param [in] rows The rows dimension of the convolution."]
+    #[doc = " Must be odd and greater than or equal to 3 and less than the value returned"]
+    #[doc = " from <tt>\\ref VX_CONTEXT_CONVOLUTION_MAX_DIMENSION</tt>."]
+    #[doc = " \\returns A convolution reference <tt>\\ref vx_convolution</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_convolution"]
+    pub fn vxCreateConvolution(
+        context: vx_context,
+        columns: vx_size,
+        rows: vx_size,
+    ) -> vx_convolution;
+}
+extern "C" {
+    #[doc = " \\brief Creates an opaque reference to a convolution matrix object without direct user access."]
+    #[doc = " \\param [in] graph The reference to the parent graph."]
+    #[doc = " \\param [in] columns The columns dimension of the convolution."]
+    #[doc = " Must be odd and greater than or equal to 3 and less than the value returned"]
+    #[doc = " from <tt>\\ref VX_CONTEXT_CONVOLUTION_MAX_DIMENSION</tt>."]
+    #[doc = " \\param [in] rows The rows dimension of the convolution."]
+    #[doc = " Must be odd and greater than or equal to 3 and less than the value returned"]
+    #[doc = " from <tt>\\ref VX_CONTEXT_CONVOLUTION_MAX_DIMENSION</tt>."]
+    #[doc = " \\see <tt>\\ref vxCreateConvolution</tt>"]
+    #[doc = " \\returns A convolution reference <tt>\\ref vx_convolution</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_convolution"]
+    pub fn vxCreateVirtualConvolution(
+        graph: vx_graph,
+        columns: vx_size,
+        rows: vx_size,
+    ) -> vx_convolution;
+}
+extern "C" {
+    #[doc = " \\brief Releases the reference to a convolution matrix."]
+    #[doc = " The object may not be garbage collected until its total reference count is zero."]
+    #[doc = " \\param [in] conv The pointer to the convolution matrix to release."]
+    #[doc = " \\post After returning from this function the reference is zeroed."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE conv is not a valid <tt>\\ref vx_convolution</tt> reference."]
+    #[doc = " \\ingroup group_convolution"]
+    pub fn vxReleaseConvolution(conv: *mut vx_convolution) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Queries an attribute on the convolution matrix object."]
+    #[doc = " \\param [in] conv The convolution matrix object to set."]
+    #[doc = " \\param [in] attribute The attribute to query. Use a <tt>\\ref vx_convolution_attribute_e</tt> enumeration."]
+    #[doc = " \\param [out] ptr The location at which to store the resulting value."]
+    #[doc = " \\param [in] size The size in bytes of the container to which \\a ptr points."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE conv is not a valid <tt>\\ref vx_convolution</tt> reference."]
+    #[doc = " \\ingroup group_convolution"]
+    pub fn vxQueryConvolution(
+        conv: vx_convolution,
+        attribute: vx_enum,
+        ptr: *mut ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Sets attributes on the convolution object."]
+    #[doc = " \\param [in] conv The coordinates object to set."]
+    #[doc = " \\param [in] attribute The attribute to modify. Use a <tt>\\ref vx_convolution_attribute_e</tt> enumeration."]
+    #[doc = " \\param [in] ptr The pointer to the value to which to set the attribute."]
+    #[doc = " \\param [in] size The size in bytes of the data pointed to by \\a ptr."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE conv is not a valid <tt>\\ref vx_convolution</tt> reference."]
+    #[doc = " \\ingroup group_convolution"]
+    pub fn vxSetConvolutionAttribute(
+        conv: vx_convolution,
+        attribute: vx_enum,
+        ptr: *const ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allows the application to copy coefficients from/into a convolution object."]
+    #[doc = " \\param [in] conv The reference to the convolution object that is the source or the destination of the copy."]
+    #[doc = " \\param [in] user_ptr The address of the memory location where to store the requested"]
+    #[doc = " coefficient data if the copy was requested in read mode, or from where to get the"]
+    #[doc = " coefficient data to store into the convolution object if the copy was requested in"]
+    #[doc = " write mode. In the user memory, the convolution coefficient data is structured as a"]
+    #[doc = " row-major 2D array with elements of the type corresponding"]
+    #[doc = " to <tt>\\ref VX_TYPE_CONVOLUTION</tt>, with a number of rows corresponding to"]
+    #[doc = " <tt>\\ref VX_CONVOLUTION_ROWS</tt> and a number of columns corresponding to"]
+    #[doc = " <tt>\\ref VX_CONVOLUTION_COLUMNS</tt>. The accessible memory must be large"]
+    #[doc = " enough to contain this 2D array:"]
+    #[doc = " accessible memory in bytes >= sizeof(data_element) * rows * columns."]
+    #[doc = " \\param [in] usage This declares the effect of the copy with regard to the convolution object"]
+    #[doc = " using the <tt>\\ref vx_accessor_e</tt> enumeration. Only <tt>\\ref VX_READ_ONLY</tt> and <tt>\\ref VX_WRITE_ONLY</tt>"]
+    #[doc = " are supported:"]
+    #[doc = " \\arg <tt>\\ref VX_READ_ONLY</tt> means that data are copied from the convolution object into the user memory."]
+    #[doc = " \\arg <tt>\\ref VX_WRITE_ONLY</tt> means that data are copied into the convolution object from the user memory."]
+    #[doc = " \\param [in] user_mem_type A <tt>\\ref vx_memory_type_e</tt> enumeration that specifies"]
+    #[doc = " the memory type of the memory referenced by the user_addr."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE conv is not a valid <tt>\\ref vx_convolution</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS An other parameter is incorrect."]
+    #[doc = " \\ingroup group_convolution"]
+    pub fn vxCopyConvolutionCoefficients(
+        conv: vx_convolution,
+        user_ptr: *mut ::std::os::raw::c_void,
+        usage: vx_enum,
+        user_mem_type: vx_enum,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Creates a reference to a pyramid object of the supplied number of levels."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] levels The number of levels desired. This is required to be a non-zero value."]
+    #[doc = " \\param [in] scale Used to indicate the scale between pyramid levels. This is required to be a non-zero positive value."]
+    #[doc = " <tt>\\ref VX_SCALE_PYRAMID_HALF</tt> and <tt>\\ref VX_SCALE_PYRAMID_ORB</tt> must be supported."]
+    #[doc = " \\param [in] width The width of the 0th level image in pixels."]
+    #[doc = " \\param [in] height The height of the 0th level image in pixels."]
+    #[doc = " \\param [in] format The format of all images in the pyramid. NV12, NV21, IYUV, UYVY and YUYV formats are not supported."]
+    #[doc = " \\returns A pyramid reference <tt>\\ref vx_pyramid</tt> containing the sub-images. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_pyramid"]
+    pub fn vxCreatePyramid(
+        context: vx_context,
+        levels: vx_size,
+        scale: vx_float32,
+        width: vx_uint32,
+        height: vx_uint32,
+        format: vx_df_image,
+    ) -> vx_pyramid;
+}
+extern "C" {
+    #[doc = " \\brief Creates a reference to a virtual pyramid object of the supplied number of levels."]
+    #[doc = " \\details Virtual Pyramids can be used to connect Nodes together when the contents of the pyramids will"]
+    #[doc = " not be accessed by the user of the API."]
+    #[doc = " All of the following constructions are valid:"]
+    #[doc = " \\code"]
+    #[doc = " vx_context context = vxCreateContext();"]
+    #[doc = " vx_graph graph = vxCreateGraph(context);"]
+    #[doc = " vx_pyramid virt[] = {"]
+    #[doc = "     vxCreateVirtualPyramid(graph, 4, VX_SCALE_PYRAMID_HALF, 0, 0, VX_DF_IMAGE_VIRT), // no dimension and format specified for level 0"]
+    #[doc = "     vxCreateVirtualPyramid(graph, 4, VX_SCALE_PYRAMID_HALF, 640, 480, VX_DF_IMAGE_VIRT), // no format specified."]
+    #[doc = "     vxCreateVirtualPyramid(graph, 4, VX_SCALE_PYRAMID_HALF, 640, 480, VX_DF_IMAGE_U8), // no access"]
+    #[doc = " };"]
+    #[doc = " \\endcode"]
+    #[doc = " \\param [in] graph The reference to the parent graph."]
+    #[doc = " \\param [in] levels The number of levels desired. This is required to be a non-zero value."]
+    #[doc = " \\param [in] scale Used to indicate the scale between pyramid levels. This is required to be a non-zero positive value."]
+    #[doc = " <tt>\\ref VX_SCALE_PYRAMID_HALF</tt> and <tt>\\ref VX_SCALE_PYRAMID_ORB</tt> must be supported."]
+    #[doc = " \\param [in] width The width of the 0th level image in pixels. This may be set to zero to indicate to the interface that the value is unspecified."]
+    #[doc = " \\param [in] height The height of the 0th level image in pixels. This may be set to zero to indicate to the interface that the value is unspecified."]
+    #[doc = " \\param [in] format The format of all images in the pyramid. This may be set to <tt>\\ref VX_DF_IMAGE_VIRT</tt> to indicate that the format is unspecified."]
+    #[doc = " \\returns A pyramid reference <tt>\\ref vx_pyramid</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\note Images extracted with <tt>\\ref vxGetPyramidLevel</tt> behave as Virtual Images and"]
+    #[doc = " cause <tt>\\ref vxMapImagePatch</tt> to return errors."]
+    #[doc = " \\ingroup group_pyramid"]
+    pub fn vxCreateVirtualPyramid(
+        graph: vx_graph,
+        levels: vx_size,
+        scale: vx_float32,
+        width: vx_uint32,
+        height: vx_uint32,
+        format: vx_df_image,
+    ) -> vx_pyramid;
+}
+extern "C" {
+    #[doc = " \\brief Releases a reference to a pyramid object."]
+    #[doc = " The object may not be garbage collected until its total reference count is zero."]
+    #[doc = " \\param [in] pyr The pointer to the pyramid to release."]
+    #[doc = " \\ingroup group_pyramid"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE pyr is not a valid <tt>\\ref vx_pyramid</tt> reference."]
+    #[doc = " \\post After returning from this function the reference is zeroed."]
+    pub fn vxReleasePyramid(pyr: *mut vx_pyramid) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Queries an attribute from an image pyramid."]
+    #[doc = " \\param [in] pyr The pyramid to query."]
+    #[doc = " \\param [in] attribute The attribute for which to query. Use a <tt>\\ref vx_pyramid_attribute_e</tt> enumeration."]
+    #[doc = " \\param [out] ptr The location at which to store the resulting value."]
+    #[doc = " \\param [in] size The size in bytes of the container to which \\a ptr points."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE pyr is not a valid <tt>\\ref vx_pyramid</tt> reference."]
+    #[doc = " \\ingroup group_pyramid"]
+    pub fn vxQueryPyramid(
+        pyr: vx_pyramid,
+        attribute: vx_enum,
+        ptr: *mut ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Retrieves a level of the pyramid as a <tt>\\ref vx_image</tt>, which can be used"]
+    #[doc = " elsewhere in OpenVX. A call to vxReleaseImage is necessary to release an image for each"]
+    #[doc = " call of vxGetPyramidLevel."]
+    #[doc = " \\param [in] pyr The pyramid object."]
+    #[doc = " \\param [in] index The index of the level, such that index is less than levels."]
+    #[doc = " \\return A <tt>\\ref vx_image</tt> reference. Any possible errors preventing a successful"]
+    #[doc = " function completion should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_pyramid"]
+    pub fn vxGetPyramidLevel(pyr: vx_pyramid, index: vx_uint32) -> vx_image;
+}
+extern "C" {
+    #[doc = " \\brief Creates a remap table object."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] src_width Width of the source image in pixel."]
+    #[doc = " \\param [in] src_height Height of the source image in pixels."]
+    #[doc = " \\param [in] dst_width Width of the destination image in pixels."]
+    #[doc = " \\param [in] dst_height Height of the destination image in pixels."]
+    #[doc = " \\ingroup group_remap"]
+    #[doc = " \\returns A remap reference <tt>\\ref vx_remap</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    pub fn vxCreateRemap(
+        context: vx_context,
+        src_width: vx_uint32,
+        src_height: vx_uint32,
+        dst_width: vx_uint32,
+        dst_height: vx_uint32,
+    ) -> vx_remap;
+}
+extern "C" {
+    #[doc = " \\brief Creates an opaque reference to a remap table object without direct user access."]
+    #[doc = " \\param [in] graph The reference to the parent graph."]
+    #[doc = " \\param [in] src_width Width of the source image in pixel."]
+    #[doc = " \\param [in] src_height Height of the source image in pixels."]
+    #[doc = " \\param [in] dst_width Width of the destination image in pixels."]
+    #[doc = " \\param [in] dst_height Height of the destination image in pixels."]
+    #[doc = " \\see <tt>\\ref vxCreateRemap</tt>"]
+    #[doc = " \\ingroup group_remap"]
+    #[doc = " \\returns A remap reference <tt>\\ref vx_remap</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    pub fn vxCreateVirtualRemap(
+        graph: vx_graph,
+        src_width: vx_uint32,
+        src_height: vx_uint32,
+        dst_width: vx_uint32,
+        dst_height: vx_uint32,
+    ) -> vx_remap;
+}
+extern "C" {
+    #[doc = " \\brief Releases a reference to a remap table object. The object may not be"]
+    #[doc = " garbage collected until its total reference count is zero."]
+    #[doc = " \\param [in] table The pointer to the remap table to release."]
+    #[doc = " \\post After returning from this function the reference is zeroed."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE table is not a valid <tt>\\ref vx_remap</tt> reference."]
+    #[doc = " \\ingroup group_remap"]
+    pub fn vxReleaseRemap(table: *mut vx_remap) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allows the application to get direct access to a rectangular patch of a remap object."]
+    #[doc = ""]
+    #[doc = " The patch is specified within the destination dimensions and its"]
+    #[doc = " data provide the corresponding coordinate within the source dimensions."]
+    #[doc = " The patch is mapped as a 2D array of elements of the type associated"]
+    #[doc = " with the \\p coordinate_type parameter (i.e., <tt>\\ref vx_coordinates2df_t</tt>"]
+    #[doc = " for <tt>\\ref VX_TYPE_COORDINATES2DF</tt>)."]
+    #[doc = " The memory layout of the mapped 2D array follows a row-major order where rows are"]
+    #[doc = " compact (without any gap between elements), and where the potential"]
+    #[doc = " padding after each lines is determined by (* \\p stride_y)."]
+    #[doc = ""]
+    #[doc = " \\param [in] remap The reference to the remap object that contains the"]
+    #[doc = " patch to map."]
+    #[doc = ""]
+    #[doc = " \\param [in] rect The coordinates of remap patch. The patch must be specified"]
+    #[doc = " within the bounds of the remap destination dimensions"]
+    #[doc = " (<tt>\\ref VX_REMAP_DESTINATION_WIDTH</tt> x <tt>\\ref VX_REMAP_DESTINATION_HEIGHT</tt>)."]
+    #[doc = " (start_x, start_y) gives the coordinate of the topleft element inside the patch,"]
+    #[doc = " while (end_x, end_y) gives the coordinate of the bottomright element out of the patch."]
+    #[doc = ""]
+    #[doc = " \\param [out] map_id The address of a <tt>\\ref vx_map_id</tt> variable"]
+    #[doc = " where the function returns a map identifier."]
+    #[doc = " \\arg (*map_id) must eventually be provided as the map_id parameter of a call"]
+    #[doc = " to <tt>\\ref vxUnmapRemapPatch</tt>."]
+    #[doc = ""]
+    #[doc = " \\param [out] stride_y The address of a vx_size variable where the function"]
+    #[doc = " returns the difference between the address of the first element of two"]
+    #[doc = " successive lines in the mapped remap patch. The stride value follows the"]
+    #[doc = " following rule :"]
+    #[doc = " (*stride_y) >= sizeof(<ELEMENT_TYPE>) * (rect->end_x - rect->start_x)"]
+    #[doc = ""]
+    #[doc = " \\param [out] ptr The address of a pointer where the function returns where"]
+    #[doc = " remap patch data can be accessed. (*ptr) is the address of the the top-left"]
+    #[doc = " element of the remap patch."]
+    #[doc = " The returned (*ptr) address is only valid between the call to this function"]
+    #[doc = " and the corresponding call to <tt>\\ref vxUnmapRemapPatch</tt>."]
+    #[doc = ""]
+    #[doc = " \\param [in] coordinate_type This declares the type of the source coordinate"]
+    #[doc = " data that the application wants to access in the remap patch."]
+    #[doc = " It must be <tt>\\ref VX_TYPE_COORDINATES2DF</tt>."]
+    #[doc = ""]
+    #[doc = " \\param [in] usage This declares the access mode for the remap patch, using"]
+    #[doc = " the <tt>\\ref vx_accessor_e</tt> enumeration."]
+    #[doc = " \\arg <tt>\\ref VX_READ_ONLY</tt>: after the function call, the content of the"]
+    #[doc = " memory location pointed by (*ptr) contains the remap patch data. Writing into"]
+    #[doc = " this memory location is forbidden and its behavior is undefined."]
+    #[doc = " \\arg <tt>\\ref VX_READ_AND_WRITE</tt>: after the function call, the content of"]
+    #[doc = " the memory location pointed by (*ptr) contains the remap patch data; writing"]
+    #[doc = " into this memory is allowed for the location of elements only and will"]
+    #[doc = " result in a modification of the written elements in the remap object once the"]
+    #[doc = " patch is unmapped. Writing into a gap between element lines"]
+    #[doc = " (when (*stride_y) > sizeof(<ELEMENT_TYPE>) * (rect->end_x - rect->start_x))"]
+    #[doc = " is forbidden and its behavior is undefined."]
+    #[doc = " \\arg <tt>\\ref VX_WRITE_ONLY</tt>: after the function call, the memory location"]
+    #[doc = " pointed by (*ptr) contains undefined data; writing each element of the patch is"]
+    #[doc = " required prior to unmapping. Elements not written by the application before"]
+    #[doc = " unmap will become undefined after unmap, even if they were well defined before"]
+    #[doc = " map. Like for <tt>\\ref VX_READ_AND_WRITE</tt>, writing into a gap between"]
+    #[doc = " element lines is forbidden and its behavior is undefined."]
+    #[doc = ""]
+    #[doc = " \\param [in] mem_type A <tt>\\ref vx_memory_type_e</tt> enumeration that"]
+    #[doc = " specifies the type of the memory where the remap patch is requested to be mapped."]
+    #[doc = ""]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE remap is not a valid <tt>\\ref vx_remap</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS An other parameter is incorrect."]
+    #[doc = ""]
+    #[doc = " \\ingroup group_remap"]
+    #[doc = " \\post <tt>\\ref vxUnmapRemapPatch </tt> with same (*map_id) value."]
+    pub fn vxMapRemapPatch(
+        remap: vx_remap,
+        rect: *const vx_rectangle_t,
+        map_id: *mut vx_map_id,
+        stride_y: *mut vx_size,
+        ptr: *mut *mut ::std::os::raw::c_void,
+        coordinate_type: vx_enum,
+        usage: vx_enum,
+        mem_type: vx_enum,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Unmap and commit potential changes to a remap object patch that was previously mapped."]
+    #[doc = ""]
+    #[doc = " Unmapping a remap patch invalidates the memory location from which the patch could"]
+    #[doc = " be accessed by the application. Accessing this memory location after the unmap function"]
+    #[doc = " completes has an undefined behavior."]
+    #[doc = " \\param [in] remap The reference to the remap object to unmap."]
+    #[doc = " \\param [out] map_id The unique map identifier that was returned by <tt>\\ref vxMapRemapPatch</tt> ."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE remap is not a valid <tt>\\ref vx_remap</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS An other parameter is incorrect."]
+    #[doc = " \\ingroup group_remap"]
+    #[doc = " \\pre <tt>\\ref vxMapRemapPatch</tt> with same map_id value"]
+    pub fn vxUnmapRemapPatch(remap: vx_remap, map_id: vx_map_id) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allows the application to copy a rectangular patch from/into a remap object."]
+    #[doc = ""]
+    #[doc = " The patch is specified within the destination dimensions and its"]
+    #[doc = " data provide the corresponding coordinate within the source dimensions."]
+    #[doc = " The patch in user memory is a 2D array of elements of the type associated with the"]
+    #[doc = " \\p coordinate_type parameter (i.e., <tt>\\ref vx_coordinates2df_t</tt> for"]
+    #[doc = " <tt>\\ref VX_TYPE_COORDINATES2DF</tt>)."]
+    #[doc = " The memory layout of this array follows a row-major order where rows are"]
+    #[doc = " compact (without any gap between elements), and where the potential padding"]
+    #[doc = " after each line is determined by the \\p user_stride_y parameter."]
+    #[doc = ""]
+    #[doc = " \\param [in] remap The reference to the remap object that is the source or the"]
+    #[doc = " destination of the patch copy."]
+    #[doc = ""]
+    #[doc = " \\param [in] rect The coordinates of remap patch. The patch must be specified"]
+    #[doc = " within the bounds of the remap destination dimensions"]
+    #[doc = " (<tt>\\ref VX_REMAP_DESTINATION_WIDTH</tt> x <tt>\\ref VX_REMAP_DESTINATION_HEIGHT</tt>)."]
+    #[doc = " (start_x, start_y) gives the coordinate of the topleft element inside the patch,"]
+    #[doc = " while (end_x, end_y) gives the coordinate of the bottomright element out of the patch."]
+    #[doc = ""]
+    #[doc = " \\param [in] user_stride_y The difference between the address of the first element"]
+    #[doc = " of two successive lines of the remap patch in user memory (pointed by"]
+    #[doc = " \\p user_ptr). The layout of the user memory must follow a row major order and user_stride_y"]
+    #[doc = " must follow the following rule :"]
+    #[doc = "  user_stride_y >= sizeof(<ELEMENT_TYPE>) * (rect->end_x - rect->start_x)."]
+    #[doc = ""]
+    #[doc = " \\param [in] user_ptr The address of the user memory location where to store the requested"]
+    #[doc = " remap data if the copy was requested in read mode, or from where to get the remap data to"]
+    #[doc = " store into the remap object if the copy was requested in write mode. \\p user_ptr is the"]
+    #[doc = " address of the the top-left element of the remap patch."]
+    #[doc = " The accessible user memory must be large enough to contain the specified patch with"]
+    #[doc = " the specified layout:"]
+    #[doc = " accessible memory in bytes >= (rect->end_y - rect->start_y) * user_stride_y."]
+    #[doc = ""]
+    #[doc = " \\param [in] user_coordinate_type This declares the type of the source coordinate remap"]
+    #[doc = " data in the user memory. It must be <tt>\\ref VX_TYPE_COORDINATES2DF</tt>."]
+    #[doc = ""]
+    #[doc = " \\param [in] usage This declares the effect of the copy with regard to the remap object"]
+    #[doc = " using the <tt>\\ref vx_accessor_e</tt> enumeration. Only VX_READ_ONLY and VX_WRITE_ONLY are"]
+    #[doc = " supported:"]
+    #[doc = " \\arg <tt>\\ref VX_READ_ONLY</tt> means that data is copied from the remap object into the user"]
+    #[doc = " memory pointer by \\p user_ptr. The potential padding after each line in user"]
+    #[doc = " memory will stay unchanged."]
+    #[doc = " \\arg <tt>\\ref VX_WRITE_ONLY</tt> means that data is copied into the remap object from"]
+    #[doc = " the user memory."]
+    #[doc = ""]
+    #[doc = " \\param [in] user_mem_type A <tt>\\ref vx_memory_type_e</tt> enumeration that specifies"]
+    #[doc = " the type of the memory pointer by \\p user_ptr."]
+    #[doc = ""]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE remap is not a valid <tt>\\ref vx_remap</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS An other parameter is incorrect."]
+    #[doc = ""]
+    #[doc = " \\ingroup group_remap"]
+    pub fn vxCopyRemapPatch(
+        remap: vx_remap,
+        rect: *const vx_rectangle_t,
+        user_stride_y: vx_size,
+        user_ptr: *mut ::std::os::raw::c_void,
+        user_coordinate_type: vx_enum,
+        usage: vx_enum,
+        user_mem_type: vx_enum,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Queries attributes from a Remap table."]
+    #[doc = " \\param [in] table The remap to query."]
+    #[doc = " \\param [in] attribute The attribute to query. Use a <tt>\\ref vx_remap_attribute_e</tt> enumeration."]
+    #[doc = " \\param [out] ptr The location at which to store the resulting value."]
+    #[doc = " \\param [in] size The size in bytes of the container to which \\a ptr points."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE table is not a valid <tt>\\ref vx_remap</tt> reference."]
+    #[doc = " \\ingroup group_remap"]
+    pub fn vxQueryRemap(
+        table: vx_remap,
+        attribute: vx_enum,
+        ptr: *mut ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Creates a reference to an Array object."]
+    #[doc = ""]
+    #[doc = " User must specify the Array capacity (i.e., the maximal number of items that the array can hold)."]
+    #[doc = ""]
+    #[doc = " \\param [in] context      The reference to the overall Context."]
+    #[doc = " \\param [in] item_type The type of data to hold. Must be greater than"]
+    #[doc = " <tt>\\ref VX_TYPE_INVALID</tt> and less than or equal to <tt>\\ref VX_TYPE_VENDOR_STRUCT_END</tt>."]
+    #[doc = " Or must be a <tt>\\ref vx_enum</tt> returned from <tt>\\ref vxRegisterUserStruct</tt>."]
+    #[doc = " \\param [in] capacity     The maximal number of items that the array can hold. This value must be greater than zero."]
+    #[doc = ""]
+    #[doc = " \\returns An array reference <tt>\\ref vx_array</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = ""]
+    #[doc = " \\ingroup group_array"]
+    pub fn vxCreateArray(context: vx_context, item_type: vx_enum, capacity: vx_size) -> vx_array;
+}
+extern "C" {
+    #[doc = " \\brief Creates an opaque reference to a virtual Array with no direct user access."]
+    #[doc = ""]
+    #[doc = " Virtual Arrays are useful when item type or capacity are unknown ahead of time"]
+    #[doc = " and the Array is used as internal graph edge. Virtual arrays are scoped within the parent graph only."]
+    #[doc = ""]
+    #[doc = " All of the following constructions are allowed."]
+    #[doc = " \\code"]
+    #[doc = " vx_context context = vxCreateContext();"]
+    #[doc = " vx_graph graph = vxCreateGraph(context);"]
+    #[doc = " vx_array virt[] = {"]
+    #[doc = "     vxCreateVirtualArray(graph, 0, 0), // totally unspecified"]
+    #[doc = "     vxCreateVirtualArray(graph, VX_TYPE_KEYPOINT, 0), // unspecified capacity"]
+    #[doc = "     vxCreateVirtualArray(graph, VX_TYPE_KEYPOINT, 1000), // no access"]
+    #[doc = " };"]
+    #[doc = " \\endcode"]
+    #[doc = ""]
+    #[doc = " \\param [in] graph        The reference to the parent graph."]
+    #[doc = " \\param [in] item_type The type of data to hold. Must be greater than"]
+    #[doc = " <tt>\\ref VX_TYPE_INVALID</tt> and less than or equal to <tt>\\ref VX_TYPE_VENDOR_STRUCT_END</tt>."]
+    #[doc = " Or must be a <tt>\\ref vx_enum</tt> returned from <tt>\\ref vxRegisterUserStruct</tt>."]
+    #[doc = "                          This may to set to zero to indicate an unspecified item type."]
+    #[doc = " \\param [in] capacity     The maximal number of items that the array can hold."]
+    #[doc = "                          This may be to set to zero to indicate an unspecified capacity."]
+    #[doc = " \\see vxCreateArray for a type list."]
+    #[doc = " \\returns A array reference <tt>\\ref vx_array</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = ""]
+    #[doc = " \\ingroup group_array"]
+    pub fn vxCreateVirtualArray(graph: vx_graph, item_type: vx_enum, capacity: vx_size)
+        -> vx_array;
+}
+extern "C" {
+    #[doc = " \\brief Releases a reference of an Array object."]
+    #[doc = " The object may not be garbage collected until its total reference count is zero."]
+    #[doc = " After returning from this function the reference is zeroed."]
+    #[doc = " \\param [in] arr          The pointer to the Array to release."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE arr is not a valid <tt>\\ref vx_array</tt> reference."]
+    #[doc = " \\ingroup group_array"]
+    pub fn vxReleaseArray(arr: *mut vx_array) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Queries the Array for some specific information."]
+    #[doc = ""]
+    #[doc = " \\param [in] arr          The reference to the Array."]
+    #[doc = " \\param [in] attribute    The attribute to query. Use a <tt>\\ref vx_array_attribute_e</tt>."]
+    #[doc = " \\param [out] ptr         The location at which to store the resulting value."]
+    #[doc = " \\param [in] size         The size in bytes of the container to which \\a ptr points."]
+    #[doc = ""]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS                   No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE   arr is not a valid <tt>\\ref vx_array</tt> reference."]
+    #[doc = " \\retval VX_ERROR_NOT_SUPPORTED       If the \\a attribute is not a value supported on this implementation."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS  If any of the other parameters are incorrect."]
+    #[doc = ""]
+    #[doc = " \\ingroup group_array"]
+    pub fn vxQueryArray(
+        arr: vx_array,
+        attribute: vx_enum,
+        ptr: *mut ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Adds items to the Array."]
+    #[doc = ""]
+    #[doc = " This function increases the container size."]
+    #[doc = ""]
+    #[doc = " By default, the function does not reallocate memory,"]
+    #[doc = " so if the container is already full (number of elements is equal to capacity)"]
+    #[doc = " or it doesn't have enough space,"]
+    #[doc = " the function returns <tt>\\ref VX_FAILURE</tt> error code."]
+    #[doc = ""]
+    #[doc = " \\param [in] arr          The reference to the Array."]
+    #[doc = " \\param [in] count        The total number of elements to insert."]
+    #[doc = " \\param [in] ptr          The location from which to read the input values."]
+    #[doc = " \\param [in] stride       The number of bytes between the beginning of two consecutive elements."]
+    #[doc = ""]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS                   No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE   arr is not a valid <tt>\\ref vx_array</tt> reference."]
+    #[doc = " \\retval VX_FAILURE                   If the Array is full."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS  If any of the other parameters are incorrect."]
+    #[doc = ""]
+    #[doc = " \\ingroup group_array"]
+    pub fn vxAddArrayItems(
+        arr: vx_array,
+        count: vx_size,
+        ptr: *const ::std::os::raw::c_void,
+        stride: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Truncates an Array (remove items from the end)."]
+    #[doc = ""]
+    #[doc = " \\param [in,out] arr          The reference to the Array."]
+    #[doc = " \\param [in] new_num_items    The new number of items for the Array."]
+    #[doc = ""]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS                   No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE   arr is not a valid <tt>\\ref vx_array</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS  The \\a new_size is greater than the current size."]
+    #[doc = ""]
+    #[doc = " \\ingroup group_array"]
+    pub fn vxTruncateArray(arr: vx_array, new_num_items: vx_size) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allows the application to copy a range from/into an array object."]
+    #[doc = " \\param [in] array The reference to the array object that is the source or the"]
+    #[doc = " destination of the copy."]
+    #[doc = " \\param [in] range_start The index of the first item of the array object to copy."]
+    #[doc = " \\param [in] range_end The index of the item following the last item of the"]
+    #[doc = " array object to copy. (range_end range_start) items are copied from index"]
+    #[doc = " range_start included. The range must be within the bounds of the array:"]
+    #[doc = " 0 <= range_start < range_end <= number of items in the array."]
+    #[doc = " \\param [in] user_stride The number of bytes between the beginning of two consecutive"]
+    #[doc = " items in the user memory pointed by user_ptr. The layout of the user memory must"]
+    #[doc = " follow an item major order:"]
+    #[doc = " user_stride >= element size in bytes."]
+    #[doc = " \\param [in] user_ptr The address of the memory location where to store the requested data"]
+    #[doc = " if the copy was requested in read mode, or from where to get the data to store into the array"]
+    #[doc = " object if the copy was requested in write mode. The accessible memory must be large enough"]
+    #[doc = " to contain the specified range with the specified stride:"]
+    #[doc = " accessible memory in bytes >= (range_end range_start) * user_stride."]
+    #[doc = " \\param [in] usage This declares the effect of the copy with regard to the array object"]
+    #[doc = " using the <tt>\\ref vx_accessor_e</tt> enumeration. Only <tt>\\ref VX_READ_ONLY</tt> and <tt>\\ref VX_WRITE_ONLY</tt>"]
+    #[doc = " are supported:"]
+    #[doc = " \\arg <tt>\\ref VX_READ_ONLY</tt> means that data are copied from the array object into the user memory."]
+    #[doc = " \\arg <tt>\\ref VX_WRITE_ONLY</tt> means that data are copied into the array object from the user memory."]
+    #[doc = " \\param [in] user_mem_type A <tt>\\ref vx_memory_type_e</tt> enumeration that specifies"]
+    #[doc = " the memory type of the memory referenced by the user_addr."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_OPTIMIZED_AWAY This is a reference to a virtual array that cannot be"]
+    #[doc = " accessed by the application."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE array is not a valid <tt>\\ref vx_array</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS An other parameter is incorrect."]
+    #[doc = " \\ingroup group_array"]
+    pub fn vxCopyArrayRange(
+        array: vx_array,
+        range_start: vx_size,
+        range_end: vx_size,
+        user_stride: vx_size,
+        user_ptr: *mut ::std::os::raw::c_void,
+        usage: vx_enum,
+        user_mem_type: vx_enum,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allows the application to get direct access to a range of an array object."]
+    #[doc = " \\param [in] array The reference to the array object that contains the range to map."]
+    #[doc = " \\param [in] range_start The index of the first item of the array object to map."]
+    #[doc = " \\param [in] range_end The index of the item following the last item of the"]
+    #[doc = " array object to map. (range_end range_start) items are mapped, starting from index"]
+    #[doc = " range_start included. The range must be within the bounds of the array:"]
+    #[doc = " Must be 0 <= range_start < range_end <= number of items."]
+    #[doc = " \\param [out] map_id The address of a <tt>\\ref vx_map_id</tt> variable where the function"]
+    #[doc = " returns a map identifier."]
+    #[doc = " \\arg (*map_id) must eventually be provided as the map_id parameter of a call to"]
+    #[doc = " <tt>\\ref vxUnmapArrayRange</tt>."]
+    #[doc = " \\param [out] stride The address of a vx_size variable where the function"]
+    #[doc = " returns the memory layout of the mapped array range. The function sets (*stride)"]
+    #[doc = " to the number of bytes between the beginning of two consecutive items."]
+    #[doc = " The application must consult (*stride) to access the array items starting from"]
+    #[doc = " address (*ptr). The layout of the mapped array follows an item major order:"]
+    #[doc = " (*stride) >= item size in bytes."]
+    #[doc = " \\param [out] ptr The address of a pointer that the function sets to the"]
+    #[doc = " address where the requested data can be accessed. The returned (*ptr) address"]
+    #[doc = " is only valid between the call to the function and the corresponding call to"]
+    #[doc = " <tt>\\ref vxUnmapArrayRange</tt>."]
+    #[doc = " \\param [in] usage This declares the access mode for the array range, using"]
+    #[doc = " the <tt>\\ref vx_accessor_e</tt> enumeration."]
+    #[doc = " \\arg <tt>\\ref VX_READ_ONLY</tt>: after the function call, the content of the memory location"]
+    #[doc = " pointed by (*ptr) contains the array range data. Writing into this memory location"]
+    #[doc = " is forbidden and its behavior is undefined."]
+    #[doc = " \\arg <tt>\\ref VX_READ_AND_WRITE</tt>: after the function call, the content of the memory"]
+    #[doc = " location pointed by (*ptr) contains the array range data; writing into this memory"]
+    #[doc = " is allowed only for the location of items and will result in a modification of the"]
+    #[doc = " affected items in the array object once the range is unmapped. Writing into"]
+    #[doc = " a gap between items (when (*stride) > item size in bytes) is forbidden and its"]
+    #[doc = " behavior is undefined."]
+    #[doc = " \\arg <tt>\\ref VX_WRITE_ONLY</tt>: after the function call, the memory location pointed by (*ptr)"]
+    #[doc = " contains undefined data; writing each item of the range is required prior to"]
+    #[doc = " unmapping. Items not written by the application before unmap will become"]
+    #[doc = " undefined after unmap, even if they were well defined before map. Like for"]
+    #[doc = " VX_READ_AND_WRITE, writing into a gap between items is forbidden and its behavior"]
+    #[doc = " is undefined."]
+    #[doc = " \\param [in] mem_type A <tt>\\ref vx_memory_type_e</tt> enumeration that"]
+    #[doc = " specifies the type of the memory where the array range is requested to be mapped."]
+    #[doc = " \\param [in] flags An integer that allows passing options to the map operation."]
+    #[doc = " Use the <tt>\\ref vx_map_flag_e</tt> enumeration."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_OPTIMIZED_AWAY This is a reference to a virtual array that cannot be"]
+    #[doc = " accessed by the application."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE array is not a valid <tt>\\ref vx_array</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS An other parameter is incorrect."]
+    #[doc = " \\ingroup group_array"]
+    #[doc = " \\post <tt>\\ref vxUnmapArrayRange </tt> with same (*map_id) value."]
+    pub fn vxMapArrayRange(
+        array: vx_array,
+        range_start: vx_size,
+        range_end: vx_size,
+        map_id: *mut vx_map_id,
+        stride: *mut vx_size,
+        ptr: *mut *mut ::std::os::raw::c_void,
+        usage: vx_enum,
+        mem_type: vx_enum,
+        flags: vx_uint32,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Unmap and commit potential changes to an array object range that was previously mapped."]
+    #[doc = " Unmapping an array range invalidates the memory location from which the range could"]
+    #[doc = " be accessed by the application. Accessing this memory location after the unmap function"]
+    #[doc = " completes has an undefined behavior."]
+    #[doc = " \\param [in] array The reference to the array object to unmap."]
+    #[doc = " \\param [out] map_id The unique map identifier that was returned when calling"]
+    #[doc = " <tt>\\ref vxMapArrayRange</tt> ."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE array is not a valid <tt>\\ref vx_array</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS An other parameter is incorrect."]
+    #[doc = " \\ingroup group_array"]
+    #[doc = " \\pre <tt>\\ref vxMapArrayRange</tt> returning the same map_id value"]
+    pub fn vxUnmapArrayRange(array: vx_array, map_id: vx_map_id) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Creates a reference to an ObjectArray of count objects."]
+    #[doc = ""]
+    #[doc = " It uses the metadata of the exemplar to determine the object attributes,"]
+    #[doc = " ignoring the object data. It does not alter the exemplar or keep or release"]
+    #[doc = " the reference to the exemplar. For the definition of supported attributes see"]
+    #[doc = " <tt>\\ref vxSetMetaFormatAttribute</tt>. In case the exemplar is a virtual object"]
+    #[doc = " it must be of immutable metadata, thus it is not allowed to be dimensionless or formatless."]
+    #[doc = ""]
+    #[doc = " \\param [in] context      The reference to the overall Context."]
+    #[doc = " \\param [in] exemplar     The exemplar object that defines the metadata of the created objects in the ObjectArray."]
+    #[doc = " \\param [in] count        Number of Objects to create in the ObjectArray. This value must be greater than zero."]
+    #[doc = ""]
+    #[doc = " \\returns An ObjectArray reference <tt>\\ref vx_object_array</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>. Data objects are not initialized by this function."]
+    #[doc = ""]
+    #[doc = " \\ingroup group_object_array"]
+    pub fn vxCreateObjectArray(
+        context: vx_context,
+        exemplar: vx_reference,
+        count: vx_size,
+    ) -> vx_object_array;
+}
+extern "C" {
+    #[doc = " \\brief Creates an opaque reference to a virtual ObjectArray with no direct user access."]
+    #[doc = ""]
+    #[doc = " This function creates an ObjectArray of count objects with similar behavior as"]
+    #[doc = " <tt>\\ref vxCreateObjectArray</tt>. The only difference is that the objects that are"]
+    #[doc = " created are virtual in the given graph."]
+    #[doc = ""]
+    #[doc = " \\param [in] graph      Reference to the graph where to create the virtual ObjectArray."]
+    #[doc = " \\param [in] exemplar   The exemplar object that defines the type of object in the ObjectArray."]
+    #[doc = "                        Only exemplar type of <tt>\\ref vx_image</tt>, <tt>\\ref vx_array</tt> and"]
+    #[doc = "                        <tt>\\ref vx_pyramid</tt> are allowed."]
+    #[doc = " \\param [in] count      Number of Objects to create in the ObjectArray."]
+    #[doc = " \\returns               A ObjectArray reference <tt>\\ref vx_object_array</tt>. Any possible errors preventing a"]
+    #[doc = "                        successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_object_array"]
+    pub fn vxCreateVirtualObjectArray(
+        graph: vx_graph,
+        exemplar: vx_reference,
+        count: vx_size,
+    ) -> vx_object_array;
+}
+extern "C" {
+    #[doc = " \\brief                 Retrieves the reference to the OpenVX Object in location index of the ObjectArray."]
+    #[doc = ""]
+    #[doc = " This is a vx_reference, which can be used elsewhere in OpenVX. A call to vxRelease<Object> or <tt>\\ref vxReleaseReference</tt>"]
+    #[doc = " is necessary to release the Object for each call to this function."]
+    #[doc = ""]
+    #[doc = " \\param [in] arr       The ObjectArray."]
+    #[doc = " \\param [in] index     The index of the object in the ObjectArray."]
+    #[doc = " \\return A reference to an OpenVX data object. Any possible errors preventing a successful"]
+    #[doc = " completion of the function should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_object_array"]
+    pub fn vxGetObjectArrayItem(arr: vx_object_array, index: vx_uint32) -> vx_reference;
+}
+extern "C" {
+    #[doc = " \\brief Releases a reference of an ObjectArray object."]
+    #[doc = ""]
+    #[doc = " The object may not be garbage collected until its total reference and its contained objects"]
+    #[doc = " count is zero. After returning from this function the reference is zeroed/cleared."]
+    #[doc = ""]
+    #[doc = " \\param [in] arr          The pointer to the ObjectArray to release."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE arr is not a valid <tt>\\ref vx_object_array</tt> reference."]
+    #[doc = " \\ingroup group_object_array"]
+    pub fn vxReleaseObjectArray(arr: *mut vx_object_array) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Queries an atribute from the ObjectArray."]
+    #[doc = ""]
+    #[doc = " \\param [in] arr          The reference to the ObjectArray."]
+    #[doc = " \\param [in] attribute    The attribute to query. Use a <tt>\\ref vx_object_array_attribute_e</tt>."]
+    #[doc = " \\param [out] ptr         The location at which to store the resulting value."]
+    #[doc = " \\param [in] size         The size in bytes of the container to which \\a ptr points."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS                   No errors; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE   arr is not a valid <tt>\\ref vx_object_array</tt> reference."]
+    #[doc = " \\retval VX_ERROR_NOT_SUPPORTED       If the \\a attribute is not a value supported on this implementation."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS  If any of the other parameters are incorrect."]
+    #[doc = ""]
+    #[doc = " \\ingroup group_object_array"]
+    pub fn vxQueryObjectArray(
+        arr: vx_object_array,
+        attribute: vx_enum,
+        ptr: *mut ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief This function allows a user to set the attributes of a <tt>\\ref vx_meta_format</tt> object in a kernel output validator."]
+    #[doc = ""]
+    #[doc = " The \\ref vx_meta_format object contains two types of information: data object meta data and"]
+    #[doc = " some specific information that defines how the valid region of an image changes"]
+    #[doc = ""]
+    #[doc = " The meta data attributes that can be set are identified by this list:"]
+    #[doc = " - \\ref vx_image : \\ref VX_IMAGE_FORMAT, \\ref VX_IMAGE_HEIGHT, \\ref VX_IMAGE_WIDTH"]
+    #[doc = " - \\ref vx_array : \\ref VX_ARRAY_CAPACITY, \\ref VX_ARRAY_ITEMTYPE"]
+    #[doc = " - \\ref vx_pyramid : \\ref VX_PYRAMID_FORMAT, \\ref VX_PYRAMID_HEIGHT, \\ref VX_PYRAMID_WIDTH, \\ref VX_PYRAMID_LEVELS, \\ref VX_PYRAMID_SCALE"]
+    #[doc = " - \\ref vx_scalar : \\ref VX_SCALAR_TYPE"]
+    #[doc = " - \\ref vx_matrix : \\ref VX_MATRIX_TYPE, \\ref VX_MATRIX_ROWS, \\ref VX_MATRIX_COLUMNS"]
+    #[doc = " - \\ref vx_distribution : \\ref VX_DISTRIBUTION_BINS, \\ref VX_DISTRIBUTION_OFFSET, \\ref VX_DISTRIBUTION_RANGE"]
+    #[doc = " - \\ref vx_remap : \\ref VX_REMAP_SOURCE_WIDTH, \\ref VX_REMAP_SOURCE_HEIGHT, \\ref VX_REMAP_DESTINATION_WIDTH, \\ref VX_REMAP_DESTINATION_HEIGHT"]
+    #[doc = " - \\ref vx_lut : \\ref VX_LUT_TYPE, \\ref VX_LUT_COUNT"]
+    #[doc = " - \\ref vx_threshold : \\ref VX_THRESHOLD_TYPE, \\ref VX_THRESHOLD_INPUT_FORMAT, \\ref VX_THRESHOLD_INPUT_FORMAT"]
+    #[doc = " - \\ref vx_object_array : \\ref VX_OBJECT_ARRAY_NUMITEMS, \\ref VX_OBJECT_ARRAY_ITEMTYPE"]
+    #[doc = " - \\ref vx_tensor : \\ref VX_TENSOR_NUMBER_OF_DIMS, \\ref VX_TENSOR_DIMS, \\ref VX_TENSOR_DATA_TYPE, \\ref VX_TENSOR_FIXED_POINT_POSITION"]
+    #[doc = " - \\ref VX_VALID_RECT_CALLBACK"]
+    #[doc = " \\note For vx_image, a specific attribute can be used to specify the valid region evolution. This information is not a meta data."]
+    #[doc = ""]
+    #[doc = " \\param [in] meta The reference to the \\ref vx_meta_format struct to set"]
+    #[doc = " \\param [in] attribute Use the subset of data object attributes that define the meta data of this object or attributes from <tt>\\ref vx_meta_format</tt>."]
+    #[doc = " \\param [in] ptr The input pointer of the value to set on the meta format object."]
+    #[doc = " \\param [in] size The size in bytes of the object to which \\a ptr points."]
+    #[doc = " \\ingroup group_user_kernels"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS The attribute was set; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE meta is not a valid <tt>\\ref vx_meta_format</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS size was not correct for the type needed."]
+    #[doc = " \\retval VX_ERROR_NOT_SUPPORTED the object attribute was not supported on the meta format object."]
+    #[doc = " \\retval VX_ERROR_INVALID_TYPE attribute type did not match known meta format type."]
+    pub fn vxSetMetaFormatAttribute(
+        meta: vx_meta_format,
+        attribute: vx_enum,
+        ptr: *const ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Set a meta format object from an exemplar data object reference"]
+    #[doc = ""]
+    #[doc = " This function sets a \\ref vx_meta_format object from the meta data of the exemplar"]
+    #[doc = ""]
+    #[doc = " \\param [in] meta The meta format object to set"]
+    #[doc = " \\param [in] exemplar The exemplar data object."]
+    #[doc = " \\ingroup group_user_kernels"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS The meta format was correctly set; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE meta is not a valid <tt>\\ref vx_meta_format</tt> reference,"]
+    #[doc = " or exemplar is not a valid <tt>\\ref vx_reference</tt> reference."]
+    pub fn vxSetMetaFormatFromReference(meta: vx_meta_format, exemplar: vx_reference) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief This function allows a user to query the attributes of a <tt>\\ref vx_meta_format</tt> object in a kernel parameter."]
+    #[doc = ""]
+    #[doc = " The \\ref vx_meta_format object contains two types of information: data object meta data and"]
+    #[doc = " some specific information that defines how the valid region of an image changes"]
+    #[doc = ""]
+    #[doc = " The meta data attributes that can be queried are identified by this list:"]
+    #[doc = " - \\ref vx_image : \\ref VX_IMAGE_FORMAT, \\ref VX_IMAGE_HEIGHT, \\ref VX_IMAGE_WIDTH"]
+    #[doc = " - \\ref vx_array : \\ref VX_ARRAY_CAPACITY, \\ref VX_ARRAY_ITEMTYPE"]
+    #[doc = " - \\ref vx_pyramid : \\ref VX_PYRAMID_FORMAT, \\ref VX_PYRAMID_HEIGHT, \\ref VX_PYRAMID_WIDTH, \\ref VX_PYRAMID_LEVELS, \\ref VX_PYRAMID_SCALE"]
+    #[doc = " - \\ref vx_scalar : \\ref VX_SCALAR_TYPE"]
+    #[doc = " - \\ref vx_matrix : \\ref VX_MATRIX_TYPE, \\ref VX_MATRIX_ROWS, \\ref VX_MATRIX_COLUMNS"]
+    #[doc = " - \\ref vx_distribution : \\ref VX_DISTRIBUTION_BINS, \\ref VX_DISTRIBUTION_OFFSET, \\ref VX_DISTRIBUTION_RANGE"]
+    #[doc = " - \\ref vx_remap : \\ref VX_REMAP_SOURCE_WIDTH, \\ref VX_REMAP_SOURCE_HEIGHT, \\ref VX_REMAP_DESTINATION_WIDTH, \\ref VX_REMAP_DESTINATION_HEIGHT"]
+    #[doc = " - \\ref vx_lut : \\ref VX_LUT_TYPE, \\ref VX_LUT_COUNT"]
+    #[doc = " - \\ref vx_threshold : \\ref VX_THRESHOLD_TYPE, \\ref VX_THRESHOLD_INPUT_FORMAT, \\ref VX_THRESHOLD_INPUT_FORMAT"]
+    #[doc = " - \\ref vx_object_array : \\ref VX_OBJECT_ARRAY_NUMITEMS, \\ref VX_OBJECT_ARRAY_ITEMTYPE"]
+    #[doc = " - \\ref vx_tensor : \\ref VX_TENSOR_NUMBER_OF_DIMS, \\ref VX_TENSOR_DIMS, \\ref VX_TENSOR_DATA_TYPE, \\ref VX_TENSOR_FIXED_POINT_POSITION"]
+    #[doc = " - \\ref VX_VALID_RECT_CALLBACK"]
+    #[doc = " \\note For vx_image, a specific attribute can be used to query the valid region evolution. This information is not a meta data."]
+    #[doc = ""]
+    #[doc = " \\param [in] meta The reference to the \\ref vx_meta_format struct to query"]
+    #[doc = " \\param [in] attribute Use the subset of data object attributes that define the meta data of this object or attributes from <tt>\\ref vx_meta_format</tt>."]
+    #[doc = " \\param [out] ptr The output pointer of the value to query on the meta format object."]
+    #[doc = " \\param [in] size The size in bytes of the object to which \\a ptr points."]
+    #[doc = " \\ingroup group_import_kernel"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS The attribute was returned; any other value indicates failure."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE meta is not a valid <tt>\\ref vx_meta_format</tt> reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS size was not correct for the type needed."]
+    #[doc = " \\retval VX_ERROR_NOT_SUPPORTED the object attribute was not supported on the meta format object."]
+    #[doc = " \\retval VX_ERROR_INVALID_TYPE attribute type did not match known meta format type."]
+    pub fn vxQueryMetaFormatAttribute(
+        meta: vx_meta_format,
+        attribute: vx_enum,
+        ptr: *mut ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Creates an opaque reference to a tensor data buffer."]
+    #[doc = " \\details Not guaranteed to exist until the <tt>\\ref vx_graph</tt> containing it has been verified."]
+    #[doc = " Since functions using tensors, need to understand the context of each dimension. We describe a layout of the dimensions in each function using tensors."]
+    #[doc = " That layout is not mandatory. It is done specifically to explain the functions and not to mandate layout. Different implementation may have different layout."]
+    #[doc = " Therefore the layout description is logical and not physical. It refers to the order of dimensions given in this function."]
+    #[doc = " \\param [in] context The reference to the implementation context."]
+    #[doc = " \\param [in] number_of_dims The number of dimensions."]
+    #[doc = " \\param [in] dims Dimensions sizes in elements."]
+    #[doc = " \\param [in] data_type The <tt>\\ref vx_type_e</tt> that represents the data type of the tensor data elements."]
+    #[doc = " \\param [in] fixed_point_position Specifies the fixed point position when the input element type is integer. if 0, calculations are performed in integer math."]
+    #[doc = " \\return A tensor data reference. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_object_tensor"]
+    pub fn vxCreateTensor(
+        context: vx_context,
+        number_of_dims: vx_size,
+        dims: *const vx_size,
+        data_type: vx_enum,
+        fixed_point_position: vx_int8,
+    ) -> vx_tensor;
+}
+extern "C" {
+    #[doc = " \\brief Creates an array of images into the multi-dimension data, this can be adjacent 2D images or not depending on the stride value."]
+    #[doc = " The stride value is representing bytes in the third dimension."]
+    #[doc = " The OpenVX image object that points to a three dimension data and access it as an array of images."]
+    #[doc = " This has to be portion of the third lowest dimension, and the stride correspond to that third dimension."]
+    #[doc = " The returned Object array is an array of images. Where the image data is pointing to a specific memory in the input tensor."]
+    #[doc = " \\param [in] tensor The tensor data from which to extract the images. Has to be a 3d tensor."]
+    #[doc = " \\param [in] rect Image coordinates within tensor data."]
+    #[doc = " \\param [in] array_size Number of images to extract."]
+    #[doc = " \\param [in] jump Delta between two images in the array."]
+    #[doc = " \\param [in] image_format The requested image format. Should match the tensor data's data type."]
+    #[doc = " \\return An array of images pointing to the tensor data's data."]
+    #[doc = " \\ingroup group_object_tensor"]
+    pub fn vxCreateImageObjectArrayFromTensor(
+        tensor: vx_tensor,
+        rect: *const vx_rectangle_t,
+        array_size: vx_size,
+        jump: vx_size,
+        image_format: vx_df_image,
+    ) -> vx_object_array;
+}
+extern "C" {
+    #[doc = " \\brief Creates a tensor data from another tensor data given a view. This second"]
+    #[doc = " reference refers to the data in the original tensor data. Updates to this tensor data"]
+    #[doc = " updates the parent tensor data. The view must be defined within the dimensions"]
+    #[doc = " of the parent tensor data."]
+    #[doc = " \\param [in] tensor The reference to the parent tensor data."]
+    #[doc = " \\param [in] number_of_dims Number of dimensions in the view. Error return if 0 or greater than number of"]
+    #[doc = " tensor dimensions. If smaller than number of tensor dimensions, the lower dimensions are assumed."]
+    #[doc = " \\param [in] view_start View start coordinates"]
+    #[doc = " \\param [in] view_end View end coordinates"]
+    #[doc = " \\return The reference to the sub-tensor. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\ingroup group_object_tensor"]
+    pub fn vxCreateTensorFromView(
+        tensor: vx_tensor,
+        number_of_dims: vx_size,
+        view_start: *const vx_size,
+        view_end: *const vx_size,
+    ) -> vx_tensor;
+}
+extern "C" {
+    #[doc = " \\brief Creates an opaque reference to a tensor data buffer with no direct"]
+    #[doc = " user access. This function allows setting the tensor data dimensions or data format."]
+    #[doc = " \\details Virtual data objects allow users to connect various nodes within a"]
+    #[doc = " graph via data references without access to that data, but they also permit the"]
+    #[doc = " implementation to take maximum advantage of possible optimizations. Use this"]
+    #[doc = " API to create a data reference to link two or more nodes together when the"]
+    #[doc = " intermediate data are not required to be accessed by outside entities. This API"]
+    #[doc = " in particular allows the user to define the tensor data format of the data without"]
+    #[doc = " requiring the exact dimensions. Virtual objects are scoped within the graph"]
+    #[doc = " they are declared a part of, and can't be shared outside of this scope."]
+    #[doc = " Since functions using tensors, need to understand the context of each dimension. We describe a layout of the dimensions in each function."]
+    #[doc = " That layout is not mandated. It is done specifically to explain the functions and not to mandate layout. Different implementation may have different layout."]
+    #[doc = " Therfore the layout description is logical and not physical. It refers to the order of dimensions given in <tt>\\ref vxCreateTensor</tt> and <tt>\\ref vxCreateVirtualTensor</tt>."]
+    #[doc = " \\param [in] graph The reference to the parent graph."]
+    #[doc = " \\param [in] number_of_dims The number of dimensions."]
+    #[doc = " \\param [in] dims Dimensions sizes in elements."]
+    #[doc = " \\param [in] data_type The <tt>\\ref vx_type_e</tt> that represents the data type of the tensor data elements."]
+    #[doc = " \\param [in] fixed_point_position Specifies the fixed point position when the input element type is integer. If 0, calculations are performed in integer math."]
+    #[doc = " \\return A tensor data reference.Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\note Passing this reference to <tt>\\ref vxCopyTensorPatch</tt> will return an error."]
+    #[doc = " \\ingroup group_object_tensor"]
+    pub fn vxCreateVirtualTensor(
+        graph: vx_graph,
+        number_of_dims: vx_size,
+        dims: *const vx_size,
+        data_type: vx_enum,
+        fixed_point_position: vx_int8,
+    ) -> vx_tensor;
+}
+extern "C" {
+    #[doc = " \\brief Creates a reference to an tensor object that was externally allocated."]
+    #[doc = " \\param [in] context The reference to the implementation context."]
+    #[doc = " \\param [in] number_of_dims The number of dimensions."]
+    #[doc = " \\param [in] dims Dimensions sizes in elements."]
+    #[doc = " \\param [in] data_type The <tt>\\ref vx_type_e</tt> that represents the data type of the tensor data elements."]
+    #[doc = " \\param [in] fixed_point_position Specifies the fixed point position when the input element type is integer. if 0, calculations are performed in integer math."]
+    #[doc = " \\param [in] stride An array of stride in all dimensions in bytes. The stride value at index 0 must be size of the tensor data element type."]
+    #[doc = " \\param [in] ptr The platform-defined reference to tensor. See note below."]
+    #[doc = " \\param [in] memory_type <tt>\\ref vx_memory_type_e</tt>. When giving <tt>\\ref VX_MEMORY_TYPE_HOST</tt>"]
+    #[doc = " the \\a ptr is assumed to be HOST accessible pointer to memory."]
+    #[doc = " \\return A tensor data reference. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\note The user must call vxMapTensorPatch prior to accessing the elements of a tensor, even if the"]
+    #[doc = " tensor was created via <tt>\\ref vxCreateTensorFromHandle</tt>. Reads or writes to memory referenced"]
+    #[doc = " by ptr after calling <tt>\\ref vxCreateTensorFromHandle</tt> without first calling"]
+    #[doc = " <tt>\\ref vxMapTensorPatch</tt> will result in undefined behavior."]
+    #[doc = " The property of stride[] and ptr is kept by the caller (It means that the implementation will"]
+    #[doc = " make an internal copy of the provided information. \\a stride and \\a ptr can then simply be application's"]
+    #[doc = " local variables)."]
+    #[doc = ""]
+    #[doc = " In order to release the tensor back to the application we should use <tt>\\ref vxSwapTensorHandle</tt>."]
+    #[doc = ""]
+    #[doc = " \\ingroup group_object_tensor"]
+    pub fn vxCreateTensorFromHandle(
+        context: vx_context,
+        number_of_dims: vx_size,
+        dims: *const vx_size,
+        data_type: vx_enum,
+        fixed_point_position: vx_int8,
+        stride: *const vx_size,
+        ptr: *mut ::std::os::raw::c_void,
+        memory_type: vx_enum,
+    ) -> vx_tensor;
+}
+extern "C" {
+    #[doc = " \\brief Swaps the tensor handle of an tensor previously created from handle."]
+    #[doc = ""]
+    #[doc = " This function sets the new tensor handle"]
+    #[doc = " and returns the previous one."]
+    #[doc = ""]
+    #[doc = " Once this function call has completed, the application gets back the"]
+    #[doc = " ownership of the memory referenced by the previous handle. This memory"]
+    #[doc = " contains up-to-date tensor data, and the application can safely reuse or"]
+    #[doc = " release it."]
+    #[doc = ""]
+    #[doc = " The memory referenced by the new handle must have been allocated"]
+    #[doc = " consistently with the tensor properties since the import type,"]
+    #[doc = " memory layout and dimensions are unchanged (see stride and"]
+    #[doc = " memory_type in <tt>\\ref vxCreateTensorFromHandle</tt>)."]
+    #[doc = ""]
+    #[doc = " All tensors created from view with this tensor as parent or ancestor"]
+    #[doc = " will automatically use the memory referenced by the new handle."]
+    #[doc = ""]
+    #[doc = " The behavior of <tt>\\ref vxSwapTensorHandle</tt> when called from a user node is undefined."]
+    #[doc = " \\param [in] tensor The reference to an tensor created from handle."]
+    #[doc = " \\param [in] new_ptr new tensor handle"]
+    #[doc = "  If new_ptr is NULL,"]
+    #[doc = "  If the new_ptr is NULL, the previous tensor storage memory is reclaimed by the"]
+    #[doc = "  caller, while no new handle is provided."]
+    #[doc = " \\param [out] prev_ptr pointer to return the previous tensor handle."]
+    #[doc = " If prev_ptr is NULL, the previous handle is not returned."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE tensor is not a valid <tt>\\ref vx_tensor</tt> reference."]
+    #[doc = " reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS The tensor was not created from handle or"]
+    #[doc = " the content of new_ptr is not valid."]
+    #[doc = " \\retval VX_FAILURE The tensor was already being accessed."]
+    #[doc = " \\ingroup group_tensor"]
+    pub fn vxSwapTensorHandle(
+        tensor: vx_tensor,
+        new_ptr: *mut ::std::os::raw::c_void,
+        prev_ptr: *mut *mut ::std::os::raw::c_void,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allows the application to copy a view patch from/into an tensor object ."]
+    #[doc = " \\param [in] tensor The reference to the tensor object that is the source or the"]
+    #[doc = " destination of the copy."]
+    #[doc = " \\param [in] number_of_dims Number of patch dimension. Error return if 0 or greater than number of"]
+    #[doc = " tensor dimensions. If smaller than number of tensor dimensions, the lower dimensions are assumed."]
+    #[doc = " \\param [in] view_start Array of patch start points in each dimension"]
+    #[doc = " \\param [in] view_end Array of patch end points in each dimension"]
+    #[doc = " \\param [in] user_stride Array of user memory strides in each dimension"]
+    #[doc = " \\param [in] user_ptr The address of the memory location where to store the requested data"]
+    #[doc = " if the copy was requested in read mode, or from where to get the data to store into the tensor"]
+    #[doc = " object if the copy was requested in write mode. The accessible memory must be large enough"]
+    #[doc = " to contain the specified patch with the specified layout:\\n"]
+    #[doc = " accessible memory in bytes >= (end[last_dimension] - start[last_dimension]) * stride[last_dimension].\\n"]
+    #[doc = " The layout of the user memory must follow a row major order."]
+    #[doc = " \\param [in] usage This declares the effect of the copy with regard to the tensor object"]
+    #[doc = " using the <tt>\\ref vx_accessor_e</tt> enumeration. Only <tt>\\ref VX_READ_ONLY</tt> and <tt>\\ref VX_WRITE_ONLY</tt> are supported:"]
+    #[doc = " \\arg <tt>\\ref VX_READ_ONLY</tt> means that data is copied from the tensor object into the application memory"]
+    #[doc = " \\arg <tt>\\ref VX_WRITE_ONLY</tt> means that data is copied into the tensor object from the application memory"]
+    #[doc = " \\param [in] user_memory_type A <tt>\\ref vx_memory_type_e</tt> enumeration that specifies"]
+    #[doc = " the memory type of the memory referenced by the user_addr."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_ERROR_OPTIMIZED_AWAY This is a reference to a virtual tensor that cannot be"]
+    #[doc = " accessed by the application."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE The tensor reference is not actually an tensor reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS An other parameter is incorrect."]
+    #[doc = " \\ingroup group_object_tensor"]
+    pub fn vxCopyTensorPatch(
+        tensor: vx_tensor,
+        number_of_dims: vx_size,
+        view_start: *const vx_size,
+        view_end: *const vx_size,
+        user_stride: *const vx_size,
+        user_ptr: *mut ::std::os::raw::c_void,
+        usage: vx_enum,
+        user_memory_type: vx_enum,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allows the application to get direct access to a patch of tensor object."]
+    #[doc = " \\param [in] tensor The reference to the tensor object that is the source or the"]
+    #[doc = " destination for direct access."]
+    #[doc = " \\param [in] number_of_dims The number of dimensions. Must be same as tensor number_of_dims."]
+    #[doc = " \\param [in] view_start Array of patch start points in each dimension. This is optional parameter and will be zero when NULL."]
+    #[doc = " \\param [in] view_end Array of patch end points in each dimension. This is optional parameter and will be dims[] of tensor when NULL."]
+    #[doc = " \\param [out] map_id The address of a vx_map_id variable where the function returns a map identifier."]
+    #[doc = " \\arg (*map_id) must eventually be provided as the map_id parameter of a call to <tt>\\ref vxUnmapTensorPatch</tt>."]
+    #[doc = " \\param [out] stride An array of stride in all dimensions in bytes. The stride value at index 0 must be size of the tensor data element type."]
+    #[doc = " \\param [out] ptr The address of a pointer that the function sets to the"]
+    #[doc = " address where the requested data can be accessed. The returned (*ptr) address"]
+    #[doc = " is only valid between the call to the function and the corresponding call to"]
+    #[doc = " <tt>\\ref vxUnmapTensorPatch</tt>."]
+    #[doc = " \\param [in] usage This declares the access mode for the tensor patch, using"]
+    #[doc = " the <tt>\\ref vx_accessor_e</tt> enumeration."]
+    #[doc = " \\arg VX_READ_ONLY: after the function call, the content of the memory location"]
+    #[doc = " pointed by (*ptr) contains the tensor patch data. Writing into this memory location"]
+    #[doc = " is forbidden and its behavior is undefined."]
+    #[doc = " \\arg VX_READ_AND_WRITE : after the function call, the content of the memory"]
+    #[doc = " location pointed by (*ptr) contains the tensor patch data; writing into this memory"]
+    #[doc = " is allowed only for the location of items and will result in a modification of the"]
+    #[doc = " affected items in the tensor object once the range is unmapped. Writing into"]
+    #[doc = " a gap between items (when (*stride) > item size in bytes) is forbidden and its"]
+    #[doc = " behavior is undefined."]
+    #[doc = " \\arg VX_WRITE_ONLY: after the function call, the memory location pointed by (*ptr)"]
+    #[doc = " contains undefined data; writing each item of the range is required prior to"]
+    #[doc = " unmapping. Items not written by the application before unmap will become"]
+    #[doc = " undefined after unmap, even if they were well defined before map. Like for"]
+    #[doc = " VX_READ_AND_WRITE, writing into a gap between items is forbidden and its behavior"]
+    #[doc = " is undefined."]
+    #[doc = " \\param [in] mem_type A <tt>\\ref vx_memory_type_e</tt> enumeration that"]
+    #[doc = " specifies the type of the memory where the tensor patch is requested to be mapped."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_ERROR_OPTIMIZED_AWAY This is a reference to a virtual tensor that cannot be accessed by the application."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE The tensor reference is not actually an tensor reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS An other parameter is incorrect."]
+    #[doc = " \\retval VX_ERROR_NO_MEMORY Internal memory allocation failed."]
+    #[doc = " \\ingroup group_tensor"]
+    #[doc = " \\post <tt>\\ref vxUnmapTensorPatch </tt> with same (*map_id) value."]
+    pub fn vxMapTensorPatch(
+        tensor: vx_tensor,
+        number_of_dims: vx_size,
+        view_start: *const vx_size,
+        view_end: *const vx_size,
+        map_id: *mut vx_map_id,
+        stride: *mut vx_size,
+        ptr: *mut *mut ::std::os::raw::c_void,
+        usage: vx_enum,
+        mem_type: vx_enum,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Unmap and commit potential changes to a tensor object patch that was previously mapped."]
+    #[doc = " Unmapping a tensor patch invalidates the memory location from which the patch could"]
+    #[doc = " be accessed by the application. Accessing this memory location after the unmap function"]
+    #[doc = " completes has an undefined behavior."]
+    #[doc = " \\param [in] tensor The reference to the tensor object to unmap."]
+    #[doc = " \\param [in] map_id The unique map identifier that was returned when calling"]
+    #[doc = " <tt>\\ref vxMapTensorPatch</tt> ."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE The tensor reference is not actually an tensor reference."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS An other parameter is incorrect."]
+    #[doc = " \\ingroup group_tensor"]
+    #[doc = " \\pre <tt>\\ref vxMapTensorPatch</tt> returning the same map_id value"]
+    pub fn vxUnmapTensorPatch(tensor: vx_tensor, map_id: vx_map_id) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Retrieves various attributes of a tensor data."]
+    #[doc = " \\param [in] tensor The reference to the tensor data to query."]
+    #[doc = " \\param [in] attribute The attribute to query. Use a <tt>\\ref vx_tensor_attribute_e</tt>."]
+    #[doc = " \\param [out] ptr The location at which to store the resulting value."]
+    #[doc = " \\param [in] size The size of the container to which \\a ptr points."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors."]
+    #[doc = " \\retval VX_ERROR_INVALID_REFERENCE If data is not a <tt>\\ref vx_tensor</tt>."]
+    #[doc = " \\retval VX_ERROR_INVALID_PARAMETERS If any of the other parameters are incorrect."]
+    #[doc = " \\ingroup group_object_tensor"]
+    pub fn vxQueryTensor(
+        tensor: vx_tensor,
+        attribute: vx_enum,
+        ptr: *mut ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Releases a reference to a tensor data object."]
+    #[doc = " The object may not be garbage collected until its total reference count is zero."]
+    #[doc = " \\param [in] tensor The pointer to the tensor data to release."]
+    #[doc = " \\post After returning from this function the reference is zeroed."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS No errors; all other values indicate failure"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    #[doc = " \\ingroup group_object_tensor"]
+    pub fn vxReleaseTensor(tensor: *mut vx_tensor) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a color conversion node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The input image from which to convert."]
+    #[doc = " \\param [out] output The output image to which to convert, which must have the same dimensions as the input image."]
+    #[doc = " \\see <tt>VX_KERNEL_COLOR_CONVERT</tt>"]
+    #[doc = " \\ingroup group_vision_function_colorconvert"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxColorConvertNode(graph: vx_graph, input: vx_image, output: vx_image) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a channel extract node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The input image. Must be one of the defined \\ref vx_df_image_e multi-channel formats."]
+    #[doc = " \\param [in] channel The <tt>\\ref vx_channel_e</tt> channel to extract."]
+    #[doc = " \\param [out] output The output image. Must be <tt>\\ref VX_DF_IMAGE_U8</tt>, and must have the same dimensions as the input image."]
+    #[doc = " <tt>\\see VX_KERNEL_CHANNEL_EXTRACT</tt>"]
+    #[doc = " \\ingroup group_vision_function_channelextract"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxChannelExtractNode(
+        graph: vx_graph,
+        input: vx_image,
+        channel: vx_enum,
+        output: vx_image,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a channel combine node."]
+    #[doc = " \\param [in] graph The graph reference."]
+    #[doc = " \\param [in] plane0 The plane that forms channel 0. Must be <tt>\\ref VX_DF_IMAGE_U8</tt>."]
+    #[doc = " \\param [in] plane1 The plane that forms channel 1. Must be <tt>\\ref VX_DF_IMAGE_U8</tt>."]
+    #[doc = " \\param [in] plane2 [optional] The plane that forms channel 2. Must be <tt>\\ref VX_DF_IMAGE_U8</tt>."]
+    #[doc = " \\param [in] plane3 [optional] The plane that forms channel 3. Must be <tt>\\ref VX_DF_IMAGE_U8</tt>."]
+    #[doc = " \\param [out] output The output image. The format of the image must be defined, even if the image is virtual. Must have the same dimensions as the input images"]
+    #[doc = " \\see <tt>VX_KERNEL_CHANNEL_COMBINE</tt>"]
+    #[doc = " \\ingroup group_vision_function_channelcombine"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxChannelCombineNode(
+        graph: vx_graph,
+        plane0: vx_image,
+        plane1: vx_image,
+        plane2: vx_image,
+        plane3: vx_image,
+        output: vx_image,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a Phase node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] grad_x The input x image. This must be in <tt>\\ref VX_DF_IMAGE_S16</tt> format."]
+    #[doc = " \\param [in] grad_y The input y image. This must be in <tt>\\ref VX_DF_IMAGE_S16</tt> format."]
+    #[doc = " \\param [out] orientation The phase image. This is in <tt>\\ref VX_DF_IMAGE_U8</tt> format, and must have the same dimensions as the input images."]
+    #[doc = " \\see <tt>VX_KERNEL_PHASE</tt>"]
+    #[doc = " \\ingroup group_vision_function_phase"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxPhaseNode(
+        graph: vx_graph,
+        grad_x: vx_image,
+        grad_y: vx_image,
+        orientation: vx_image,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a Sobel3x3 node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> format."]
+    #[doc = " \\param [out] output_x [optional] The output gradient in the x direction in <tt>\\ref VX_DF_IMAGE_S16</tt>. Must have the same dimensions as the input image."]
+    #[doc = " \\param [out] output_y [optional] The output gradient in the y direction in <tt>\\ref VX_DF_IMAGE_S16</tt>. Must have the same dimensions as the input image."]
+    #[doc = " \\see <tt>VX_KERNEL_SOBEL_3x3</tt>"]
+    #[doc = " \\ingroup group_vision_function_sobel3x3"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxSobel3x3Node(
+        graph: vx_graph,
+        input: vx_image,
+        output_x: vx_image,
+        output_y: vx_image,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Create a Magnitude node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] grad_x The input x image. This must be in <tt>\\ref VX_DF_IMAGE_S16</tt> format."]
+    #[doc = " \\param [in] grad_y The input y image. This must be in <tt>\\ref VX_DF_IMAGE_S16</tt> format."]
+    #[doc = " \\param [out] mag The magnitude image. This is in <tt>\\ref VX_DF_IMAGE_S16</tt> format. Must have the same dimensions as the input image."]
+    #[doc = " \\see <tt>VX_KERNEL_MAGNITUDE</tt>"]
+    #[doc = " \\ingroup group_vision_function_magnitude"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxMagnitudeNode(
+        graph: vx_graph,
+        grad_x: vx_image,
+        grad_y: vx_image,
+        mag: vx_image,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a Scale Image Node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] src The source image of type <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt>."]
+    #[doc = " \\param [out] dst The destination image of type <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt>. The output type must be the same as that of the input image."]
+    #[doc = " \\param [in] type The interpolation type to use. \\see vx_interpolation_type_e."]
+    #[doc = " \\ingroup group_vision_function_scale_image"]
+    #[doc = " \\note The destination image must have a defined size and format. The border modes"]
+    #[doc = "  <tt>\\ref VX_NODE_BORDER</tt> value <tt>\\ref VX_BORDER_UNDEFINED</tt>,"]
+    #[doc = "  <tt>\\ref VX_BORDER_REPLICATE</tt> and <tt>\\ref VX_BORDER_CONSTANT</tt> are supported."]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxScaleImageNode(
+        graph: vx_graph,
+        src: vx_image,
+        dst: vx_image,
+        type_: vx_enum,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a Table Lookup node. If a value from the input image is not present in the lookup table, the result is undefined."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt>."]
+    #[doc = " \\param [in] lut The LUT which is of type <tt>\\ref VX_TYPE_UINT8</tt> if input image is <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_TYPE_INT16</tt> if input image is <tt>\\ref VX_DF_IMAGE_S16</tt>."]
+    #[doc = " \\param [out] output The output image of the same type and size as the input image."]
+    #[doc = " \\ingroup group_vision_function_lut"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    pub fn vxTableLookupNode(
+        graph: vx_graph,
+        input: vx_image,
+        lut: vx_lut,
+        output: vx_image,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a Histogram node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt>."]
+    #[doc = " \\param [out] distribution The output distribution."]
+    #[doc = " \\ingroup group_vision_function_histogram"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxHistogramNode(
+        graph: vx_graph,
+        input: vx_image,
+        distribution: vx_distribution,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a Histogram Equalization node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The grayscale input image in <tt>\\ref VX_DF_IMAGE_U8</tt>."]
+    #[doc = " \\param [out] output The grayscale output image of type <tt>\\ref VX_DF_IMAGE_U8</tt> with equalized brightness and contrast and same size as the input image."]
+    #[doc = " \\ingroup group_vision_function_equalize_hist"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxEqualizeHistNode(graph: vx_graph, input: vx_image, output: vx_image) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates an AbsDiff node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] in1 An input image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> format."]
+    #[doc = " \\param [in] in2 An input image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> format."]
+    #[doc = " \\param [out] out The output image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> format, which must have the same dimensions as the input image."]
+    #[doc = " \\ingroup group_vision_function_absdiff"]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxAbsDiffNode(graph: vx_graph, in1: vx_image, in2: vx_image, out: vx_image) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a mean value and optionally, a standard deviation node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The input image. <tt>\\ref VX_DF_IMAGE_U8</tt> and <tt>\\ref VX_DF_IMAGE_U1</tt> are supported."]
+    #[doc = " \\param [out] mean The <tt>\\ref VX_TYPE_FLOAT32</tt> average pixel value."]
+    #[doc = " \\param [out] stddev [optional] The <tt>\\ref VX_TYPE_FLOAT32</tt> standard deviation of the pixel values."]
+    #[doc = " \\ingroup group_vision_function_meanstddev"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxMeanStdDevNode(
+        graph: vx_graph,
+        input: vx_image,
+        mean: vx_scalar,
+        stddev: vx_scalar,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a Threshold node and returns a reference to it."]
+    #[doc = " \\param [in] graph The reference to the graph in which the node is created."]
+    #[doc = " \\param [in] input The input image. Only images with format <tt>\\ref VX_DF_IMAGE_U8</tt>"]
+    #[doc = " and <tt>\\ref VX_DF_IMAGE_S16</tt> are supported."]
+    #[doc = " \\param [in] thresh The thresholding object that defines the parameters of"]
+    #[doc = " the operation. The <tt>\\ref VX_THRESHOLD_INPUT_FORMAT</tt> must be the same as the input image format and"]
+    #[doc = " the <tt>\\ref VX_THRESHOLD_OUTPUT_FORMAT</tt> must be the same as the output image format."]
+    #[doc = " \\param [out] output The output image, that will contain as pixel value"]
+    #[doc = " true and false values defined by \\p thresh. Images with format"]
+    #[doc = " <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> are supported. The dimensions are the same as the input image."]
+    #[doc = " \\ingroup group_vision_function_threshold"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation"]
+    #[doc = " should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxThresholdNode(
+        graph: vx_graph,
+        input: vx_image,
+        thresh: vx_threshold,
+        output: vx_image,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a Non-Maxima Suppression node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> format."]
+    #[doc = " \\param [in] mask [optional] Constrict suppression to a ROI. The mask image is of type <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> and must have the same dimensions as the input image."]
+    #[doc = " \\param [in] win_size The size of window over which to perform the localized non-maxima suppression. Must be odd, and less than or equal to the smallest dimension of the input image."]
+    #[doc = " \\param [out] output The output image, of the same type and size as the input, that has been non-maxima suppressed."]
+    #[doc = " \\ingroup group_vision_function_nms"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxNonMaxSuppressionNode(
+        graph: vx_graph,
+        input: vx_image,
+        mask: vx_image,
+        win_size: vx_int32,
+        output: vx_image,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates an Integral Image Node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> format."]
+    #[doc = " \\param [out] output The output image in <tt>\\ref VX_DF_IMAGE_U32</tt> format, which must have the same dimensions as the input image."]
+    #[doc = " \\ingroup group_vision_function_integral_image"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxIntegralImageNode(graph: vx_graph, input: vx_image, output: vx_image) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates an Erosion Image Node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> format."]
+    #[doc = " \\param [out] output The output image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> format, which must have the same dimensions and type as the input image."]
+    #[doc = " \\ingroup group_vision_function_erode_image"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxErode3x3Node(graph: vx_graph, input: vx_image, output: vx_image) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a Dilation Image Node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> format."]
+    #[doc = " \\param [out] output The output image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> format, which must have the same dimensions and type as the input image."]
+    #[doc = " \\ingroup group_vision_function_dilate_image"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxDilate3x3Node(graph: vx_graph, input: vx_image, output: vx_image) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a Median Image Node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> format."]
+    #[doc = " \\param [out] output The output image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> format, which must have the same dimensions and type as the input image."]
+    #[doc = " \\ingroup group_vision_function_median_image"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxMedian3x3Node(graph: vx_graph, input: vx_image, output: vx_image) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a Box Filter Node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> format."]
+    #[doc = " \\param [out] output The output image in <tt>\\ref VX_DF_IMAGE_U8</tt> format, which must have the same dimensions as the input image."]
+    #[doc = " \\ingroup group_vision_function_box_image"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxBox3x3Node(graph: vx_graph, input: vx_image, output: vx_image) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a Gaussian Filter Node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> format."]
+    #[doc = " \\param [out] output The output image in <tt>\\ref VX_DF_IMAGE_U8</tt> format, which must have the same dimensions as the input image."]
+    #[doc = " \\ingroup group_vision_function_gaussian_image"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxGaussian3x3Node(graph: vx_graph, input: vx_image, output: vx_image) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a Non-linear Filter Node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] function The non-linear filter function. See <tt>\\ref vx_non_linear_filter_e</tt>."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> format."]
+    #[doc = " \\param [in] mask The mask to be applied to the Non-linear function. <tt>\\ref VX_MATRIX_ORIGIN</tt> attribute is used"]
+    #[doc = "  to place the mask appropriately when computing the resulting image. See <tt>\\ref vxCreateMatrixFromPattern</tt>."]
+    #[doc = " \\param [out] output The output image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> format, which must have the same dimensions and type as the input image."]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    #[doc = " \\ingroup group_vision_function_nonlinear_filter"]
+    pub fn vxNonLinearFilterNode(
+        graph: vx_graph,
+        function: vx_enum,
+        input: vx_image,
+        mask: vx_matrix,
+        output: vx_image,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a custom convolution node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> format."]
+    #[doc = " \\param [in] conv The <tt>\\ref vx_int16</tt> convolution matrix."]
+    #[doc = " \\param [out] output The output image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> format, which must have the same dimensions as the input image."]
+    #[doc = " \\ingroup group_vision_function_custom_convolution"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxConvolveNode(
+        graph: vx_graph,
+        input: vx_image,
+        conv: vx_convolution,
+        output: vx_image,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a node for a Gaussian Image Pyramid."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> format."]
+    #[doc = " \\param [out] gaussian The Gaussian pyramid with <tt>\\ref VX_DF_IMAGE_U8</tt> to construct."]
+    #[doc = " \\ingroup group_vision_function_gaussian_pyramid"]
+    #[doc = " \\see group_pyramid"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxGaussianPyramidNode(graph: vx_graph, input: vx_image, gaussian: vx_pyramid)
+        -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a node for a Laplacian Image Pyramid."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> format."]
+    #[doc = " \\param [out] laplacian The Laplacian pyramid with <tt>\\ref VX_DF_IMAGE_S16</tt> to construct."]
+    #[doc = " \\param [out] output The lowest resolution image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> format necessary to reconstruct the input image from the pyramid. The output image format should be same as input image format."]
+    #[doc = " \\ingroup group_vision_function_laplacian_pyramid"]
+    #[doc = " \\see group_pyramid"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxLaplacianPyramidNode(
+        graph: vx_graph,
+        input: vx_image,
+        laplacian: vx_pyramid,
+        output: vx_image,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Reconstructs an image from a Laplacian Image pyramid."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] laplacian The Laplacian pyramid with <tt>\\ref VX_DF_IMAGE_S16</tt> format."]
+    #[doc = " \\param [in] input The lowest resolution image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> format for the Laplacian pyramid."]
+    #[doc = " \\param [out] output The output image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> format with the highest possible resolution reconstructed from the Laplacian pyramid. The output image format should be same as input image format."]
+    #[doc = " \\ingroup group_vision_function_laplacian_reconstruct"]
+    #[doc = " \\see group_pyramid"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval 0 Node could not be created."]
+    #[doc = " \\retval * Node handle."]
+    pub fn vxLaplacianReconstructNode(
+        graph: vx_graph,
+        laplacian: vx_pyramid,
+        input: vx_image,
+        output: vx_image,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a image weighted average node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] img1 The first input <tt>\\ref VX_DF_IMAGE_U8</tt> image."]
+    #[doc = " \\param [in] alpha The input <tt>\\ref VX_TYPE_FLOAT32</tt> scalar value with a value in the range of \\f$ 0.0 \\le \\alpha \\le 1.0 \\f$."]
+    #[doc = " \\param [in] img2 The second <tt>\\ref VX_DF_IMAGE_U8</tt> image, which must have the same dimensions as the img1."]
+    #[doc = " \\param [out] output The output <tt>\\ref VX_DF_IMAGE_U8</tt> image, which must have the same dimensions as the img1."]
+    #[doc = " \\ingroup group_vision_function_weighted_average"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxWeightedAverageNode(
+        graph: vx_graph,
+        img1: vx_image,
+        alpha: vx_scalar,
+        img2: vx_image,
+        output: vx_image,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a min,max,loc node."]
+    #[doc = " \\param [in] graph The reference to create the graph."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> format."]
+    #[doc = " \\param [out] minVal The minimum value in the image, which corresponds to the type of the input."]
+    #[doc = " \\param [out] maxVal The maximum value in the image, which corresponds to the type of the input."]
+    #[doc = " \\param [out] minLoc [optional] The minimum <tt>\\ref VX_TYPE_COORDINATES2D</tt> locations. If the input image has several minimums, the kernel will return up to the capacity of the array."]
+    #[doc = " \\param [out] maxLoc [optional] The maximum <tt>\\ref VX_TYPE_COORDINATES2D</tt> locations. If the input image has several maximums, the kernel will return up to the capacity of the array."]
+    #[doc = " \\param [out] minCount [optional] The total number of detected minimums in image. Use a <tt>\\ref VX_TYPE_SIZE</tt> scalar."]
+    #[doc = " \\param [out] maxCount [optional] The total number of detected maximums in image. Use a <tt>\\ref VX_TYPE_SIZE</tt> scalar."]
+    #[doc = " \\ingroup group_vision_function_minmaxloc"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxMinMaxLocNode(
+        graph: vx_graph,
+        input: vx_image,
+        minVal: vx_scalar,
+        maxVal: vx_scalar,
+        minLoc: vx_array,
+        maxLoc: vx_array,
+        minCount: vx_scalar,
+        maxCount: vx_scalar,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a pixel-wise minimum kernel."]
+    #[doc = " \\param [in] graph The reference to the graph where to create the node."]
+    #[doc = " \\param [in] in1 The first input image. Must be of type <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt>."]
+    #[doc = " \\param [in] in2 The second input image. Must be of type <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt>."]
+    #[doc = " \\param [out] out The output image which will hold the result of min and will have the same type and dimensions of the imput images."]
+    #[doc = " \\ingroup group_vision_function_min"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxMinNode(graph: vx_graph, in1: vx_image, in2: vx_image, out: vx_image) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a pixel-wise maximum kernel."]
+    #[doc = " \\param [in] graph The reference to the graph where to create the node."]
+    #[doc = " \\param [in] in1 The first input image. Must be of type <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt>."]
+    #[doc = " \\param [in] in2 The second input image. Must be of type <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt>."]
+    #[doc = " \\param [out] out The output image which will hold the result of max and will have the same type and dimensions of the imput images."]
+    #[doc = " \\ingroup group_vision_function_max"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxMaxNode(graph: vx_graph, in1: vx_image, in2: vx_image, out: vx_image) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a bitwise AND node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] in1 A <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> input image."]
+    #[doc = " \\param [in] in2 A <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> input image."]
+    #[doc = " \\param [out] out The <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> output image, which must have the same dimensions and type as the input images."]
+    #[doc = " \\ingroup group_vision_function_and"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxAndNode(graph: vx_graph, in1: vx_image, in2: vx_image, out: vx_image) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a bitwise INCLUSIVE OR node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] in1 A <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> input image."]
+    #[doc = " \\param [in] in2 A <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> input image."]
+    #[doc = " \\param [out] out The <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> output image, which must have the same dimensions and type as the input images."]
+    #[doc = " \\ingroup group_vision_function_or"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxOrNode(graph: vx_graph, in1: vx_image, in2: vx_image, out: vx_image) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a bitwise EXCLUSIVE OR node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] in1 A <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> input image."]
+    #[doc = " \\param [in] in2 A <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> input image."]
+    #[doc = " \\param [out] out The <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> output image, which must have the same dimensions and type as the input images."]
+    #[doc = " \\ingroup group_vision_function_xor"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxXorNode(graph: vx_graph, in1: vx_image, in2: vx_image, out: vx_image) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a bitwise NOT node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input A <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> input image."]
+    #[doc = " \\param [out] output The <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> output image, which must have the same dimensions and type as the input image."]
+    #[doc = " \\ingroup group_vision_function_not"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxNotNode(graph: vx_graph, input: vx_image, output: vx_image) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a scalar operation node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] scalar_operation A <tt>\\ref VX_TYPE_ENUM</tt> of the <tt>\\ref vx_scalar_operation_e</tt> enumeration."]
+    #[doc = " \\param [in] a First scalar operand."]
+    #[doc = " \\param [in] b Second scalar operand."]
+    #[doc = " \\param [out] output Result of the scalar operation."]
+    #[doc = " \\ingroup group_control_flow"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxScalarOperationNode(
+        graph: vx_graph,
+        scalar_operation: vx_enum,
+        a: vx_scalar,
+        b: vx_scalar,
+        output: vx_scalar,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Selects one of two data objects depending on the the value of a condition (boolean scalar), and copies its data into another data object."]
+    #[doc = " \\details This node supports predicated execution flow within a graph. All the data objects passed to this kernel shall"]
+    #[doc = " have the same object type and meta data. It is important to note that an implementation may optimize away the select and copy when virtual data"]
+    #[doc = " objects are used.\\n"]
+    #[doc = " If there is a kernel node that contribute only into virtual data objects during the graph execution due to certain data path being eliminated by not"]
+    #[doc = " taken argument of select node, then the OpenVX implementation guarantees that there will not be any side effects to graph execution and node state.\\n"]
+    #[doc = " If the path to a select node contains non-virtual objects, user nodes, or  nodes with completion callbacks, then that path may not be \"optimized out\""]
+    #[doc = " because the callback must be executed and the non-virtual objects must be modified."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] condition <tt>\\ref VX_TYPE_BOOL</tt> predicate variable."]
+    #[doc = " \\param [in] true_value Data object for true."]
+    #[doc = " \\param [in] false_value Data object for false."]
+    #[doc = " \\param [out] output Output data object."]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    #[doc = " \\ingroup group_control_flow"]
+    pub fn vxSelectNode(
+        graph: vx_graph,
+        condition: vx_scalar,
+        true_value: vx_reference,
+        false_value: vx_reference,
+        output: vx_reference,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates an pixelwise-multiplication node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] in1 An input image, <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt>."]
+    #[doc = " \\param [in] in2 An input image, <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt>."]
+    #[doc = " \\param [in] scale A non-negative <tt>\\ref VX_TYPE_FLOAT32</tt> multiplied to each product before overflow handling."]
+    #[doc = " \\param [in] overflow_policy A <tt>\\ref VX_TYPE_ENUM</tt> of the <tt>\\ref vx_convert_policy_e</tt> enumeration."]
+    #[doc = " \\param [in] rounding_policy A <tt>\\ref VX_TYPE_ENUM</tt> of the <tt>\\ref vx_round_policy_e</tt> enumeration."]
+    #[doc = " \\param [out] out The output image, a <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> image. Must have the same type and dimensions of the imput images."]
+    #[doc = " \\ingroup group_vision_function_mult"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxMultiplyNode(
+        graph: vx_graph,
+        in1: vx_image,
+        in2: vx_image,
+        scale: vx_scalar,
+        overflow_policy: vx_enum,
+        rounding_policy: vx_enum,
+        out: vx_image,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates an arithmetic addition node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] in1 An input image, <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt>."]
+    #[doc = " \\param [in] in2 An input image, <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt>."]
+    #[doc = " \\param [in] policy A <tt>\\ref VX_TYPE_ENUM</tt> of the \\ref vx_convert_policy_e enumeration."]
+    #[doc = " \\param [out] out The output image, a <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> image, which must have the same dimensions as the input images."]
+    #[doc = " \\ingroup group_vision_function_add"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxAddNode(
+        graph: vx_graph,
+        in1: vx_image,
+        in2: vx_image,
+        policy: vx_enum,
+        out: vx_image,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates an arithmetic subtraction node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] in1 An input image, <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt>, the minuend."]
+    #[doc = " \\param [in] in2 An input image, <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt>, the subtrahend."]
+    #[doc = " \\param [in] policy A <tt>\\ref VX_TYPE_ENUM</tt> of the \\ref vx_convert_policy_e enumeration."]
+    #[doc = " \\param [out] out The output image, a <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> image, which must have the same dimensions as the input images."]
+    #[doc = " \\ingroup group_vision_function_sub"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxSubtractNode(
+        graph: vx_graph,
+        in1: vx_image,
+        in2: vx_image,
+        policy: vx_enum,
+        out: vx_image,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a bit-depth conversion node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The input image."]
+    #[doc = " \\param [out] output The output image with the same dimensions of the input image."]
+    #[doc = " \\param [in] policy A <tt>\\ref VX_TYPE_ENUM</tt> of the <tt>\\ref vx_convert_policy_e</tt> enumeration."]
+    #[doc = " \\param [in] shift A scalar containing a <tt>\\ref VX_TYPE_INT32</tt> of the shift value."]
+    #[doc = " \\ingroup group_vision_function_convertdepth"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxConvertDepthNode(
+        graph: vx_graph,
+        input: vx_image,
+        output: vx_image,
+        policy: vx_enum,
+        shift: vx_scalar,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a Canny Edge Detection Node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The input <tt>\\ref VX_DF_IMAGE_U8</tt> image."]
+    #[doc = " \\param [in] hyst The double threshold for hysteresis. The <tt>\\ref VX_THRESHOLD_INPUT_FORMAT</tt> shall be either"]
+    #[doc = " <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt>. The <tt>\\ref VX_THRESHOLD_OUTPUT_FORMAT</tt> is ignored."]
+    #[doc = " \\param [in] gradient_size The size of the Sobel filter window, must support at least 3, 5, and 7."]
+    #[doc = " \\param [in] norm_type A flag indicating the norm used to compute the gradient, <tt>\\ref VX_NORM_L1</tt> or <tt>\\ref VX_NORM_L2</tt>."]
+    #[doc = " \\param [out] output The binary output image in <tt>\\ref VX_DF_IMAGE_U1</tt> or <tt>\\ref VX_DF_IMAGE_U8</tt> format"]
+    #[doc = " with values either 0 and 1 (<tt>VX_DF_IMAGE_U1</tt>), or 0 and 255 (<tt>VX_DF_IMAGE_U8</tt>)."]
+    #[doc = " \\ingroup group_vision_function_canny"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxCannyEdgeDetectorNode(
+        graph: vx_graph,
+        input: vx_image,
+        hyst: vx_threshold,
+        gradient_size: vx_int32,
+        norm_type: vx_enum,
+        output: vx_image,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates an Affine Warp Node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The input <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> image."]
+    #[doc = " \\param [in] matrix The affine matrix. Must be 2x3 of type \\ref VX_TYPE_FLOAT32."]
+    #[doc = " \\param [in] type The interpolation type from <tt>\\ref vx_interpolation_type_e</tt>."]
+    #[doc = " <tt>\\ref VX_INTERPOLATION_AREA</tt> is not supported."]
+    #[doc = " \\param [out] output The output <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> image with the same dimensions and type as the input image."]
+    #[doc = " \\ingroup group_vision_function_warp_affine"]
+    #[doc = " \\note The border modes <tt>\\ref VX_NODE_BORDER</tt> value <tt>\\ref VX_BORDER_UNDEFINED</tt> and"]
+    #[doc = " <tt>\\ref VX_BORDER_CONSTANT</tt> are supported."]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxWarpAffineNode(
+        graph: vx_graph,
+        input: vx_image,
+        matrix: vx_matrix,
+        type_: vx_enum,
+        output: vx_image,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a Perspective Warp Node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The input <tt>\\ref VX_DF_IMAGE_U8</tt> image."]
+    #[doc = " \\param [in] matrix The perspective matrix. Must be 3x3 of type <tt>\\ref VX_TYPE_FLOAT32</tt>."]
+    #[doc = " \\param [in] type The interpolation type from <tt>\\ref vx_interpolation_type_e</tt>."]
+    #[doc = " <tt>\\ref VX_INTERPOLATION_AREA</tt> is not supported."]
+    #[doc = " \\param [out] output The output <tt>\\ref VX_DF_IMAGE_U8</tt> image with the same dimensions as the input image."]
+    #[doc = " \\ingroup group_vision_function_warp_perspective"]
+    #[doc = " \\note The border modes <tt>\\ref VX_NODE_BORDER</tt> value <tt>\\ref VX_BORDER_UNDEFINED</tt> and"]
+    #[doc = " <tt>\\ref VX_BORDER_CONSTANT</tt> are supported."]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxWarpPerspectiveNode(
+        graph: vx_graph,
+        input: vx_image,
+        matrix: vx_matrix,
+        type_: vx_enum,
+        output: vx_image,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a Harris Corners Node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The input <tt>\\ref VX_DF_IMAGE_U8</tt> image."]
+    #[doc = " \\param [in] strength_thresh The <tt>\\ref VX_TYPE_FLOAT32</tt> minimum threshold with which to eliminate Harris Corner scores (computed using the normalized Sobel kernel)."]
+    #[doc = " \\param [in] min_distance The <tt>\\ref VX_TYPE_FLOAT32</tt> radial Euclidean distance for non-maximum suppression."]
+    #[doc = " \\param [in] sensitivity The <tt>\\ref VX_TYPE_FLOAT32</tt> scalar sensitivity threshold \\f$ k \\f$ from the Harris-Stephens equation."]
+    #[doc = " \\param [in] gradient_size The gradient window size to use on the input. The"]
+    #[doc = " implementation must support at least 3, 5, and 7."]
+    #[doc = " \\param [in] block_size The block window size used to compute the Harris Corner score."]
+    #[doc = " The implementation must support at least 3, 5, and 7."]
+    #[doc = " \\param [out] corners The array of <tt>\\ref VX_TYPE_KEYPOINT</tt> objects. The order of the keypoints in this array is implementation dependent."]
+    #[doc = " \\param [out] num_corners [optional] The total number of detected corners in image. Use a \\ref VX_TYPE_SIZE scalar."]
+    #[doc = " \\ingroup group_vision_function_harris"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxHarrisCornersNode(
+        graph: vx_graph,
+        input: vx_image,
+        strength_thresh: vx_scalar,
+        min_distance: vx_scalar,
+        sensitivity: vx_scalar,
+        gradient_size: vx_int32,
+        block_size: vx_int32,
+        corners: vx_array,
+        num_corners: vx_scalar,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a FAST Corners Node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The input <tt>\\ref VX_DF_IMAGE_U8</tt> image."]
+    #[doc = " \\param [in] strength_thresh Threshold on difference between intensity of the central pixel and pixels on Bresenham's circle"]
+    #[doc = " of radius 3 (<tt>\\ref VX_TYPE_FLOAT32</tt> scalar), with a value in the range of 0.0 \\f$\\le\\f$ strength_thresh < 256.0."]
+    #[doc = "  Any fractional value will be truncated to an integer."]
+    #[doc = " \\param [in] nonmax_suppression If true, non-maximum suppression is applied to"]
+    #[doc = " detected corners before being placed in the <tt>\\ref vx_array</tt> of <tt>\\ref VX_TYPE_KEYPOINT</tt> objects."]
+    #[doc = " \\param [out] corners Output corner <tt>\\ref vx_array</tt> of <tt>\\ref VX_TYPE_KEYPOINT</tt>. The order of the"]
+    #[doc = "                      keypoints in this array is implementation dependent."]
+    #[doc = " \\param [out] num_corners [optional] The total number of detected corners in image. Use a \\ref VX_TYPE_SIZE scalar."]
+    #[doc = " \\ingroup group_vision_function_fast"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxFastCornersNode(
+        graph: vx_graph,
+        input: vx_image,
+        strength_thresh: vx_scalar,
+        nonmax_suppression: vx_bool,
+        corners: vx_array,
+        num_corners: vx_scalar,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a Lucas Kanade Tracking Node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] old_images Input of first (old) image pyramid in <tt>\\ref VX_DF_IMAGE_U8</tt>."]
+    #[doc = " \\param [in] new_images Input of destination (new) image pyramid <tt>\\ref VX_DF_IMAGE_U8</tt>."]
+    #[doc = " \\param [in] old_points An array of key points in a <tt>\\ref vx_array</tt> of <tt>\\ref VX_TYPE_KEYPOINT</tt>; those key points are defined at"]
+    #[doc = "  the \\a old_images high resolution pyramid."]
+    #[doc = " \\param [in] new_points_estimates An array of estimation on what is the output key points in a <tt>\\ref vx_array</tt> of"]
+    #[doc = "  <tt>\\ref VX_TYPE_KEYPOINT</tt>; those keypoints are defined at the \\a new_images high resolution pyramid."]
+    #[doc = " \\param [out] new_points An output array of key points in a <tt>\\ref vx_array</tt> of <tt>\\ref VX_TYPE_KEYPOINT</tt>; those key points are"]
+    #[doc = "  defined at the \\a new_images high resolution pyramid."]
+    #[doc = " \\param [in] termination The termination can be <tt>\\ref VX_TERM_CRITERIA_ITERATIONS</tt> or <tt>\\ref VX_TERM_CRITERIA_EPSILON</tt> or"]
+    #[doc = " <tt>\\ref VX_TERM_CRITERIA_BOTH</tt>."]
+    #[doc = " \\param [in] epsilon The <tt>\\ref vx_float32</tt> error for terminating the algorithm."]
+    #[doc = " \\param [in] num_iterations The number of iterations. Use a <tt>\\ref VX_TYPE_UINT32</tt> scalar."]
+    #[doc = " \\param [in] use_initial_estimate Use a <tt>\\ref VX_TYPE_BOOL</tt> scalar."]
+    #[doc = " \\param [in] window_dimension The size of the window on which to perform the algorithm. See"]
+    #[doc = "  <tt>\\ref VX_CONTEXT_OPTICAL_FLOW_MAX_WINDOW_DIMENSION</tt>"]
+    #[doc = " \\ingroup group_vision_function_opticalflowpyrlk"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxOpticalFlowPyrLKNode(
+        graph: vx_graph,
+        old_images: vx_pyramid,
+        new_images: vx_pyramid,
+        old_points: vx_array,
+        new_points_estimates: vx_array,
+        new_points: vx_array,
+        termination: vx_enum,
+        epsilon: vx_scalar,
+        num_iterations: vx_scalar,
+        use_initial_estimate: vx_scalar,
+        window_dimension: vx_size,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a Remap Node."]
+    #[doc = " \\param [in] graph The reference to the graph that will contain the node."]
+    #[doc = " \\param [in] input The input <tt>\\ref VX_DF_IMAGE_U8</tt> image."]
+    #[doc = " \\param [in] table The remap table object."]
+    #[doc = " \\param [in] policy An interpolation type from <tt>\\ref vx_interpolation_type_e</tt>."]
+    #[doc = " <tt>\\ref VX_INTERPOLATION_AREA</tt> is not supported."]
+    #[doc = " \\param [out] output The output <tt>\\ref VX_DF_IMAGE_U8</tt> image with the same dimensions as the input image."]
+    #[doc = " \\note The border modes <tt>\\ref VX_NODE_BORDER</tt> value <tt>\\ref VX_BORDER_UNDEFINED</tt> and"]
+    #[doc = " <tt>\\ref VX_BORDER_CONSTANT</tt> are supported."]
+    #[doc = " \\return A <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    #[doc = " \\ingroup group_vision_function_remap"]
+    pub fn vxRemapNode(
+        graph: vx_graph,
+        input: vx_image,
+        table: vx_remap,
+        policy: vx_enum,
+        output: vx_image,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Performs a Gaussian Blur on an image then half-scales it. The interpolation mode used is nearest-neighbor."]
+    #[doc = " \\details The output image size is determined by:"]
+    #[doc = " \\f["]
+    #[doc = " W_{output} = \\frac{W_{input} + 1}{2} \\\\"]
+    #[doc = " ,"]
+    #[doc = " H_{output} = \\frac{H_{input} + 1}{2}"]
+    #[doc = " \\f]"]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The input <tt>\\ref VX_DF_IMAGE_U8</tt> image."]
+    #[doc = " \\param [out] output The output <tt>\\ref VX_DF_IMAGE_U8</tt> image."]
+    #[doc = " \\param [in] kernel_size The input size of the Gaussian filter. Supported values are 1, 3 and 5."]
+    #[doc = " \\ingroup group_vision_function_scale_image"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxHalfScaleGaussianNode(
+        graph: vx_graph,
+        input: vx_image,
+        output: vx_image,
+        kernel_size: vx_int32,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph]  The Node Compares an image template against overlapped image regions."]
+    #[doc = " \\details The detailed equation to the matching can be found in <tt>\\ref vx_comp_metric_e</tt>."]
+    #[doc = " The output of the template matching node is a comparison map as described in <tt>\\ref vx_comp_metric_e</tt>."]
+    #[doc = " The Node have a limitation on the template image size (width*height). It should not be larger then 65535."]
+    #[doc = " If the valid region of the template image is smaller than the entire template image, the result in the destination image is implementation-dependent."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] src The input image of type <tt>\\ref VX_DF_IMAGE_U8</tt>."]
+    #[doc = " \\param [in] templateImage Searched template of type <tt>\\ref VX_DF_IMAGE_U8</tt>."]
+    #[doc = " \\param [in] matchingMethod attribute specifying the comparison method <tt>\\ref vx_comp_metric_e</tt>. This function support only <tt>\\ref VX_COMPARE_CCORR_NORM</tt> and <tt>\\ref VX_COMPARE_L2</tt>."]
+    #[doc = " \\param [out] output Map of comparison results. The output is an image of type VX_DF_IMAGE_S16"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    #[doc = " \\ingroup group_vision_function_match_template"]
+    pub fn vxMatchTemplateNode(
+        graph: vx_graph,
+        src: vx_image,
+        templateImage: vx_image,
+        matchingMethod: vx_enum,
+        output: vx_image,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a node that extracts LBP image from an input image"]
+    #[doc = " \\param [in] graph\tThe reference to the graph."]
+    #[doc = " \\param [in] in\t\tAn input image in <tt>vx_image</tt>. Or \\f$ SrcImg\\f$ in the equations. the image is of type <tt>\\ref VX_DF_IMAGE_U8</tt>"]
+    #[doc = " \\param [in] format\tA variation of LBP like original LBP and mLBP. see <tt> \\ref vx_lbp_format_e </tt>"]
+    #[doc = " \\param [in] kernel_size Kernel size. Only size of 3 and 5 are supported"]
+    #[doc = " \\param [out] out\tAn output image in <tt>vx_image</tt>.Or \\f$ DstImg\\f$ in the equations. the image is of type <tt>\\ref VX_DF_IMAGE_U8</tt> with the same dimensions as the input image."]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    #[doc = " \\ingroup group_vision_function_lbp"]
+    pub fn vxLBPNode(
+        graph: vx_graph,
+        in_: vx_image,
+        format: vx_enum,
+        kernel_size: vx_int8,
+        out: vx_image,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Performs cell calculations for the average gradient magnitude and gradient orientation histograms."]
+    #[doc = " \\details Firstly, the gradient magnitude and gradient orientation are computed for each pixel in the input image."]
+    #[doc = " Two 1-D centred, point discrete derivative masks are applied to the input image in the horizontal and vertical directions."]
+    #[doc = " \\f[ M_h = [-1, 0, 1] \\f] and \\f[ M_v = [-1, 0, 1]^T \\f]"]
+    #[doc = " \\f$G_v\\f$ is the result of applying mask \\f$M_v\\f$ to the input image, and \\f$G_h\\f$ is the result of applying mask \\f$M_h\\f$ to the input image."]
+    #[doc = " The border mode used for the gradient calculation is implementation dependent. Its behavior should be similar to <tt>\\ref VX_BORDER_UNDEFINED</tt>."]
+    #[doc = " The gradient magnitudes and gradient orientations for each pixel are then calculated in the following manner."]
+    #[doc = " \\f[ G(x,y) = \\sqrt{G_v(x,y)^2 + G_h(x,y)^2} \\f]"]
+    #[doc = " \\f[ \\theta(x,y) = arctan(G_v(x,y), G_h(x,y)) \\f]"]
+    #[doc = " where \\f$arctan(v, h)\\f$"]
+    #[doc = " is \\f$ tan^{-1}(v/h)\\f$ when \\f$h!=0\\f$,"]
+    #[doc = ""]
+    #[doc = " \\f$ -pi/2 \\f$ if \\f$v<0\\f$ and \\f$h==0\\f$,"]
+    #[doc = ""]
+    #[doc = " \\f$  pi/2  \\f$ if \\f$v>0\\f$ and \\f$h==0\\f$"]
+    #[doc = ""]
+    #[doc = " and \\f$     0  \\f$ if \\f$v==0\\f$ and \\f$h==0\\f$"]
+    #[doc = ""]
+    #[doc = " Secondly, the gradient magnitudes and orientations are used to compute the bins output tensor and optional magnitudes output tensor."]
+    #[doc = " These tensors are computed on a cell level where the cells are rectangular in shape."]
+    #[doc = " The magnitudes tensor contains the average gradient magnitude for each cell."]
+    #[doc = " \\f[magnitudes(c) = \\frac{1}{(cell\\_width * cell\\_height)}\\sum\\limits_{w=0}^{cell\\_width} \\sum\\limits_{h=0}^{cell\\_height} G_c(w,h)\\f]"]
+    #[doc = " where \\f$G_c\\f$ is the gradient magnitudes related to cell \\f$c\\f$."]
+    #[doc = " The bins tensor contains histograms of gradient orientations for each cell."]
+    #[doc = " The gradient orientations at each pixel range from 0 to 360 degrees.  These are quantised into a set of histogram bins based on the num_bins parameter."]
+    #[doc = " Each pixel votes for a specific cell histogram bin based on its gradient orientation.  The vote itself is the pixel's gradient magnitude."]
+    #[doc = " \\f[bins(c, n) = \\sum\\limits_{w=0}^{cell\\_width} \\sum\\limits_{h=0}^{cell\\_height} G_c(w,h) * 1[B_c(w, h, num\\_bins) == n]\\f]"]
+    #[doc = " where \\f$B_c\\f$ produces the histogram bin number based on the gradient orientation of the pixel at location (\\f$w\\f$, \\f$h\\f$) in cell \\f$c\\f$ based on"]
+    #[doc = " the \\f$num\\_bins\\f$ and \\f[1[B_c(w, h, num\\_bins) == n]\\f] is a delta-function with value 1 when \\f$B_c(w, h, num\\_bins) == n\\f$ or 0 otherwise."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The input image of type <tt>\\ref VX_DF_IMAGE_U8</tt>."]
+    #[doc = " \\param [in] cell_width The histogram cell width of type <tt>\\ref VX_TYPE_INT32</tt>."]
+    #[doc = " \\param [in] cell_height The histogram cell height of type <tt>\\ref VX_TYPE_INT32</tt>."]
+    #[doc = " \\param [in] num_bins  The histogram size of type <tt>\\ref VX_TYPE_INT32</tt>."]
+    #[doc = " \\param [out] magnitudes (Optional) The output average gradient magnitudes per cell of <tt>\\ref vx_tensor</tt> of type <tt>\\ref VX_TYPE_INT16</tt> of size \\f$ [floor(image_{width}/cell_{width}) ,floor(image_{height}/cell_{height}) ] \\f$."]
+    #[doc = " \\param [out] bins       The output gradient orientation histograms per cell of <tt>\\ref vx_tensor</tt> of type <tt>\\ref VX_TYPE_INT16</tt> of size \\f$ [floor(image_{width}/cell_{width}) ,floor(image_{height}/cell_{height}), num_{bins}] \\f$."]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval 0 Node could not be created."]
+    #[doc = " \\retval * Node handle."]
+    #[doc = " \\ingroup group_vision_function_hog"]
+    pub fn vxHOGCellsNode(
+        graph: vx_graph,
+        input: vx_image,
+        cell_width: vx_int32,
+        cell_height: vx_int32,
+        num_bins: vx_int32,
+        magnitudes: vx_tensor,
+        bins: vx_tensor,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] The node produces HOG features for the W1xW2 window in a sliding window fashion over the whole input image. Each position produces a HOG feature vector."]
+    #[doc = " \\details Firstly if a magnitudes tensor is provided the cell histograms in the bins tensor are normalised by the average cell gradient magnitudes."]
+    #[doc = "\\f[bins(c,n) = \\frac{bins(c,n)}{magnitudes(c)}\\f]"]
+    #[doc = " To account for changes in illumination and contrast the cell histograms must be locally normalized which requires grouping the cell histograms together into larger spatially connected blocks."]
+    #[doc = " Blocks are rectangular grids represented by three parameters: the number of cells per block, the number of pixels per cell, and the number of bins per cell histogram."]
+    #[doc = " These blocks typically overlap, meaning that each cell histogram contributes more than once to the final descriptor."]
+    #[doc = " To normalize a block its cell histograms \\f$h\\f$ are grouped together to form a vector \\f$v = [h_1, h_2, h_3, ... , h_n]\\f$."]
+    #[doc = " This vector is normalised using L2-Hys which means performing L2-norm on this vector; clipping the result (by limiting the maximum values of v to be threshold) and renormalizing again. If the threshold is equal to zero then L2-Hys normalization is not performed."]
+    #[doc = " \\f[L2norm(v) = \\frac{v}{\\sqrt{\\|v\\|_2^2 + \\epsilon^2}}\\f]"]
+    #[doc = " where \\f$ \\|v\\|_k \\f$ be its k-norm for k=1, 2, and \\f$ \\epsilon \\f$ be a small constant."]
+    #[doc = " For a specific window its HOG descriptor is then the concatenated vector of the components of the normalized cell histograms from all of the block regions contained in the window."]
+    #[doc = " The W1xW2 window starting position is at coordinates 0x0."]
+    #[doc = " If the input image has dimensions that are not an integer multiple of W1xW2 blocks with the specified stride, then the last positions that contain only a partial W1xW2 window"]
+    #[doc = " will be calculated with the remaining part of the W1xW2 window padded with zeroes."]
+    #[doc = " The Window W1xW2 must also have a size so that it contains an integer number of cells, otherwise the node is not well-defined."]
+    #[doc = " The final output tensor will contain HOG descriptors equal to the number of windows in the input image."]
+    #[doc = " The output features tensor has 3 dimensions, given by:\\n"]
+    #[doc = " \\f[[ (floor((image_{width}-window_{width})/window_{stride}) + 1),\\f]"]
+    #[doc = " \\f[ (floor((image_{height}-window_{height})/window_{stride}) + 1),\\f]"]
+    #[doc = " \\f[ floor((window_{width} - block_{width})/block_{stride} + 1) * floor((window_{height} - block_{height})/block_{stride} + 1) *\\f]"]
+    #[doc = " \\f[ (((block_{width} * block_{height}) / (cell_{width} * cell_{height})) * num_{bins})] \\f]"]
+    #[doc = " See <tt>\\ref vxCreateTensor</tt> and <tt>\\ref vxCreateVirtualTensor</tt>."]
+    #[doc = " We recommend the output tensors always be *virtual* objects, with this node connected directly to the classifier."]
+    #[doc = " The output tensor will be very large, and using non-virtual tensors will result in a poorly optimized implementation."]
+    #[doc = " Merging of this node with a classifier node such as that described in the classifier extension will result in better performance."]
+    #[doc = " Notice that this node creation function has more parameters than the corresponding kernel. Numbering of kernel parameters (required if you create this node using the generic interface) is explicitly specified here."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The input image of type <tt>\\ref VX_DF_IMAGE_U8</tt>. (Kernel parameter #0)"]
+    #[doc = " \\param [in] magnitudes (Optional) The gradient magnitudes per cell of <tt>\\ref vx_tensor</tt> of type <tt>\\ref VX_TYPE_INT16</tt>. It is the output of <tt>\\ref vxHOGCellsNode</tt>.  (Kernel parameter #1)"]
+    #[doc = " \\param [in] bins       The gradient orientation histograms per cell of <tt>\\ref vx_tensor</tt> of type <tt>\\ref VX_TYPE_INT16</tt>. It is the output of <tt>\\ref vxHOGCellsNode</tt>. (Kernel parameter #2)"]
+    #[doc = " \\param [in] params The parameters of type <tt>\\ref vx_hog_t</tt>.  (Kernel parameter #3)"]
+    #[doc = " \\param [in] hog_param_size Size of <tt>\\ref vx_hog_t</tt> in bytes. Note that this parameter is not counted as one of the kernel parameters."]
+    #[doc = " \\param [out] features The output HOG features of <tt>\\ref vx_tensor</tt> of type <tt>\\ref VX_TYPE_INT16</tt>.  (Kernel parameter #4)"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval 0 Node could not be created."]
+    #[doc = " \\retval * Node handle."]
+    #[doc = " \\ingroup group_vision_function_hog"]
+    pub fn vxHOGFeaturesNode(
+        graph: vx_graph,
+        input: vx_image,
+        magnitudes: vx_tensor,
+        bins: vx_tensor,
+        params: *const vx_hog_t,
+        hog_param_size: vx_size,
+        features: vx_tensor,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Finds the Probabilistic Hough Lines detected in the input binary image, each line is stored in the output array as a set of points (x1, y1, x2, y2) ."]
+    #[doc = " \\details Some implementations of the algorithm may have a random or non-deterministic element. If the target application is in a safety-critical environment this"]
+    #[doc = " should be borne in mind and steps taken in the implementation, the application or both to achieve the level of determinism required by the system design."]
+    #[doc = " \\param [in] graph graph handle"]
+    #[doc = " \\param [in] input A single channel binary source image of type <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt>."]
+    #[doc = " \\param [in] params parameters of the struct <tt>\\ref vx_hough_lines_p_t</tt>"]
+    #[doc = " \\param [out] lines_array lines_array contains array of lines, see <tt>\\ref vx_line2d_t</tt> The order of lines in implementation dependent"]
+    #[doc = " \\param [out] num_lines [optional] The total number of detected lines in image. Use a VX_TYPE_SIZE scalar"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    #[doc = " \\ingroup group_vision_function_hough_lines_p"]
+    pub fn vxHoughLinesPNode(
+        graph: vx_graph,
+        input: vx_image,
+        params: *const vx_hough_lines_p_t,
+        lines_array: vx_array,
+        num_lines: vx_scalar,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] The function applies bilateral filtering to the input tensor."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] src The input data a <tt>\\ref vx_tensor</tt>. maximum 3 dimension and minimum 2. The tensor is of type <tt>\\ref VX_TYPE_UINT8</tt> or <tt>\\ref VX_TYPE_INT16</tt>."]
+    #[doc = " dimensions are [radiometric ,width,height] or [width,height].See <tt>\\ref vxCreateTensor</tt> and <tt>\\ref vxCreateVirtualTensor</tt>."]
+    #[doc = " \\param [in] diameter of each pixel neighbourhood that is used during filtering. Values of diameter must be odd. Bigger then 3 and smaller then 10."]
+    #[doc = " \\param [in] sigmaValues Filter sigma in the radiometric space. Supported values are bigger then 0 and smaller or equal 20."]
+    #[doc = " \\param [in] sigmaSpace Filter sigma in the spatial space. Supported values are bigger then 0 and smaller or equal 20."]
+    #[doc = " \\param [out] dst The output data a <tt>\\ref vx_tensor</tt>,Of type <tt>\\ref VX_TYPE_UINT8</tt> or <tt>\\ref VX_TYPE_INT16</tt>. And must be the same type and size of the input."]
+    #[doc = " \\note The border modes"]
+    #[doc = "  <tt>\\ref VX_NODE_BORDER</tt> value"]
+    #[doc = "  <tt>\\ref VX_BORDER_REPLICATE</tt> and <tt>\\ref VX_BORDER_CONSTANT</tt> are supported."]
+    #[doc = " \\return <tt>vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>vxGetStatus</tt>"]
+    #[doc = " \\ingroup group_vision_function_bilateral_filter"]
+    pub fn vxBilateralFilterNode(
+        graph: vx_graph,
+        src: vx_tensor,
+        diameter: vx_int32,
+        sigmaSpace: vx_float32,
+        sigmaValues: vx_float32,
+        dst: vx_tensor,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Performs element wise multiplications on element values in the input tensor data with a scale."]
+    #[doc = " \\param [in] graph The handle to the graph."]
+    #[doc = " \\param [in] input1 Input tensor data.  Implementations must support input tensor data type <tt>\\ref VX_TYPE_INT16</tt> with fixed_point_position 8,"]
+    #[doc = " and tensor data types <tt>\\ref VX_TYPE_UINT8</tt> and <tt>\\ref VX_TYPE_INT8</tt>, with fixed_point_position 0."]
+    #[doc = " \\param [in] input2 Input tensor data. The dimensions and sizes of input2 match those of input1, unless the vx_tensor of one or more dimensions in input2 is 1."]
+    #[doc = " In this case, those dimensions are treated as if this tensor was expanded to match the size of the corresponding dimension of input1,"]
+    #[doc = " and data was duplicated on all terms in that dimension. After this expansion, the dimensions will be equal."]
+    #[doc = " The data type must match the data type of Input1."]
+    #[doc = " \\param [in] scale A non-negative <tt>\\ref VX_TYPE_FLOAT32</tt> multiplied to each product before overflow handling."]
+    #[doc = " \\param [in] overflow_policy A <tt>\\ref vx_convert_policy_e</tt> enumeration."]
+    #[doc = " \\param [in] rounding_policy A <tt>\\ref vx_round_policy_e</tt> enumeration."]
+    #[doc = " \\param [out] output The output tensor data with the same dimensions as the input tensor data."]
+    #[doc = " \\ingroup group_vision_function_tensor_multiply"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\returns A node reference <tt>\\ref vx_node</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    pub fn vxTensorMultiplyNode(
+        graph: vx_graph,
+        input1: vx_tensor,
+        input2: vx_tensor,
+        scale: vx_scalar,
+        overflow_policy: vx_enum,
+        rounding_policy: vx_enum,
+        output: vx_tensor,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Performs arithmetic addition on element values in the input tensor data."]
+    #[doc = " \\param [in] graph The handle to the graph."]
+    #[doc = " \\param [in] input1 Input tensor data.  Implementations must support input tensor data type <tt>\\ref VX_TYPE_INT16</tt> with fixed_point_position 8,"]
+    #[doc = " and tensor data types <tt>\\ref VX_TYPE_UINT8</tt> and <tt>\\ref VX_TYPE_INT8</tt>, with fixed_point_position 0."]
+    #[doc = " \\param [in] input2 Input tensor data. The dimensions and sizes of input2 match those of input1, unless the vx_tensor of one or more dimensions in input2 is 1."]
+    #[doc = " In this case, those dimensions are treated as if this tensor was expanded to match the size of the corresponding dimension of input1,"]
+    #[doc = " and data was duplicated on all terms in that dimension. After this expansion, the dimensions will be equal."]
+    #[doc = " The data type must match the data type of Input1."]
+    #[doc = " \\param [in] policy A <tt>\\ref vx_convert_policy_e</tt> enumeration."]
+    #[doc = " \\param [out] output The output tensor data with the same dimensions as the input tensor data."]
+    #[doc = " \\ingroup group_vision_function_tensor_add"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\returns A node reference <tt>\\ref vx_node</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    pub fn vxTensorAddNode(
+        graph: vx_graph,
+        input1: vx_tensor,
+        input2: vx_tensor,
+        policy: vx_enum,
+        output: vx_tensor,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Performs arithmetic subtraction on element values in the input tensor data."]
+    #[doc = " \\param [in] graph The handle to the graph."]
+    #[doc = " \\param [in] input1 Input tensor data.  Implementations must support input tensor data type <tt>\\ref VX_TYPE_INT16</tt> with fixed_point_position 8,"]
+    #[doc = " and tensor data types <tt>\\ref VX_TYPE_UINT8</tt> and <tt>\\ref VX_TYPE_INT8</tt>, with fixed_point_position 0."]
+    #[doc = " \\param [in] input2 Input tensor data. The dimensions and sizes of input2 match those of input1, unless the vx_tensor of one or more dimensions in input2 is 1."]
+    #[doc = " In this case, those dimensions are treated as if this tensor was expanded to match the size of the corresponding dimension of input1,"]
+    #[doc = " and data was duplicated on all terms in that dimension. After this expansion, the dimensions will be equal."]
+    #[doc = " The data type must match the data type of Input1."]
+    #[doc = " \\param [in] policy A <tt>\\ref vx_convert_policy_e</tt> enumeration."]
+    #[doc = " \\param [out] output The output tensor data with the same dimensions as the input tensor data."]
+    #[doc = " \\ingroup group_vision_function_tensor_subtract"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\returns A node reference <tt>\\ref vx_node</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    pub fn vxTensorSubtractNode(
+        graph: vx_graph,
+        input1: vx_tensor,
+        input2: vx_tensor,
+        policy: vx_enum,
+        output: vx_tensor,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Performs LUT on element values in the input tensor data."]
+    #[doc = " \\param [in] graph The handle to the graph."]
+    #[doc = " \\param [in] input1 Input tensor data. Implementations must support input tensor data type <tt>\\ref VX_TYPE_INT16</tt> with fixed_point_position 8,"]
+    #[doc = " and tensor data types <tt>\\ref VX_TYPE_UINT8</tt>, with fixed_point_position 0."]
+    #[doc = " \\param [in] lut The look-up table to use, of type <tt>\\ref vx_lut</tt>."]
+    #[doc = " The elements of input1 are treated as unsigned integers to determine an index into the look-up table."]
+    #[doc = " The data type of the items in the look-up table must match that of the output tensor."]
+    #[doc = " \\param [out] output The output tensor data with the same dimensions as the input tensor data."]
+    #[doc = " \\ingroup group_vision_function_tensor_tablelookup"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\returns A node reference <tt>\\ref vx_node</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    pub fn vxTensorTableLookupNode(
+        graph: vx_graph,
+        input1: vx_tensor,
+        lut: vx_lut,
+        output: vx_tensor,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Performs transpose on the input tensor."]
+    #[doc = " The node transpose the tensor according to a specified 2 indexes in the tensor (0-based indexing)"]
+    #[doc = " \\param [in] graph The handle to the graph."]
+    #[doc = " \\param [in] input Input tensor data, Implementations must support input tensor data type <tt>\\ref VX_TYPE_INT16</tt> with fixed_point_position 8,"]
+    #[doc = " and tensor data types <tt>\\ref VX_TYPE_UINT8</tt> and <tt>\\ref VX_TYPE_INT8</tt>, with fixed_point_position 0."]
+    #[doc = " \\param [out] output output tensor data,"]
+    #[doc = " \\param [in] dimension1 Dimension index that is transposed with dim 2."]
+    #[doc = " \\param [in] dimension2 Dimension index that is transposed with dim 1."]
+    #[doc = " \\ingroup group_vision_function_tensor_transpose"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\returns A node reference <tt>\\ref vx_node</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    pub fn vxTensorTransposeNode(
+        graph: vx_graph,
+        input: vx_tensor,
+        output: vx_tensor,
+        dimension1: vx_size,
+        dimension2: vx_size,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a bit-depth conversion node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The input tensor. Implementations must support input tensor data type <tt>\\ref VX_TYPE_INT16</tt> with fixed_point_position 8,"]
+    #[doc = " and tensor data types <tt>\\ref VX_TYPE_UINT8</tt> and <tt>\\ref VX_TYPE_INT8</tt>, with fixed_point_position 0."]
+    #[doc = " \\param [in] policy A <tt>\\ref VX_TYPE_ENUM</tt> of the <tt>\\ref vx_convert_policy_e</tt> enumeration."]
+    #[doc = " \\param [in] norm A scalar containing a <tt>\\ref VX_TYPE_FLOAT32</tt> of the normalization value."]
+    #[doc = " \\param [in] offset A scalar containing a <tt>\\ref VX_TYPE_FLOAT32</tt> of the offset value subtracted before normalization."]
+    #[doc = " \\param [out] output The output tensor. Implementations must support input tensor data type <tt>\\ref VX_TYPE_INT16</tt>. with fixed_point_position 8."]
+    #[doc = " And <tt>\\ref VX_TYPE_UINT8</tt> with fixed_point_position 0."]
+    #[doc = " \\ingroup group_vision_function_tensor_convert_depth"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxTensorConvertDepthNode(
+        graph: vx_graph,
+        input: vx_tensor,
+        policy: vx_enum,
+        norm: vx_scalar,
+        offset: vx_scalar,
+        output: vx_tensor,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Creates a generalized matrix multiplication node."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input1 The first input 2D tensor of type <tt>\\ref  VX_TYPE_INT16</tt> with fixed_point_pos 8, or tensor data types <tt>\\ref VX_TYPE_UINT8</tt> or <tt>\\ref VX_TYPE_INT8</tt>, with fixed_point_pos 0."]
+    #[doc = " \\param [in] input2 The second 2D tensor. Must be in the same data type as input1."]
+    #[doc = " \\param [in] input3 The third 2D tensor. Must be in the same data type as input1. [optional]."]
+    #[doc = " \\param [in] matrix_multiply_params Matrix multiply parameters, see <tt>\\ref vx_tensor_matrix_multiply_params_t </tt>."]
+    #[doc = " \\param [out] output The output 2D tensor. Must be in the same data type as input1. Output dimension must agree the formula in the description."]
+    #[doc = " \\ingroup group_vision_function_tensor_matrix_multiply"]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\returns A node reference <tt>\\ref vx_node</tt>. Any possible errors preventing a"]
+    #[doc = " successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    pub fn vxTensorMatrixMultiplyNode(
+        graph: vx_graph,
+        input1: vx_tensor,
+        input2: vx_tensor,
+        input3: vx_tensor,
+        matrix_multiply_params: *const vx_tensor_matrix_multiply_params_t,
+        output: vx_tensor,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief Copy data from one object to another."]
+    #[doc = " \\note An implementation may optimize away the copy when virtual data objects are used."]
+    #[doc = " \\param [in] graph The reference to the graph."]
+    #[doc = " \\param [in] input The input data object."]
+    #[doc = " \\param [out] output The output data object with meta-data identical to the input data object."]
+    #[doc = " \\return <tt>\\ref vx_node</tt>."]
+    #[doc = " \\retval vx_node A node reference. Any possible errors preventing a successful creation"]
+    #[doc = " should be checked using <tt>\\ref vxGetStatus</tt>"]
+    #[doc = " \\ingroup group_vision_function_copy"]
+    pub fn vxCopyNode(graph: vx_graph, input: vx_reference, output: vx_reference) -> vx_node;
+}
+pub type vx_kernel_input_validate_f =
+    ::std::option::Option<unsafe extern "C" fn(node: vx_node, index: vx_uint32) -> vx_status>;
+pub type vx_kernel_output_validate_f = ::std::option::Option<
+    unsafe extern "C" fn(node: vx_node, index: vx_uint32, meta: vx_meta_format) -> vx_status,
+>;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _vx_delta_rectangle_t {
+    #[doc = "< \\brief The change in the start x."]
+    pub delta_start_x: vx_int32,
+    #[doc = "< \\brief The change in the start y."]
+    pub delta_start_y: vx_int32,
+    #[doc = "< \\brief The change in the end x."]
+    pub delta_end_x: vx_int32,
+    #[doc = "< \\brief The change in the end y."]
+    pub delta_end_y: vx_int32,
+}
+#[test]
+fn bindgen_test_layout__vx_delta_rectangle_t() {
+    assert_eq!(
+        ::std::mem::size_of::<_vx_delta_rectangle_t>(),
+        16usize,
+        concat!("Size of: ", stringify!(_vx_delta_rectangle_t))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<_vx_delta_rectangle_t>(),
+        4usize,
+        concat!("Alignment of ", stringify!(_vx_delta_rectangle_t))
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<_vx_delta_rectangle_t>())).delta_start_x as *const _ as usize
+        },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_delta_rectangle_t),
+            "::",
+            stringify!(delta_start_x)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<_vx_delta_rectangle_t>())).delta_start_y as *const _ as usize
+        },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_delta_rectangle_t),
+            "::",
+            stringify!(delta_start_y)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<_vx_delta_rectangle_t>())).delta_end_x as *const _ as usize
+        },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_delta_rectangle_t),
+            "::",
+            stringify!(delta_end_x)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<_vx_delta_rectangle_t>())).delta_end_y as *const _ as usize
+        },
+        12usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_delta_rectangle_t),
+            "::",
+            stringify!(delta_end_y)
+        )
+    );
+}
+pub type vx_delta_rectangle_t = _vx_delta_rectangle_t;
+extern "C" {
+    pub fn vxAddKernel(
+        context: vx_context,
+        name: *const vx_char,
+        enumeration: vx_enum,
+        func_ptr: vx_kernel_f,
+        numParams: vx_uint32,
+        input: vx_kernel_input_validate_f,
+        output: vx_kernel_output_validate_f,
+        init: vx_kernel_initialize_f,
+        deinit: vx_kernel_deinitialize_f,
+    ) -> vx_kernel;
+}
+extern "C" {
+    pub fn vxComputeImagePatchSize(
+        image: vx_image,
+        rect: *const vx_rectangle_t,
+        plane_index: vx_uint32,
+    ) -> vx_size;
+}
+extern "C" {
+    pub fn vxAccessImagePatch(
+        image: vx_image,
+        rect: *const vx_rectangle_t,
+        plane_index: vx_uint32,
+        addr: *mut vx_imagepatch_addressing_t,
+        ptr: *mut *mut ::std::os::raw::c_void,
+        usage: vx_enum,
+    ) -> vx_status;
+}
+extern "C" {
+    pub fn vxCommitImagePatch(
+        image: vx_image,
+        rect: *const vx_rectangle_t,
+        plane_index: vx_uint32,
+        addr: *const vx_imagepatch_addressing_t,
+        ptr: *const ::std::os::raw::c_void,
+    ) -> vx_status;
+}
+extern "C" {
+    pub fn vxAccessArrayRange(
+        arr: vx_array,
+        start: vx_size,
+        end: vx_size,
+        stride: *mut vx_size,
+        ptr: *mut *mut ::std::os::raw::c_void,
+        usage: vx_enum,
+    ) -> vx_status;
+}
+extern "C" {
+    pub fn vxCommitArrayRange(
+        arr: vx_array,
+        start: vx_size,
+        end: vx_size,
+        ptr: *const ::std::os::raw::c_void,
+    ) -> vx_status;
+}
+extern "C" {
+    pub fn vxAccessDistribution(
+        distribution: vx_distribution,
+        ptr: *mut *mut ::std::os::raw::c_void,
+        usage: vx_enum,
+    ) -> vx_status;
+}
+extern "C" {
+    pub fn vxCommitDistribution(
+        distribution: vx_distribution,
+        ptr: *const ::std::os::raw::c_void,
+    ) -> vx_status;
+}
+extern "C" {
+    pub fn vxAccessLUT(
+        lut: vx_lut,
+        ptr: *mut *mut ::std::os::raw::c_void,
+        usage: vx_enum,
+    ) -> vx_status;
+}
+extern "C" {
+    pub fn vxCommitLUT(lut: vx_lut, ptr: *const ::std::os::raw::c_void) -> vx_status;
+}
+extern "C" {
+    pub fn vxReadMatrix(mat: vx_matrix, array: *mut ::std::os::raw::c_void) -> vx_status;
+}
+extern "C" {
+    pub fn vxWriteMatrix(mat: vx_matrix, array: *const ::std::os::raw::c_void) -> vx_status;
+}
+extern "C" {
+    pub fn vxReadConvolutionCoefficients(conv: vx_convolution, array: *mut vx_int16) -> vx_status;
+}
+extern "C" {
+    pub fn vxWriteConvolutionCoefficients(
+        conv: vx_convolution,
+        array: *const vx_int16,
+    ) -> vx_status;
+}
+extern "C" {
+    pub fn vxReadScalarValue(ref_: vx_scalar, ptr: *mut ::std::os::raw::c_void) -> vx_status;
+}
+extern "C" {
+    pub fn vxWriteScalarValue(ref_: vx_scalar, ptr: *const ::std::os::raw::c_void) -> vx_status;
+}
+extern "C" {
+    pub fn vxSetRemapPoint(
+        table: vx_remap,
+        dst_x: vx_uint32,
+        dst_y: vx_uint32,
+        src_x: vx_float32,
+        src_y: vx_float32,
+    ) -> vx_status;
+}
+extern "C" {
+    pub fn vxGetRemapPoint(
+        table: vx_remap,
+        dst_x: vx_uint32,
+        dst_y: vx_uint32,
+        src_x: *mut vx_float32,
+        src_y: *mut vx_float32,
+    ) -> vx_status;
+}
+extern "C" {
+    pub fn vxCreateThreshold(
+        c: vx_context,
+        thresh_type: vx_enum,
+        data_type: vx_enum,
+    ) -> vx_threshold;
+}
+extern "C" {
+    pub fn vxAccumulateImageNode(graph: vx_graph, input: vx_image, accum: vx_image) -> vx_node;
+}
+extern "C" {
+    pub fn vxAccumulateWeightedImageNode(
+        graph: vx_graph,
+        input: vx_image,
+        alpha: vx_scalar,
+        accum: vx_image,
+    ) -> vx_node;
+}
+extern "C" {
+    pub fn vxAccumulateSquareImageNode(
+        graph: vx_graph,
+        input: vx_image,
+        shift: vx_scalar,
+        accum: vx_image,
+    ) -> vx_node;
+}
+extern "C" {
+    pub fn vxuAccumulateImage(context: vx_context, input: vx_image, accum: vx_image) -> vx_status;
+}
+extern "C" {
+    pub fn vxuAccumulateWeightedImage(
+        context: vx_context,
+        input: vx_image,
+        alpha: vx_scalar,
+        accum: vx_image,
+    ) -> vx_status;
+}
+extern "C" {
+    pub fn vxuAccumulateSquareImage(
+        context: vx_context,
+        input: vx_image,
+        shift: vx_scalar,
+        accum: vx_image,
+    ) -> vx_status;
+}
+extern "C" {
+    pub fn vxNormalizationLayer(
+        graph: vx_graph,
+        inputs: vx_tensor,
+        type_: vx_enum,
+        normalization_size: vx_size,
+        alpha: vx_float32,
+        beta: vx_float32,
+        outputs: vx_tensor,
+    ) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Invokes an immediate Color Conversion."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input image."]
+    #[doc = " \\param [out] output The output image."]
+    #[doc = " \\ingroup group_vision_function_colorconvert"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuColorConvert(context: vx_context, input: vx_image, output: vx_image) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Invokes an immediate Channel Extract."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input image. Must be one of the defined <tt>\\ref vx_df_image_e</tt> multi-channel formats."]
+    #[doc = " \\param [in] channel The <tt>\\ref vx_channel_e</tt> enumeration to extract."]
+    #[doc = " \\param [out] output The output image. Must be <tt>\\ref VX_DF_IMAGE_U8</tt>."]
+    #[doc = " \\ingroup group_vision_function_channelextract"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuChannelExtract(
+        context: vx_context,
+        input: vx_image,
+        channel: vx_enum,
+        output: vx_image,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Invokes an immediate Channel Combine."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] plane0 The plane that forms channel 0. Must be <tt>\\ref VX_DF_IMAGE_U8</tt>."]
+    #[doc = " \\param [in] plane1 The plane that forms channel 1. Must be <tt>\\ref VX_DF_IMAGE_U8</tt>."]
+    #[doc = " \\param [in] plane2 [optional] The plane that forms channel 2. Must be <tt>\\ref VX_DF_IMAGE_U8</tt>."]
+    #[doc = " \\param [in] plane3 [optional] The plane that forms channel 3. Must be <tt>\\ref VX_DF_IMAGE_U8</tt>."]
+    #[doc = " \\param [out] output The output image."]
+    #[doc = " \\ingroup group_vision_function_channelcombine"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuChannelCombine(
+        context: vx_context,
+        plane0: vx_image,
+        plane1: vx_image,
+        plane2: vx_image,
+        plane3: vx_image,
+        output: vx_image,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Invokes an immediate Sobel 3x3."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> format."]
+    #[doc = " \\param [out] output_x [optional] The output gradient in the x direction in <tt>\\ref VX_DF_IMAGE_S16</tt>."]
+    #[doc = " \\param [out] output_y [optional] The output gradient in the y direction in <tt>\\ref VX_DF_IMAGE_S16</tt>."]
+    #[doc = " \\ingroup group_vision_function_sobel3x3"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuSobel3x3(
+        context: vx_context,
+        input: vx_image,
+        output_x: vx_image,
+        output_y: vx_image,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Invokes an immediate Magnitude."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] grad_x The input x image. This must be in <tt>\\ref VX_DF_IMAGE_S16</tt> format."]
+    #[doc = " \\param [in] grad_y The input y image. This must be in <tt>\\ref VX_DF_IMAGE_S16</tt> format."]
+    #[doc = " \\param [out] mag The magnitude image. This will be in <tt>\\ref VX_DF_IMAGE_S16</tt> format."]
+    #[doc = " \\ingroup group_vision_function_magnitude"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuMagnitude(
+        context: vx_context,
+        grad_x: vx_image,
+        grad_y: vx_image,
+        mag: vx_image,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Invokes an immediate Phase."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] grad_x The input x image. This must be in <tt>\\ref VX_DF_IMAGE_S16</tt> format."]
+    #[doc = " \\param [in] grad_y The input y image. This must be in <tt>\\ref VX_DF_IMAGE_S16</tt> format."]
+    #[doc = " \\param [out] orientation The phase image. This will be in <tt>\\ref VX_DF_IMAGE_U8</tt> format."]
+    #[doc = " \\ingroup group_vision_function_phase"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuPhase(
+        context: vx_context,
+        grad_x: vx_image,
+        grad_y: vx_image,
+        orientation: vx_image,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Scales an input image to an output image."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] src The source image of type <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt>."]
+    #[doc = " \\param [out] dst The destination image of type <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt>."]
+    #[doc = " Must be of the same format as the input image."]
+    #[doc = " \\param [in] type The interpolation type. \\see vx_interpolation_type_e."]
+    #[doc = " \\ingroup group_vision_function_scale_image"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuScaleImage(
+        context: vx_context,
+        src: vx_image,
+        dst: vx_image,
+        type_: vx_enum,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Processes the image through the LUT."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt>."]
+    #[doc = " \\param [in] lut The LUT which is of type <tt>\\ref VX_TYPE_UINT8</tt> if input image is <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_TYPE_INT16</tt> if input image is <tt>\\ref VX_DF_IMAGE_S16</tt>."]
+    #[doc = " \\param [out] output The output image of the same type as the input image."]
+    #[doc = " \\ingroup group_vision_function_lut"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuTableLookup(
+        context: vx_context,
+        input: vx_image,
+        lut: vx_lut,
+        output: vx_image,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Generates a distribution from an image."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt>"]
+    #[doc = " \\param [out] distribution The output distribution."]
+    #[doc = " \\ingroup group_vision_function_histogram"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuHistogram(
+        context: vx_context,
+        input: vx_image,
+        distribution: vx_distribution,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Equalizes the Histogram of a grayscale image."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The grayscale input image in <tt>\\ref VX_DF_IMAGE_U8</tt>"]
+    #[doc = " \\param [out] output The grayscale output image of type <tt>\\ref VX_DF_IMAGE_U8</tt> with equalized brightness and contrast."]
+    #[doc = " \\ingroup group_vision_function_equalize_hist"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuEqualizeHist(context: vx_context, input: vx_image, output: vx_image) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Computes the absolute difference between two images."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] in1 An input image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> format."]
+    #[doc = " \\param [in] in2 An input image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> format."]
+    #[doc = " \\param [out] out The output image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> format."]
+    #[doc = " \\ingroup group_vision_function_absdiff"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuAbsDiff(
+        context: vx_context,
+        in1: vx_image,
+        in2: vx_image,
+        out: vx_image,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Computes the mean value and optionally the standard deviation."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input image. <tt>\\ref VX_DF_IMAGE_U8</tt> and <tt>\\ref VX_DF_IMAGE_U1</tt> are supported."]
+    #[doc = " \\param [out] mean The average pixel value."]
+    #[doc = " \\param [out] stddev [optional] The standard deviation of the pixel values."]
+    #[doc = " \\ingroup group_vision_function_meanstddev"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuMeanStdDev(
+        context: vx_context,
+        input: vx_image,
+        mean: *mut vx_float32,
+        stddev: *mut vx_float32,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Threshold's an input image and produces a <tt>\\ref VX_DF_IMAGE_U8</tt> boolean image."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input image. Only images with format <tt>\\ref VX_DF_IMAGE_U8</tt>"]
+    #[doc = " and <tt>\\ref VX_DF_IMAGE_S16</tt> are supported."]
+    #[doc = " \\param [in] thresh The thresholding object that defines the parameters of"]
+    #[doc = " the operation. The <tt>\\ref VX_THRESHOLD_INPUT_FORMAT</tt> must be the same as the input image format and"]
+    #[doc = " the <tt>\\ref VX_THRESHOLD_OUTPUT_FORMAT</tt> must be the same as the output image format."]
+    #[doc = " \\param [out] output The output image, that will contain as pixel values true and false values defined by \\p thresh."]
+    #[doc = " Only images with format <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> are supported."]
+    #[doc = " Must be of the same size as the input image."]
+    #[doc = " \\ingroup group_vision_function_threshold"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuThreshold(
+        context: vx_context,
+        input: vx_image,
+        thresh: vx_threshold,
+        output: vx_image,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Performs Non-Maxima Suppression on an image, producing an image of the same type."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> format."]
+    #[doc = " \\param [in] mask [optional] Constrict suppression to a ROI. The mask image is of type <tt>\\ref VX_DF_IMAGE_U8</tt>"]
+    #[doc = " or <tt>\\ref VX_DF_IMAGE_U1</tt> and must be the same dimensions as the input image."]
+    #[doc = " \\param [in] win_size The size of window over which to perform the localized non-maxima suppression.  Must be odd,"]
+    #[doc = " and less than or equal to the smallest dimension of the input image."]
+    #[doc = " \\param [out] output The output image, of the same type as the input, that has been non-maxima suppressed."]
+    #[doc = " \\ingroup group_vision_function_nms"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuNonMaxSuppression(
+        context: vx_context,
+        input: vx_image,
+        mask: vx_image,
+        win_size: vx_int32,
+        output: vx_image,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Computes the integral image of the input."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> format."]
+    #[doc = " \\param [out] output The output image in <tt>\\ref VX_DF_IMAGE_U32</tt> format."]
+    #[doc = " \\ingroup group_vision_function_integral_image"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuIntegralImage(context: vx_context, input: vx_image, output: vx_image) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Erodes an image by a 3x3 window."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> format."]
+    #[doc = " \\param [out] output The output image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> format, which"]
+    #[doc = " must have the same dimensions and type as the input image."]
+    #[doc = " \\ingroup group_vision_function_erode_image"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuErode3x3(context: vx_context, input: vx_image, output: vx_image) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Dilates an image by a 3x3 window."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> format."]
+    #[doc = " \\param [out] output The output image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> format, which"]
+    #[doc = " must have the same dimensions and type as the input image."]
+    #[doc = " \\ingroup group_vision_function_dilate_image"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuDilate3x3(context: vx_context, input: vx_image, output: vx_image) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Computes a median filter on the image by a 3x3 window."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> format."]
+    #[doc = " \\param [out] output The output image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> format, which"]
+    #[doc = " must have the same dimensions and type as the input image."]
+    #[doc = " \\ingroup group_vision_function_median_image"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuMedian3x3(context: vx_context, input: vx_image, output: vx_image) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Computes a box filter on the image by a 3x3 window."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> format."]
+    #[doc = " \\param [out] output The output image in <tt>\\ref VX_DF_IMAGE_U8</tt> format."]
+    #[doc = " \\ingroup group_vision_function_box_image"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuBox3x3(context: vx_context, input: vx_image, output: vx_image) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Computes a gaussian filter on the image by a 3x3 window."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> format."]
+    #[doc = " \\param [out] output The output image in <tt>\\ref VX_DF_IMAGE_U8</tt> format."]
+    #[doc = " \\ingroup group_vision_function_gaussian_image"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuGaussian3x3(context: vx_context, input: vx_image, output: vx_image) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Performs Non-linear Filtering."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] function The non-linear filter function. See <tt>\\ref vx_non_linear_filter_e</tt>."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> format."]
+    #[doc = " \\param [in] mask The mask to be applied to the Non-linear function. <tt>\\ref VX_MATRIX_ORIGIN</tt> attribute is used"]
+    #[doc = " to place the mask appropriately when computing the resulting image. See <tt>\\ref vxCreateMatrixFromPattern</tt> and <tt>\\ref vxCreateMatrixFromPatternAndOrigin</tt>."]
+    #[doc = " \\param [out] output The output image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> format, which"]
+    #[doc = " must have the same dimensions and type as the input image."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    #[doc = " \\ingroup group_vision_function_nonlinear_filter"]
+    pub fn vxuNonLinearFilter(
+        context: vx_context,
+        function: vx_enum,
+        input: vx_image,
+        mask: vx_matrix,
+        output: vx_image,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Computes a convolution on the input image with the supplied"]
+    #[doc = " matrix."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> format."]
+    #[doc = " \\param [in] conv The <tt>\\ref vx_int16</tt> convolution matrix."]
+    #[doc = " \\param [out] output The output image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> format."]
+    #[doc = " \\ingroup group_vision_function_custom_convolution"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuConvolve(
+        context: vx_context,
+        input: vx_image,
+        conv: vx_convolution,
+        output: vx_image,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Computes a Gaussian pyramid from an input image."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt>"]
+    #[doc = " \\param [out] gaussian The Gaussian pyramid with <tt>\\ref VX_DF_IMAGE_U8</tt> to construct."]
+    #[doc = " \\ingroup group_vision_function_gaussian_pyramid"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuGaussianPyramid(
+        context: vx_context,
+        input: vx_image,
+        gaussian: vx_pyramid,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Computes a Laplacian pyramid from an input image."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> format."]
+    #[doc = " \\param [out] laplacian The Laplacian pyramid with <tt>\\ref VX_DF_IMAGE_S16</tt> to construct."]
+    #[doc = " \\param [out] output The lowest resolution image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> format necessary to reconstruct the input image from the pyramid. The output image format should be same as input image format."]
+    #[doc = " \\ingroup group_vision_function_laplacian_pyramid"]
+    #[doc = " \\see group_pyramid"]
+    #[doc = " \\return A <tt>\\ref vx_status</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success."]
+    #[doc = " \\retval * An error occured. See <tt>\\ref vx_status_e</tt>"]
+    pub fn vxuLaplacianPyramid(
+        context: vx_context,
+        input: vx_image,
+        laplacian: vx_pyramid,
+        output: vx_image,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Reconstructs an image from a Laplacian Image pyramid."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] laplacian The Laplacian pyramid with <tt>\\ref VX_DF_IMAGE_S16</tt> format."]
+    #[doc = " \\param [in] input The lowest resolution image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> format for the Laplacian pyramid."]
+    #[doc = " \\param [out] output The output image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> format with the highest possible resolution reconstructed from the Laplacian pyramid. The output image format should be same as input image format."]
+    #[doc = " \\ingroup group_vision_function_laplacian_reconstruct"]
+    #[doc = " \\see group_pyramid"]
+    #[doc = " \\return A <tt>\\ref vx_status</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success."]
+    #[doc = " \\retval * An error occured. See <tt>\\ref vx_status_e</tt>"]
+    pub fn vxuLaplacianReconstruct(
+        context: vx_context,
+        laplacian: vx_pyramid,
+        input: vx_image,
+        output: vx_image,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Computes a weighted average image."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] img1 The first <tt>\\ref VX_DF_IMAGE_U8</tt> image."]
+    #[doc = " \\param [in] alpha A <tt>\\ref VX_TYPE_FLOAT32</tt> type, the input value with the range \\f$ 0.0 \\le \\alpha \\le 1.0 \\f$."]
+    #[doc = " \\param [in] img2 The second <tt>\\ref VX_DF_IMAGE_U8</tt> image."]
+    #[doc = " \\param [out] output The output <tt>\\ref VX_DF_IMAGE_U8</tt> image."]
+    #[doc = " \\ingroup group_vision_function_weighted_average"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuWeightedAverage(
+        context: vx_context,
+        img1: vx_image,
+        alpha: vx_scalar,
+        img2: vx_image,
+        output: vx_image,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Computes the minimum and maximum values of the image."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> format."]
+    #[doc = " \\param [out] minVal The minimum value in the image, which corresponds to the type of the input."]
+    #[doc = " \\param [out] maxVal The maximum value in the image, which corresponds to the type of the input."]
+    #[doc = " \\param [out] minLoc [optional] The minimum <tt>\\ref VX_TYPE_COORDINATES2D</tt> locations. If the input image has several minimums, the kernel will return up to the capacity of the array."]
+    #[doc = " \\param [out] maxLoc [optional] The maximum <tt>\\ref VX_TYPE_COORDINATES2D</tt> locations. If the input image has several maximums, the kernel will return up to the capacity of the array."]
+    #[doc = " \\param [out] minCount [optional] The total number of detected minimums in image. Use a <tt>\\ref VX_TYPE_SIZE</tt> scalar."]
+    #[doc = " \\param [out] maxCount [optional] The total number of detected maximums in image. Use a <tt>\\ref VX_TYPE_SIZE</tt> scalar."]
+    #[doc = " \\ingroup group_vision_function_minmaxloc"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuMinMaxLoc(
+        context: vx_context,
+        input: vx_image,
+        minVal: vx_scalar,
+        maxVal: vx_scalar,
+        minLoc: vx_array,
+        maxLoc: vx_array,
+        minCount: vx_scalar,
+        maxCount: vx_scalar,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Computes pixel-wise minimum values between two images."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] in1 The first input image. Must be of type <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt>."]
+    #[doc = " \\param [in] in2 The second input image. Must be of type <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt>."]
+    #[doc = " \\param [out] out The output image which will hold the result of min."]
+    #[doc = " \\ingroup group_vision_function_min"]
+    #[doc = " \\return  A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuMin(context: vx_context, in1: vx_image, in2: vx_image, out: vx_image) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Computes pixel-wise maximum values between two images."]
+    #[doc = " \\param [in]  context The reference to the overall context."]
+    #[doc = " \\param [in] in1 The first input image. Must be of type <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt>."]
+    #[doc = " \\param [in] in2 The second input image. Must be of type <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt>."]
+    #[doc = " \\param [out] out The output image which will hold the result of max."]
+    #[doc = " \\ingroup group_vision_function_max"]
+    #[doc = " \\return  A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuMax(context: vx_context, in1: vx_image, in2: vx_image, out: vx_image) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Converts the input images bit-depth into the output image."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input image."]
+    #[doc = " \\param [out] output The output image."]
+    #[doc = " \\param [in] policy A <tt>\\ref VX_TYPE_ENUM</tt> of the <tt>\\ref vx_convert_policy_e</tt> enumeration."]
+    #[doc = " \\param [in] shift A scalar containing a <tt>\\ref VX_TYPE_INT32</tt> of the shift value."]
+    #[doc = " \\ingroup group_vision_function_convertdepth"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>.."]
+    pub fn vxuConvertDepth(
+        context: vx_context,
+        input: vx_image,
+        output: vx_image,
+        policy: vx_enum,
+        shift: vx_int32,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Computes Canny Edges on the input image into the output image."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input <tt>\\ref VX_DF_IMAGE_U8</tt> image."]
+    #[doc = " \\param [in] hyst The double threshold for hysteresis. The <tt>\\ref VX_THRESHOLD_INPUT_FORMAT</tt> shall be either"]
+    #[doc = " <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt>. The <tt>\\ref VX_THRESHOLD_OUTPUT_FORMAT</tt> is ignored."]
+    #[doc = " \\param [in] gradient_size The size of the Sobel filter window, must support at least 3, 5 and 7."]
+    #[doc = " \\param [in] norm_type A flag indicating the norm used to compute the gradient, <tt>\\ref VX_NORM_L1</tt> or <tt>\\ref VX_NORM_L2</tt>."]
+    #[doc = " \\param [out] output The binary output image in <tt>\\ref VX_DF_IMAGE_U1</tt> or <tt>\\ref VX_DF_IMAGE_U8</tt> format"]
+    #[doc = " with values either 0 and 1 (<tt>VX_DF_IMAGE_U1</tt>), or 0 and 255 (<tt>VX_DF_IMAGE_U8</tt>)."]
+    #[doc = " \\ingroup group_vision_function_canny"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuCannyEdgeDetector(
+        context: vx_context,
+        input: vx_image,
+        hyst: vx_threshold,
+        gradient_size: vx_int32,
+        norm_type: vx_enum,
+        output: vx_image,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Performs a Gaussian Blur on an image then half-scales it. The interpolation mode used is nearest-neighbor."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input <tt>\\ref VX_DF_IMAGE_U8</tt> image."]
+    #[doc = " \\param [out] output The output <tt>\\ref VX_DF_IMAGE_U8</tt> image."]
+    #[doc = " \\param [in] kernel_size The input size of the Gaussian filter. Supported values are 1, 3 and 5."]
+    #[doc = " \\ingroup group_vision_function_scale_image"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuHalfScaleGaussian(
+        context: vx_context,
+        input: vx_image,
+        output: vx_image,
+        kernel_size: vx_int32,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Computes the bitwise and between two images."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] in1 A <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> input image."]
+    #[doc = " \\param [in] in2 A <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> input image."]
+    #[doc = " \\param [out] out The <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> output image, which must have the"]
+    #[doc = " same dimensions and type as the input images."]
+    #[doc = " \\ingroup group_vision_function_and"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuAnd(context: vx_context, in1: vx_image, in2: vx_image, out: vx_image) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Computes the bitwise inclusive-or between two images."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] in1 A <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> input image."]
+    #[doc = " \\param [in] in2 A <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> input image."]
+    #[doc = " \\param [out] out The <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> output image, which must have the"]
+    #[doc = " same dimensions and type as the input images."]
+    #[doc = " \\ingroup group_vision_function_or"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuOr(context: vx_context, in1: vx_image, in2: vx_image, out: vx_image) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Computes the bitwise exclusive-or between two images."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] in1 A <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> input image."]
+    #[doc = " \\param [in] in2 A <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> input image."]
+    #[doc = " \\param [out] out The <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> output image, which must have the"]
+    #[doc = " same dimensions and type as the input images."]
+    #[doc = " \\ingroup group_vision_function_xor"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuXor(context: vx_context, in1: vx_image, in2: vx_image, out: vx_image) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Computes the bitwise not of an image."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input A <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> input image."]
+    #[doc = " \\param [out] output The <tt>\\ref VX_DF_IMAGE_U8</tt>  or <tt>\\ref VX_DF_IMAGE_U1</tt> output image, which must have"]
+    #[doc = " the same dimensions and type as the input image."]
+    #[doc = " \\ingroup group_vision_function_not"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuNot(context: vx_context, input: vx_image, output: vx_image) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Performs elementwise multiplications on pixel values in the input images and a scale."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] in1 A <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> input image."]
+    #[doc = " \\param [in] in2 A <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> input image."]
+    #[doc = " \\param [in] scale A non-negative <tt>\\ref VX_TYPE_FLOAT32</tt> multiplied to each product before overflow handling."]
+    #[doc = " \\param [in] overflow_policy A <tt>\\ref vx_convert_policy_e</tt> enumeration."]
+    #[doc = " \\param [in] rounding_policy A <tt>\\ref vx_round_policy_e</tt> enumeration."]
+    #[doc = " \\param [out] out The output image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> format."]
+    #[doc = " \\ingroup group_vision_function_mult"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuMultiply(
+        context: vx_context,
+        in1: vx_image,
+        in2: vx_image,
+        scale: vx_float32,
+        overflow_policy: vx_enum,
+        rounding_policy: vx_enum,
+        out: vx_image,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Performs arithmetic addition on pixel values in the input images."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] in1 A <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> input image."]
+    #[doc = " \\param [in] in2 A <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> input image."]
+    #[doc = " \\param [in] policy A \\ref vx_convert_policy_e enumeration."]
+    #[doc = " \\param [out] out The output image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> format."]
+    #[doc = " \\ingroup group_vision_function_add"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuAdd(
+        context: vx_context,
+        in1: vx_image,
+        in2: vx_image,
+        policy: vx_enum,
+        out: vx_image,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Performs arithmetic subtraction on pixel values in the input images."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] in1 A <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> input image, the minuend."]
+    #[doc = " \\param [in] in2 A <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> input image, the subtrahend."]
+    #[doc = " \\param [in] policy A \\ref vx_convert_policy_e enumeration."]
+    #[doc = " \\param [out] out The output image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt> format."]
+    #[doc = " \\ingroup group_vision_function_sub"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuSubtract(
+        context: vx_context,
+        in1: vx_image,
+        in2: vx_image,
+        policy: vx_enum,
+        out: vx_image,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Performs an Affine warp on an image."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input <tt>\\ref VX_DF_IMAGE_U1</tt> or <tt>\\ref VX_DF_IMAGE_U8</tt> image."]
+    #[doc = " \\param [in] matrix The affine matrix. Must be 2x3 of type \\ref VX_TYPE_FLOAT32."]
+    #[doc = " \\param [in] type The interpolation type from \\ref vx_interpolation_type_e."]
+    #[doc = " \\ref VX_INTERPOLATION_AREA is not supported."]
+    #[doc = " \\param [out] output The output <tt>\\ref VX_DF_IMAGE_U1</tt> or <tt>\\ref VX_DF_IMAGE_U8</tt> image of the same"]
+    #[doc = " format and dimensions as the input image."]
+    #[doc = " \\ingroup group_vision_function_warp_affine"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuWarpAffine(
+        context: vx_context,
+        input: vx_image,
+        matrix: vx_matrix,
+        type_: vx_enum,
+        output: vx_image,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Performs an Perspective warp on an image."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input <tt>\\ref VX_DF_IMAGE_U8</tt> image."]
+    #[doc = " \\param [in] matrix The perspective matrix. Must be 3x3 of type \\ref VX_TYPE_FLOAT32."]
+    #[doc = " \\param [in] type The interpolation type from \\ref vx_interpolation_type_e."]
+    #[doc = " \\ref VX_INTERPOLATION_AREA is not supported."]
+    #[doc = " \\param [out] output The output <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> image with the same"]
+    #[doc = " dimensions and type as the input image."]
+    #[doc = " \\ingroup group_vision_function_warp_perspective"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuWarpPerspective(
+        context: vx_context,
+        input: vx_image,
+        matrix: vx_matrix,
+        type_: vx_enum,
+        output: vx_image,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Computes the Harris Corners over an image and produces the array of scored points."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input <tt>\\ref VX_DF_IMAGE_U8</tt> image."]
+    #[doc = " \\param [in] strength_thresh The <tt>\\ref VX_TYPE_FLOAT32</tt> minimum threshold which to eliminate Harris Corner scores (computed using the normalized Sobel kernel)."]
+    #[doc = " \\param [in] min_distance The <tt>\\ref VX_TYPE_FLOAT32</tt> radial Euclidean distance for non-maximum suppression."]
+    #[doc = " \\param [in] sensitivity The <tt>\\ref VX_TYPE_FLOAT32</tt> scalar sensitivity threshold \\f$ k \\f$ from the Harris-Stephens equation."]
+    #[doc = " \\param [in] gradient_size The gradient window size to use on the input. The"]
+    #[doc = " implementation must support at least 3, 5, and 7."]
+    #[doc = " \\param [in] block_size The block window size used to compute the harris corner score."]
+    #[doc = " The implementation must support at least 3, 5, and 7."]
+    #[doc = " \\param [out] corners The array of <tt>\\ref VX_TYPE_KEYPOINT</tt> structs. The order of the keypoints in this array is implementation dependent."]
+    #[doc = " \\param [out] num_corners [optional] The total number of detected corners in image. Use a \\ref VX_TYPE_SIZE scalar"]
+    #[doc = " \\ingroup group_vision_function_harris"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuHarrisCorners(
+        context: vx_context,
+        input: vx_image,
+        strength_thresh: vx_scalar,
+        min_distance: vx_scalar,
+        sensitivity: vx_scalar,
+        gradient_size: vx_int32,
+        block_size: vx_int32,
+        corners: vx_array,
+        num_corners: vx_scalar,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Computes corners on an image using FAST algorithm and produces the array of feature points."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input <tt>\\ref VX_DF_IMAGE_U8</tt> image."]
+    #[doc = " \\param [in] strength_thresh Threshold on difference between intensity of the central pixel and pixels on Bresenham's circle"]
+    #[doc = " of radius 3 (<tt>\\ref VX_TYPE_FLOAT32</tt> scalar), with a value in the range of 0.0 \\f$\\le\\f$ strength_thresh < 256.0."]
+    #[doc = "  Any fractional value will be truncated to an integer."]
+    #[doc = " \\param [in] nonmax_suppression If true, non-maximum suppression is applied to"]
+    #[doc = " detected corners before being places in the <tt>\\ref vx_array</tt> of <tt>\\ref VX_TYPE_KEYPOINT</tt> structs."]
+    #[doc = " \\param [out] corners Output corner <tt>\\ref vx_array</tt> of <tt>\\ref VX_TYPE_KEYPOINT</tt>. The order of the keypoints in this array is implementation dependent."]
+    #[doc = " \\param [out] num_corners [optional] The total number of detected corners in image. Use a \\ref VX_TYPE_SIZE scalar."]
+    #[doc = " \\ingroup group_vision_function_fast"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval *          An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuFastCorners(
+        context: vx_context,
+        input: vx_image,
+        strength_thresh: vx_scalar,
+        nonmax_suppression: vx_bool,
+        corners: vx_array,
+        num_corners: vx_scalar,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Computes an optical flow on two images."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] old_images Input of first (old) image pyramid in <tt>\\ref VX_DF_IMAGE_U8</tt>."]
+    #[doc = " \\param [in] new_images Input of destination (new) image pyramid in <tt>\\ref VX_DF_IMAGE_U8</tt>"]
+    #[doc = " \\param [in] old_points an array of key points in a vx_array of <tt>\\ref VX_TYPE_KEYPOINT</tt> those key points are defined at"]
+    #[doc = "  the old_images high resolution pyramid"]
+    #[doc = " \\param [in] new_points_estimates an array of estimation on what is the output key points in a <tt>\\ref vx_array</tt> of"]
+    #[doc = " <tt>\\ref VX_TYPE_KEYPOINT</tt> those keypoints are defined at the new_images high resolution pyramid"]
+    #[doc = " \\param [out] new_points an output array of key points in a <tt>\\ref vx_array</tt> of <tt>\\ref VX_TYPE_KEYPOINT</tt> those key points are"]
+    #[doc = "  defined at the new_images high resolution pyramid"]
+    #[doc = " \\param [in] termination termination can be <tt>\\ref VX_TERM_CRITERIA_ITERATIONS</tt> or <tt>\\ref VX_TERM_CRITERIA_EPSILON</tt> or"]
+    #[doc = " <tt>\\ref VX_TERM_CRITERIA_BOTH</tt>"]
+    #[doc = " \\param [in] epsilon is the <tt>\\ref vx_float32</tt> error for terminating the algorithm"]
+    #[doc = " \\param [in] num_iterations is the number of iterations. Use a <tt>\\ref VX_TYPE_UINT32</tt> scalar."]
+    #[doc = " \\param [in] use_initial_estimate Can be set to either <tt>\\ref vx_false_e</tt> or <tt>\\ref vx_true_e</tt>."]
+    #[doc = " \\param [in] window_dimension The size of the window on which to perform the algorithm. See"]
+    #[doc = "  <tt>\\ref VX_CONTEXT_OPTICAL_FLOW_MAX_WINDOW_DIMENSION</tt>"]
+    #[doc = ""]
+    #[doc = " \\ingroup group_vision_function_opticalflowpyrlk"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuOpticalFlowPyrLK(
+        context: vx_context,
+        old_images: vx_pyramid,
+        new_images: vx_pyramid,
+        old_points: vx_array,
+        new_points_estimates: vx_array,
+        new_points: vx_array,
+        termination: vx_enum,
+        epsilon: vx_scalar,
+        num_iterations: vx_scalar,
+        use_initial_estimate: vx_scalar,
+        window_dimension: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate]  The function compares an image template against overlapped image regions."]
+    #[doc = " \\details The detailed equation to the matching can be found in <tt>\\ref vx_comp_metric_e</tt>."]
+    #[doc = " The output of the template matching node is a comparison map as described in <tt>\\ref vx_comp_metric_e</tt>."]
+    #[doc = " The Node have a limitation on the template image size (width*height). It should not be larger then 65535."]
+    #[doc = " If the valid region of the template image is smaller than the entire template image, the result in the destination image is implementation-dependent."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] src The input image of type <tt>\\ref VX_DF_IMAGE_U8</tt>."]
+    #[doc = " \\param [in] templateImage Searched template of type <tt>\\ref VX_DF_IMAGE_U8</tt>."]
+    #[doc = " \\param [in] matchingMethod attribute specifying the comparison method <tt>\\ref vx_comp_metric_e</tt>. This function support only <tt>\\ref VX_COMPARE_CCORR_NORM</tt> and <tt>\\ref VX_COMPARE_L2</tt>."]
+    #[doc = " \\param [out] output Map of comparison results. The output is an image of type <tt>\\ref VX_DF_IMAGE_S16</tt>"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    #[doc = " \\ingroup group_vision_function_match_template"]
+    pub fn vxuMatchTemplate(
+        context: vx_context,
+        src: vx_image,
+        templateImage: vx_image,
+        matchingMethod: vx_enum,
+        output: vx_image,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] The function extracts LBP image from an input image"]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] in\t\tAn input image in <tt>vx_image</tt>. Or \\f$ SrcImg\\f$ in the equations. the image is of type <tt>\\ref VX_DF_IMAGE_U8</tt>"]
+    #[doc = " \\param [in] format\tA variation of LBP like original LBP and mLBP. see <tt> \\ref vx_lbp_format_e </tt>"]
+    #[doc = " \\param [in] kernel_size Kernel size. Only size of 3 and 5 are supported"]
+    #[doc = " \\param [out] out\tAn output image in <tt>vx_image</tt>.Or \\f$ DstImg\\f$ in the equations. the image is of type <tt>\\ref VX_DF_IMAGE_U8</tt>"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    #[doc = " \\ingroup group_vision_function_lbp"]
+    pub fn vxuLBP(
+        context: vx_context,
+        in_: vx_image,
+        format: vx_enum,
+        kernel_size: vx_int8,
+        out: vx_image,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Performs cell calculations for the average gradient magnitude and gradient orientation histograms."]
+    #[doc = " \\details Firstly, the gradient magnitude and gradient orientation are computed for each pixel in the input image."]
+    #[doc = " Two 1-D centred, point discrete derivative masks are applied to the input image in the horizontal and vertical directions."]
+    #[doc = " \\f[ M_h = [-1, 0, 1] \\f] and \\f[ M_v = [-1, 0, 1]^T \\f]"]
+    #[doc = " \\f$G_v\\f$ is the result of applying mask \\f$M_v\\f$ to the input image, and \\f$G_h\\f$ is the result of applying mask \\f$M_h\\f$ to the input image."]
+    #[doc = " The border mode used for the gradient calculation is implementation dependent. Its behavior should be similar to <tt>\\ref VX_BORDER_UNDEFINED</tt>."]
+    #[doc = " The gradient magnitudes and gradient orientations for each pixel are then calculated in the following manner."]
+    #[doc = " \\f[ G(x,y) = \\sqrt{G_v(x,y)^2 + G_h(x,y)^2} \\f]"]
+    #[doc = " \\f[ \\theta(x,y) = arctan(G_v(x,y), G_h(x,y)) \\f]"]
+    #[doc = " where \\f$arctan(v, h)\\f$"]
+    #[doc = " is \\f$ tan^{-1}(v/h)\\f$ when \\f$h!=0\\f$,"]
+    #[doc = ""]
+    #[doc = " \\f$ -pi/2 \\f$ if \\f$v<0\\f$ and \\f$h==0\\f$,"]
+    #[doc = ""]
+    #[doc = " \\f$  pi/2  \\f$ if \\f$v>0\\f$ and \\f$h==0\\f$"]
+    #[doc = ""]
+    #[doc = " and \\f$     0  \\f$ if \\f$v==0\\f$ and \\f$h==0\\f$"]
+    #[doc = ""]
+    #[doc = " Secondly, the gradient magnitudes and orientations are used to compute the bins output tensor and optional magnitudes output tensor."]
+    #[doc = " These tensors are computed on a cell level where the cells are rectangular in shape."]
+    #[doc = " The magnitudes tensor contains the average gradient magnitude for each cell."]
+    #[doc = " \\f[magnitudes(c) = \\frac{1}{(cell\\_width * cell\\_height)}\\sum\\limits_{w=0}^{cell\\_width} \\sum\\limits_{h=0}^{cell\\_height} G_c(w,h)\\f]"]
+    #[doc = " where \\f$G_c\\f$ is the gradient magnitudes related to cell \\f$c\\f$."]
+    #[doc = " The bins tensor contains histograms of gradient orientations for each cell."]
+    #[doc = " The gradient orientations at each pixel range from 0 to 360 degrees.  These are quantised into a set of histogram bins based on the num_bins parameter."]
+    #[doc = " Each pixel votes for a specific cell histogram bin based on its gradient orientation.  The vote itself is the pixel's gradient magnitude."]
+    #[doc = " \\f[bins(c, n) = \\sum\\limits_{w=0}^{cell\\_width} \\sum\\limits_{h=0}^{cell\\_height} G_c(w,h) * 1[B_c(w, h, num\\_bins) == n]\\f]"]
+    #[doc = " where \\f$B_c\\f$ produces the histogram bin number based on the gradient orientation of the pixel at location (\\f$w\\f$, \\f$h\\f$) in cell \\f$c\\f$ based on"]
+    #[doc = " the \\f$num\\_bins\\f$ and \\f[1[B_c(w, h, num\\_bins) == n]\\f] is a delta-function with value 1 when \\f$B_c(w, h, num\\_bins) == n\\f$ or 0 otherwise."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input image of type <tt>\\ref VX_DF_IMAGE_U8</tt>."]
+    #[doc = " \\param [in] cell_width The histogram cell width of type <tt>\\ref VX_TYPE_INT32</tt>."]
+    #[doc = " \\param [in] cell_height The histogram cell height of type <tt>\\ref VX_TYPE_INT32</tt>."]
+    #[doc = " \\param [in] num_bins  The histogram size of type <tt>\\ref VX_TYPE_INT32</tt>."]
+    #[doc = " \\param [out] magnitudes The output average gradient magnitudes per cell of <tt>\\ref vx_tensor</tt> of type <tt>\\ref VX_TYPE_INT16</tt> of size \\f$ [floor(image_{width}/cell_{width}) ,floor(image_{height}/cell_{height}) ] \\f$."]
+    #[doc = " \\param [out] bins       The output gradient orientation histograms per cell of <tt>\\ref vx_tensor</tt> of type <tt>\\ref VX_TYPE_INT16</tt> of size \\f$ [floor(image_{width}/cell_{width}) ,floor(image_{height}/cell_{height}), num_{bins}] \\f$."]
+    #[doc = ""]
+    #[doc = " \\ingroup group_vision_function_hog"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuHOGCells(
+        context: vx_context,
+        input: vx_image,
+        cell_width: vx_int32,
+        cell_height: vx_int32,
+        num_bins: vx_int32,
+        magnitudes: vx_tensor,
+        bins: vx_tensor,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate]  Computes Histogram of Oriented Gradients features for the W1xW2 window in a sliding window fashion over the whole input image."]
+    #[doc = " \\details Firstly if a magnitudes tensor is provided the cell histograms in the bins tensor are normalised by the average cell gradient magnitudes."]
+    #[doc = "\\f[bins(c,n) = \\frac{bins(c,n)}{magnitudes(c)}\\f]"]
+    #[doc = " To account for changes in illumination and contrast the cell histograms must be locally normalized which requires grouping the cell histograms together into larger spatially connected blocks."]
+    #[doc = " Blocks are rectangular grids represented by three parameters: the number of cells per block, the number of pixels per cell, and the number of bins per cell histogram."]
+    #[doc = " These blocks typically overlap, meaning that each cell histogram contributes more than once to the final descriptor."]
+    #[doc = " To normalize a block its cell histograms \\f$h\\f$ are grouped together to form a vector \\f$v = [h_1, h_2, h_3, ... , h_n]\\f$."]
+    #[doc = " This vector is normalised using L2-Hys which means performing L2-norm on this vector; clipping the result (by limiting the maximum values of v to be threshold) and renormalizing again. If the threshold is equal to zero then L2-Hys normalization is not performed."]
+    #[doc = " \\f[L2norm(v) = \\frac{v}{\\sqrt{\\|v\\|_2^2 + \\epsilon^2}}\\f]"]
+    #[doc = " where \\f$ \\|v\\|_k \\f$ be its k-norm for k=1, 2, and \\f$ \\epsilon \\f$ be a small constant."]
+    #[doc = " For a specific window its HOG descriptor is then the concatenated vector of the components of the normalized cell histograms from all of the block regions contained in the window."]
+    #[doc = " The W1xW2 window starting position is at coordinates 0x0."]
+    #[doc = " If the input image has dimensions that are not an integer multiple of W1xW2 blocks with the specified stride, then the last positions that contain only a partial W1xW2 window"]
+    #[doc = " will be calculated with the remaining part of the W1xW2 window padded with zeroes."]
+    #[doc = " The Window W1xW2 must also have a size so that it contains an integer number of cells, otherwise the node is not well-defined."]
+    #[doc = " The final output tensor will contain HOG descriptors equal to the number of windows in the input image."]
+    #[doc = " The output features tensor has 3 dimensions, given by:\\n"]
+    #[doc = " \\f[[ (floor((image_{width}-window_{width})/window_{stride}) + 1),\\f]"]
+    #[doc = " \\f[ (floor((image_{height}-window_{height})/window_{stride}) + 1),\\f]"]
+    #[doc = " \\f[ floor((window_{width} - block_{width})/block_{stride} + 1) * floor((window_{height} - block_{height})/block_{stride} + 1) *\\f]"]
+    #[doc = "  \\f[ (((block_{width} * block_{height}) / (cell_{width} * cell_{height})) * num_{bins})] \\f]"]
+    #[doc = " See <tt>\\ref vxCreateTensor</tt> and <tt>\\ref vxCreateVirtualTensor</tt>."]
+    #[doc = " The output tensor from this function may be very large.  For this reason, is it not recommended that this \"immediate mode\" version of the function be used."]
+    #[doc = " The preferred method to perform this function is as graph node with a virtual tensor as the output."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input image of type <tt>\\ref VX_DF_IMAGE_U8</tt>."]
+    #[doc = " \\param [in] magnitudes The averge gradient magnitudes per cell of <tt>\\ref vx_tensor</tt> of type <tt>\\ref VX_TYPE_INT16</tt>. It is the output of <tt>\\ref vxuHOGCells</tt>."]
+    #[doc = " \\param [in] bins       The gradient orientation histogram per cell of <tt>\\ref vx_tensor</tt> of type <tt>\\ref VX_TYPE_INT16</tt>. It is the output of <tt>\\ref vxuHOGCells</tt>."]
+    #[doc = " \\param [in] params The parameters of type <tt>\\ref vx_hog_t</tt>."]
+    #[doc = " \\param [in] hog_param_size Size of <tt>\\ref vx_hog_t</tt> in bytes."]
+    #[doc = " \\param [out] features The output HOG features of <tt>\\ref vx_tensor</tt> of type <tt>\\ref VX_TYPE_INT16</tt>."]
+    #[doc = ""]
+    #[doc = " \\ingroup group_vision_function_hog"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuHOGFeatures(
+        context: vx_context,
+        input: vx_image,
+        magnitudes: vx_tensor,
+        bins: vx_tensor,
+        params: *const vx_hog_t,
+        hog_param_size: vx_size,
+        features: vx_tensor,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Finds the Probabilistic Hough Lines detected in the input binary image, each line is stored in the output array as a set of points (x1, y1, x2, y2) ."]
+    #[doc = " \\details Some implementations of the algorithm may have a random or non-deterministic element. If the target application is in a safety-critical environment this"]
+    #[doc = " should be borne in mind and steps taken in the implementation, the application or both to achieve the level of determinism required by the system design."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input A single channel binary source image of type <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt>."]
+    #[doc = " \\param [in] params parameters of the struct <tt>\\ref vx_hough_lines_p_t</tt>"]
+    #[doc = " \\param [out] lines_array lines_array contains array of lines, see <tt>\\ref vx_line2d_t</tt> The order of lines in implementation dependent"]
+    #[doc = " \\param [out] num_lines [optional] The total number of detected lines in image. Use a VX_TYPE_SIZE scalar"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    #[doc = " \\ingroup group_vision_function_hough_lines_p"]
+    pub fn vxuHoughLinesP(
+        context: vx_context,
+        input: vx_image,
+        params: *const vx_hough_lines_p_t,
+        lines_array: vx_array,
+        num_lines: vx_scalar,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Remaps an output image from an input image."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input <tt>\\ref VX_DF_IMAGE_U8</tt> image."]
+    #[doc = " \\param [in] table The remap table object."]
+    #[doc = " \\param [in] policy The interpolation policy from \\ref vx_interpolation_type_e."]
+    #[doc = " \\ref VX_INTERPOLATION_AREA is not supported."]
+    #[doc = " \\param [out] output The output <tt>\\ref VX_DF_IMAGE_U8</tt> image."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\ingroup group_vision_function_remap"]
+    pub fn vxuRemap(
+        context: vx_context,
+        input: vx_image,
+        table: vx_remap,
+        policy: vx_enum,
+        output: vx_image,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] The function applies bilateral filtering to the input tensor."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] src The input data a <tt>\\ref vx_tensor</tt>. maximum 3 dimension and minimum 2. The tensor is of type <tt>\\ref VX_TYPE_UINT8</tt> or <tt>\\ref VX_TYPE_INT16</tt>."]
+    #[doc = " dimensions are [radiometric ,width,height] or [width,height]"]
+    #[doc = " \\param [in] diameter of each pixel neighbourhood that is used during filtering. Values of diameter must be odd. Bigger then 3 and smaller then 10."]
+    #[doc = " \\param [in] sigmaValues Filter sigma in the radiometric space. Supported values are bigger then 0 and smaller or equal 20."]
+    #[doc = " \\param [in] sigmaSpace Filter sigma in the spatial space. Supported values are bigger then 0 and smaller or equal 20."]
+    #[doc = " \\param [out] dst The output data a <tt>\\ref vx_tensor</tt>,Of type <tt>\\ref VX_TYPE_UINT8</tt> or <tt>\\ref VX_TYPE_INT16</tt>. And must be the same type and size of the input."]
+    #[doc = " \\note The border modes"]
+    #[doc = "  <tt>\\ref VX_NODE_BORDER</tt> value"]
+    #[doc = "  <tt>\\ref VX_BORDER_REPLICATE</tt> and <tt>\\ref VX_BORDER_CONSTANT</tt> are supported."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    #[doc = " \\ingroup group_vision_function_bilateral_filter"]
+    pub fn vxuBilateralFilter(
+        context: vx_context,
+        src: vx_tensor,
+        diameter: vx_int32,
+        sigmaSpace: vx_float32,
+        sigmaValues: vx_float32,
+        dst: vx_tensor,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Performs element wise multiplications on element values in the input tensor data with a scale."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input1 Input tensor data.  Implementations must support input tensor data type <tt>\\ref VX_TYPE_INT16</tt> with fixed_point_position 8,"]
+    #[doc = " and tensor data types <tt>\\ref VX_TYPE_UINT8</tt> and <tt>\\ref VX_TYPE_INT8</tt>, with fixed_point_position 0."]
+    #[doc = " \\param [in] input2 Input tensor data. The dimensions and sizes of input2 match those of input1, unless the vx_tensor of one or more dimensions in input2 is 1."]
+    #[doc = " In this case, those dimensions are treated as if this tensor was expanded to match the size of the corresponding dimension of input1,"]
+    #[doc = " and data was duplicated on all terms in that dimension. After this expansion, the dimensions will be equal."]
+    #[doc = " The data type must match the data type of Input1."]
+    #[doc = " \\param [in] scale A non-negative <tt>\\ref VX_TYPE_FLOAT32</tt> multiplied to each product before overflow handling."]
+    #[doc = " \\param [in] overflow_policy A <tt>\\ref vx_convert_policy_e</tt> enumeration."]
+    #[doc = " \\param [in] rounding_policy A <tt>\\ref vx_round_policy_e</tt> enumeration."]
+    #[doc = " \\param [out] output The output tensor data with the same dimensions as the input tensor data."]
+    #[doc = " \\ingroup group_vision_function_tensor_multiply"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuTensorMultiply(
+        context: vx_context,
+        input1: vx_tensor,
+        input2: vx_tensor,
+        scale: vx_scalar,
+        overflow_policy: vx_enum,
+        rounding_policy: vx_enum,
+        output: vx_tensor,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Performs arithmetic addition on element values in the input tensor data."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input1 Input tensor data.  Implementations must support input tensor data type <tt>\\ref VX_TYPE_INT16</tt> with fixed_point_position 8,"]
+    #[doc = " and tensor data types <tt>\\ref VX_TYPE_UINT8</tt> and <tt>\\ref VX_TYPE_INT8</tt>, with fixed_point_position 0."]
+    #[doc = " \\param [in] input2 Input tensor data. The dimensions and sizes of input2 match those of input1, unless the vx_tensor of one or more dimensions in input2 is 1."]
+    #[doc = " In this case, those dimensions are treated as if this tensor was expanded to match the size of the corresponding dimension of input1,"]
+    #[doc = " and data was duplicated on all terms in that dimension. After this expansion, the dimensions will be equal."]
+    #[doc = " The data type must match the data type of Input1."]
+    #[doc = " \\param [in] policy A <tt>\\ref vx_convert_policy_e</tt> enumeration."]
+    #[doc = " \\param [out] output The output tensor data with the same dimensions as the input tensor data."]
+    #[doc = " \\ingroup group_vision_function_tensor_add"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuTensorAdd(
+        context: vx_context,
+        input1: vx_tensor,
+        input2: vx_tensor,
+        policy: vx_enum,
+        output: vx_tensor,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Performs arithmetic subtraction on element values in the input tensor data."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input1 Input tensor data.  Implementations must support input tensor data type <tt>\\ref VX_TYPE_INT16</tt> with fixed_point_position 8,"]
+    #[doc = " and tensor data types <tt>\\ref VX_TYPE_UINT8</tt> and <tt>\\ref VX_TYPE_INT8</tt>, with fixed_point_position 0."]
+    #[doc = " \\param [in] input2 Input tensor data. The dimensions and sizes of input2 match those of input1, unless the vx_tensor of one or more dimensions in input2 is 1."]
+    #[doc = " In this case, those dimensions are treated as if this tensor was expanded to match the size of the corresponding dimension of input1,"]
+    #[doc = " and data was duplicated on all terms in that dimension. After this expansion, the dimensions will be equal."]
+    #[doc = " The data type must match the data type of Input1."]
+    #[doc = " \\param [in] policy A <tt>\\ref vx_convert_policy_e</tt> enumeration."]
+    #[doc = " \\param [out] output The output tensor data with the same dimensions as the input tensor data."]
+    #[doc = " \\ingroup group_vision_function_tensor_subtract"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuTensorSubtract(
+        context: vx_context,
+        input1: vx_tensor,
+        input2: vx_tensor,
+        policy: vx_enum,
+        output: vx_tensor,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Performs LUT on element values in the input tensor data."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input1 Input tensor data. Implementations must support input tensor data type <tt>\\ref VX_TYPE_INT16</tt> with fixed_point_position 8,"]
+    #[doc = " and tensor data types <tt>\\ref VX_TYPE_UINT8</tt>, with fixed_point_position 0."]
+    #[doc = " \\param [in] lut The look-up table to use, of type <tt>\\ref vx_lut</tt>."]
+    #[doc = " The elements of input1 are treated as unsigned integers to determine an index into the look-up table."]
+    #[doc = " The data type of the items in the look-up table must match that of the output tensor."]
+    #[doc = " \\param [out] output The output tensor data with the same dimensions as the input tensor data."]
+    #[doc = " \\ingroup group_vision_function_tensor_tablelookup"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuTensorTableLookup(
+        context: vx_context,
+        input1: vx_tensor,
+        lut: vx_lut,
+        output: vx_tensor,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Performs transpose on the input tensor."]
+    #[doc = " The tensor is transposed according to a specified 2 indexes in the tensor (0-based indexing)"]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input Input tensor data, Implementations must support input tensor data type <tt>\\ref VX_TYPE_INT16</tt> with fixed_point_position 8,"]
+    #[doc = " and tensor data types <tt>\\ref VX_TYPE_UINT8</tt> and <tt>\\ref VX_TYPE_INT8</tt>, with fixed_point_position 0."]
+    #[doc = " \\param [out] output output tensor data,"]
+    #[doc = " \\param [in] dimension1 Dimension index that is transposed with dim 2."]
+    #[doc = " \\param [in] dimension2 Dimension index that is transposed with dim 1."]
+    #[doc = " \\ingroup group_vision_function_tensor_transpose"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuTensorTranspose(
+        context: vx_context,
+        input: vx_tensor,
+        output: vx_tensor,
+        dimension1: vx_size,
+        dimension2: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Performs a bit-depth conversion."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input tensor. Implementations must support input tensor data type <tt>\\ref VX_TYPE_INT16</tt> with fixed_point_position 8,"]
+    #[doc = " and tensor data types <tt>\\ref VX_TYPE_UINT8</tt> and <tt>\\ref VX_TYPE_INT8</tt>, with fixed_point_position 0."]
+    #[doc = " \\param [in] policy A <tt>\\ref VX_TYPE_ENUM</tt> of the <tt>\\ref vx_convert_policy_e</tt> enumeration."]
+    #[doc = " \\param [in] norm A scalar containing a <tt>\\ref VX_TYPE_FLOAT32</tt> of the normalization value."]
+    #[doc = " \\param [in] offset A scalar containing a <tt>\\ref VX_TYPE_FLOAT32</tt> of the offset value subtracted before normalization."]
+    #[doc = " \\param [out] output The output tensor. Implementations must support input tensor data type <tt>VX_TYPE_INT16</tt>. with fixed_point_position 8."]
+    #[doc = " And <tt>VX_TYPE_UINT8</tt> with fixed_point_position 0."]
+    #[doc = " \\ingroup group_vision_function_tensor_convert_depth"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuTensorConvertDepth(
+        context: vx_context,
+        input: vx_tensor,
+        policy: vx_enum,
+        norm: vx_scalar,
+        offset: vx_scalar,
+        output: vx_tensor,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Performs a generalized matrix multiplication."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input1 The first input 2D tensor of type <tt>\\ref VX_TYPE_INT16</tt> with fixed_point_pos 8, or tensor data types <tt>\\ref VX_TYPE_UINT8</tt> or <tt>\\ref VX_TYPE_INT8</tt>, with fixed_point_pos 0."]
+    #[doc = " \\param [in] input2 The second 2D tensor. Must be in the same data type as input1."]
+    #[doc = " \\param [in] input3 The third 2D tensor. Must be in the same data type as input1. [optional]."]
+    #[doc = " \\param [in] matrix_multiply_params Matrix multiply parameters, see <tt>\\ref vx_tensor_matrix_multiply_params_t </tt>."]
+    #[doc = " \\param [out] output The output 2D tensor. Must be in the same data type as input1. Output dimension must agree the formula in the description."]
+    #[doc = " \\ingroup group_vision_function_tensor_matrix_multiply"]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    pub fn vxuTensorMatrixMultiply(
+        context: vx_context,
+        input1: vx_tensor,
+        input2: vx_tensor,
+        input3: vx_tensor,
+        matrix_multiply_params: *const vx_tensor_matrix_multiply_params_t,
+        output: vx_tensor,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Immediate] Copy data from one object to another."]
+    #[doc = " \\param [in] context The reference to the overall context."]
+    #[doc = " \\param [in] input The input data object."]
+    #[doc = " \\param [out] output The output data object."]
+    #[doc = " \\return A <tt>\\ref vx_status_e</tt> enumeration."]
+    #[doc = " \\retval VX_SUCCESS Success"]
+    #[doc = " \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    #[doc = " \\ingroup group_vision_function_copy"]
+    pub fn vxuCopy(context: vx_context, input: vx_reference, output: vx_reference) -> vx_status;
+}

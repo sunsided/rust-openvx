@@ -55,6 +55,14 @@ version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
+name = "canny-edge-detector"
+version = "0.1.0"
+dependencies = [
+ "openvx 0.1.0",
+ "openvx-sys 0.1.0",
+]
+
+[[package]]
 name = "cexpr"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -168,6 +176,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "memchr 2.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "version_check 0.9.2 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "openvx"
+version = "0.1.0"
+dependencies = [
+ "openvx-sys 0.1.0",
 ]
 
 [[package]]

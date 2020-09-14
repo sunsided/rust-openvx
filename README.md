@@ -10,9 +10,7 @@
 To install Intel OpenCL on Ubuntu 20.04, run
 
 ```bash
-sudo apt-get install \
-    ocl-icd-opencl-dev \
-    intel-opencl-icd
+sudo apt-get install ocl-icd-opencl-dev intel-opencl-icd
 ```
 
 Test using `clinfo`.
@@ -36,6 +34,14 @@ python Build.py \
 
 Building using `--conf_nnef` (the Neural Network Exchange Format) didn't work for some
 reason, and specifying `--opencl` always targeted NEON architecture, so didn't work. 
+
+To build the Rust projects, make sure the OpenVX library and headers are in scope:
+
+```bash
+export OPENVX_DIR=/path/to/OpenVX-sample-impl/install/Linux/x64/Release
+export LIBRARY_PATH=$LIBRARY_PATH:$OPENVX_DIR/bin
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$OPENVX_DIR/bin
+```
 
 ## Further reading
 

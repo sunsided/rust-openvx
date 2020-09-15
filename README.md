@@ -31,7 +31,8 @@ Failed to remove kernel[7]=org.khronos.extras.scharr3x3
 Failed to remove kernel[8]=org.khronos.extras.sobelMxN
 ```
 
-
+The OpenVX 1.3 Quick Reference Guide was added [here](reference/openvx-13-reference-card.pdf)
+for convenience.
 
 ## WIP
 

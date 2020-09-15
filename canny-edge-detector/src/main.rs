@@ -40,8 +40,8 @@ unsafe fn run() -> Result<()> {
         vx_threshold_type_e_VX_THRESHOLD_TYPE_RANGE as i32,
         vx_type_e_VX_TYPE_UINT8 as i32,
     );
-    let lower: vx_int32 = 80;
-    let upper: vx_int32 = 100;
+    let lower: vx_int32 = 130;
+    let upper: vx_int32 = 150;
     vxSetThresholdAttribute(
         hyst,
         VX_THRESHOLD_ATTRIBUTE_THRESHOLD_LOWER,

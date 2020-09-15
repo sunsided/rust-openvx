@@ -47,7 +47,7 @@ Test using `clinfo`.
 Install the [Khronos OpenVX Sample Implementation](https://github.com/KhronosGroup/OpenVX-sample-impl)
 
 ```bash
-git clone --recursive https://github.com/KhronosGroup/OpenVX-sample-impl#sample-build-instructions
+git clone --recursive https://github.com/KhronosGroup/OpenVX-sample-impl
 ```
 
 I built from commit [`63ced2f`](https://github.com/KhronosGroup/OpenVX-sample-impl/tree/63ced2ff8d359a74937dead88aa687103244177e) by using

@@ -24,6 +24,13 @@ unsafe fn run() -> Result<()> {
     let mut graph = vxCreateGraph(context);
     error_check_object(graph as vx_reference);
 
+    vxSetReferenceName(
+        graph as vx_reference,
+        std::ffi::CString::new("CANNY_GRAPH")
+            .expect("CString::new failed")
+            .as_ptr(),
+    );
+
     let mut input_rgb_image = vxCreateImage(context, width, height, vx_df_image_e_VX_DF_IMAGE_RGB);
     let mut output_filtered_image =
         vxCreateImage(context, width, height, vx_df_image_e_VX_DF_IMAGE_U8);

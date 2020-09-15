@@ -5,6 +5,32 @@
 - [canny-edge-detector](canny-edge-detector) contains a port of the Canny Edge Detector sample
   of the [OpenVX Samples](https://github.com/KhronosGroup/openvx-samples).
 
+Here's an example input and output of the Canny Edge Detection sample.
+
+![](.readme/canny.png)
+
+Note that for some reason the graph release operation 
+
+```rust
+vxReleaseGraph(&mut graph);
+```
+
+currently produces the following log messages with the associated status `VX_ERROR_INVALID_REFERENCE`:
+
+```text
+Failed to remove kernel[0]=org.khronos.extra.edge_trace
+Failed to remove kernel[1]=org.khronos.extra.euclidean_nonmaxsuppression_harris
+Failed to remove kernel[2]=org.khronos.extras.harris_score
+Failed to remove kernel[3]=org.khronos.extras.laplacian3x3
+Failed to remove kernel[4]=org.khronos.extras.image_to_list
+Failed to remove kernel[5]=org.khronos.extra.nonmaximasuppression
+Failed to remove kernel[6]=org.khronos.extra.elementwise_norm
+Failed to remove kernel[7]=org.khronos.extras.scharr3x3
+Failed to remove kernel[8]=org.khronos.extras.sobelMxN
+```
+
+
+
 ## WIP
 
 To install Intel OpenCL on Ubuntu 20.04, run

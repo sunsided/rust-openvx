@@ -12,6 +12,7 @@ pub enum VxStatus {
 
 impl VxStatus {
     fn new(status: vx_status_e) -> Self {
+        #[allow(non_upper_case_globals)]
         match status {
             vx_status_e_VX_SUCCESS => VxStatus::Success,
             vx_status_e_VX_FAILURE => VxStatus::Failure,
@@ -49,28 +50,31 @@ impl fmt::Debug for VxStatus {
         match *self {
             VxStatus::Success => write!(f, "VX_SUCCESS"),
             VxStatus::Failure => write!(f, "VX_FAILURE"),
+            #[allow(non_upper_case_globals)]
             VxStatus::Error(n) => match n {
-                vx_status_e_VX_ERROR_NOT_IMPLEMENTED => write!(f, "VX_ERROR_NOT_IMPLEMENTED"),
-                vx_status_e_VX_ERROR_NOT_SUPPORTED => write!(f, "VX_ERROR_NOT_SUPPORTED"),
-                vx_status_e_VX_ERROR_NOT_SUFFICIENT => write!(f, "VX_ERROR_NOT_SUFFICIENT"),
-                vx_status_e_VX_ERROR_NOT_ALLOCATED => write!(f, "VX_ERROR_NOT_ALLOCATED"),
-                vx_status_e_VX_ERROR_NOT_COMPATIBLE => write!(f, "VX_ERROR_NOT_COMPATIBLE"),
-                vx_status_e_VX_ERROR_NO_RESOURCES => write!(f, "VX_ERROR_NO_RESOURCES"),
-                vx_status_e_VX_ERROR_NO_MEMORY => write!(f, "VX_ERROR_NO_MEMORY"),
-                vx_status_e_VX_ERROR_OPTIMIZED_AWAY => write!(f, "VX_ERROR_OPTIMIZED_AWAY"),
-                vx_status_e_VX_ERROR_INVALID_PARAMETERS => write!(f, "VX_ERROR_INVALID_PARAMETERS"),
-                vx_status_e_VX_ERROR_INVALID_MODULE => write!(f, "VX_ERROR_INVALID_MODULE"),
-                vx_status_e_VX_ERROR_INVALID_REFERENCE => write!(f, "VX_ERROR_INVALID_REFERENCE"),
-                vx_status_e_VX_ERROR_INVALID_LINK => write!(f, "VX_ERROR_INVALID_LINK"),
-                vx_status_e_VX_ERROR_INVALID_DIMENSION => write!(f, "VX_ERROR_INVALID_DIMENSION"),
-                vx_status_e_VX_ERROR_INVALID_VALUE => write!(f, "VX_ERROR_INVALID_VALUE"),
-                vx_status_e_VX_ERROR_INVALID_TYPE => write!(f, "VX_ERROR_INVALID_TYPE"),
-                vx_status_e_VX_ERROR_INVALID_GRAPH => write!(f, "VX_ERROR_INVALID_GRAPH"),
-                vx_status_e_VX_ERROR_INVALID_NODE => write!(f, "VX_ERROR_INVALID_NODE"),
-                vx_status_e_VX_ERROR_INVALID_SCOPE => write!(f, "VX_ERROR_INVALID_SCOPE"),
-                vx_status_e_VX_ERROR_GRAPH_SCHEDULED => write!(f, "VX_ERROR_GRAPH_SCHEDULED"),
-                vx_status_e_VX_ERROR_GRAPH_ABANDONED => write!(f, "VX_ERROR_GRAPH_ABANDONED"),
-                vx_status_e_VX_ERROR_REFERENCE_NONZERO => write!(f, "VX_ERROR_REFERENCE_NONZERO"),
+                vx_status_e_VX_ERROR_NOT_IMPLEMENTED => write!(f, "VX_ERROR_NOT_IMPLEMENTED"), // -2
+                vx_status_e_VX_ERROR_NOT_SUPPORTED => write!(f, "VX_ERROR_NOT_SUPPORTED"),     // -3
+                vx_status_e_VX_ERROR_NOT_SUFFICIENT => write!(f, "VX_ERROR_NOT_SUFFICIENT"),   // -4
+                vx_status_e_VX_ERROR_NOT_ALLOCATED => write!(f, "VX_ERROR_NOT_ALLOCATED"),     // -5
+                vx_status_e_VX_ERROR_NOT_COMPATIBLE => write!(f, "VX_ERROR_NOT_COMPATIBLE"),   // -6
+                vx_status_e_VX_ERROR_NO_RESOURCES => write!(f, "VX_ERROR_NO_RESOURCES"),       // -7
+                vx_status_e_VX_ERROR_NO_MEMORY => write!(f, "VX_ERROR_NO_MEMORY"),             // -8
+                vx_status_e_VX_ERROR_OPTIMIZED_AWAY => write!(f, "VX_ERROR_OPTIMIZED_AWAY"),   // -9
+                vx_status_e_VX_ERROR_INVALID_PARAMETERS => write!(f, "VX_ERROR_INVALID_PARAMETERS"), // -10
+                vx_status_e_VX_ERROR_INVALID_MODULE => write!(f, "VX_ERROR_INVALID_MODULE"), // -11
+                vx_status_e_VX_ERROR_INVALID_REFERENCE => write!(f, "VX_ERROR_INVALID_REFERENCE"), // -12
+                vx_status_e_VX_ERROR_INVALID_LINK => write!(f, "VX_ERROR_INVALID_LINK"), // -13
+                vx_status_e_VX_ERROR_INVALID_FORMAT => write!(f, "VX_ERROR_INVALID_FORMAT"), // -14
+                vx_status_e_VX_ERROR_INVALID_DIMENSION => write!(f, "VX_ERROR_INVALID_DIMENSION"), // -15
+                vx_status_e_VX_ERROR_INVALID_VALUE => write!(f, "VX_ERROR_INVALID_VALUE"), // -16
+                vx_status_e_VX_ERROR_INVALID_TYPE => write!(f, "VX_ERROR_INVALID_TYPE"),   // -17
+                vx_status_e_VX_ERROR_INVALID_GRAPH => write!(f, "VX_ERROR_INVALID_GRAPH"), // -18
+                vx_status_e_VX_ERROR_INVALID_NODE => write!(f, "VX_ERROR_INVALID_NODE"),   // -19
+                vx_status_e_VX_ERROR_INVALID_SCOPE => write!(f, "VX_ERROR_INVALID_SCOPE"), // -20
+                vx_status_e_VX_ERROR_GRAPH_SCHEDULED => write!(f, "VX_ERROR_GRAPH_SCHEDULED"), // -21
+                vx_status_e_VX_ERROR_GRAPH_ABANDONED => write!(f, "VX_ERROR_GRAPH_ABANDONED"), // -22
+                vx_status_e_VX_ERROR_MULTIPLE_WRITERS => write!(f, "VX_ERROR_MULTIPLE_WRITERS"), // -23
+                vx_status_e_VX_ERROR_REFERENCE_NONZERO => write!(f, "VX_ERROR_REFERENCE_NONZERO"), // -24
                 _ => write!(f, "unknown error ({})", n),
             },
         }

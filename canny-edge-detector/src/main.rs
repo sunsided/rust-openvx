@@ -1,11 +1,21 @@
 // canny-edge-detector sample from https://github.com/KhronosGroup/openvx-samples
 
 use libopenvx_sys::*;
+use opencv::core::CV_8U;
+use opencv::{
+    core::Size,
+    highgui::{destroy_all_windows, imshow, wait_key},
+    imgcodecs::{imread, IMREAD_COLOR},
+    imgproc::{resize, INTER_LINEAR},
+    prelude::*,
+};
 use openvx::*;
 
-unsafe fn run() {
-    let width: vx_uint32 = 480;
-    let height: vx_uint32 = 360;
+type Result<T> = opencv::Result<T>;
+
+unsafe fn run() -> Result<()> {
+    let width: vx_uint32 = 512;
+    let height: vx_uint32 = 512;
 
     let mut context = vxCreateContext();
     error_check_object(context as vx_reference);
@@ -16,7 +26,7 @@ unsafe fn run() {
 
     let mut input_rgb_image = vxCreateImage(context, width, height, vx_df_image_e_VX_DF_IMAGE_RGB);
     let mut output_filtered_image =
-        vxCreateImage(context, width, height, vx_df_image_e_VX_DF_IMAGE_RGB);
+        vxCreateImage(context, width, height, vx_df_image_e_VX_DF_IMAGE_U8);
     error_check_object(input_rgb_image as vx_reference);
     error_check_object(output_filtered_image as vx_reference);
 
@@ -30,8 +40,8 @@ unsafe fn run() {
         vx_threshold_type_e_VX_THRESHOLD_TYPE_RANGE as i32,
         vx_type_e_VX_TYPE_UINT8 as i32,
     );
-    let mut lower: vx_int32 = 80;
-    let mut upper: vx_int32 = 100;
+    let lower: vx_int32 = 80;
+    let upper: vx_int32 = 100;
     vxSetThresholdAttribute(
         hyst,
         VX_THRESHOLD_ATTRIBUTE_THRESHOLD_LOWER,
@@ -72,12 +82,109 @@ unsafe fn run() {
 
     error_check_status(vxVerifyGraph(graph));
 
+    let image = imread(".images/selfie.jpg", IMREAD_COLOR)?;
+    let mut resized = Mat::default()?;
+    resize(
+        &image,
+        &mut resized,
+        Size {
+            width: width as i32,
+            height: height as i32,
+        },
+        0f64,
+        0f64,
+        INTER_LINEAR,
+    )?;
+
+    imshow("Input Image", &resized)?;
+
+    let cv_rgb_image_region = vx_rectangle_t {
+        start_x: 0,
+        start_y: 0,
+        end_x: width,
+        end_y: height,
+    };
+
+    let cv_rgb_image_layout = vx_imagepatch_addressing_t {
+        stride_x: 3,
+        stride_y: *resized.mat_step().first().unwrap() as i32,
+        // Not sure about these, but they do seem to work.
+        dim_x: 0,
+        dim_y: 0,
+        scale_x: 0,
+        scale_y: 0,
+        step_x: 0,
+        step_y: 0,
+        stride_x_bits: 0,
+    };
+
+    let cv_rgb_image_buffer: *mut vx_uint8 = resized.data_mut();
+    error_check_status(vxCopyImagePatch(
+        input_rgb_image,
+        &cv_rgb_image_region,
+        0,
+        &cv_rgb_image_layout,
+        cv_rgb_image_buffer as *mut std::ffi::c_void,
+        vx_accessor_e_VX_WRITE_ONLY as i32,
+        vx_memory_type_e_VX_MEMORY_TYPE_HOST as i32,
+    ));
+
+    error_check_status(vxProcessGraph(graph));
+
+    let rect = vx_rectangle_t {
+        start_x: 0,
+        start_y: 0,
+        end_x: width,
+        end_y: height,
+    };
+
+    let mut map_id: vx_map_id = 0usize;
+    let mut addr: vx_imagepatch_addressing_t = vx_imagepatch_addressing_t {
+        dim_x: 0,
+        dim_y: 0,
+        stride_x: 0,
+        stride_y: 0,
+        scale_x: 0,
+        scale_y: 0,
+        step_x: 0,
+        step_y: 0,
+        stride_x_bits: 0,
+    };
+    let mut ptr: *mut std::ffi::c_void = std::ptr::null_mut();
+    error_check_status(vxMapImagePatch(
+        output_filtered_image,
+        &rect,
+        0,
+        &mut map_id,
+        &mut addr,
+        &mut ptr,
+        vx_accessor_e_VX_READ_ONLY as i32,
+        vx_memory_type_e_VX_MEMORY_TYPE_HOST as i32,
+        vx_map_flag_e_VX_NOGAP_X,
+    ));
+
+    let mat = Mat::new_rows_cols_with_data(
+        height as i32,
+        width as i32,
+        CV_8U,
+        ptr,
+        addr.stride_y as usize,
+    )?;
+
+    imshow("Canny Edge Detection", &mat)?;
+    wait_key(0)?;
+    destroy_all_windows()?;
+
+    error_check_status(vxUnmapImagePatch(output_filtered_image, map_id));
+
     error_check_status(vxReleaseGraph(&mut graph));
     error_check_status(vxReleaseImage(&mut yuv_image));
     error_check_status(vxReleaseImage(&mut luma_image));
     error_check_status(vxReleaseImage(&mut input_rgb_image));
     error_check_status(vxReleaseImage(&mut output_filtered_image));
     error_check_status(vxReleaseContext(&mut context));
+
+    Ok(())
 }
 
 #[allow(unused_variables)]

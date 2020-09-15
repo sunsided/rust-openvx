@@ -9,3 +9,4 @@ edition = "2018"
 [dependencies]
 openvx-sys = { path ="../openvx-sys" }
 openvx = { path ="../openvx" }
+opencv = {version = "0.45", features = ["opencv-4", "buildtime-bindgen", "clang-runtime"]}

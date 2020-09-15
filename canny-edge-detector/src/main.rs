@@ -19,7 +19,7 @@ unsafe fn run() -> Result<()> {
 
     let mut context = vxCreateContext();
     error_check_object(context as vx_reference);
-    vxRegisterLogCallback(context, Some(log_callback), vx_bool_e_vx_false_e as i32);
+    vxRegisterLogCallback(context, Some(log_callback), vx_bool_e_vx_false_e as vx_enum);
 
     let mut graph = vxCreateGraph(context);
     error_check_object(graph as vx_reference);
@@ -31,21 +31,40 @@ unsafe fn run() -> Result<()> {
             .as_ptr(),
     );
 
-    let mut input_rgb_image = vxCreateImage(context, width, height, vx_df_image_e_VX_DF_IMAGE_RGB);
-    let mut output_filtered_image =
-        vxCreateImage(context, width, height, vx_df_image_e_VX_DF_IMAGE_U8);
+    let mut input_rgb_image = vxCreateImage(
+        context,
+        width,
+        height,
+        vx_df_image_e_VX_DF_IMAGE_RGB as vx_df_image,
+    );
+    let mut output_filtered_image = vxCreateImage(
+        context,
+        width,
+        height,
+        vx_df_image_e_VX_DF_IMAGE_U8 as vx_df_image,
+    );
     error_check_object(input_rgb_image as vx_reference);
     error_check_object(output_filtered_image as vx_reference);
 
-    let mut yuv_image = vxCreateVirtualImage(graph, width, height, vx_df_image_e_VX_DF_IMAGE_IYUV);
-    let mut luma_image = vxCreateVirtualImage(graph, width, height, vx_df_image_e_VX_DF_IMAGE_U8);
+    let mut yuv_image = vxCreateVirtualImage(
+        graph,
+        width,
+        height,
+        vx_df_image_e_VX_DF_IMAGE_IYUV as vx_df_image,
+    );
+    let mut luma_image = vxCreateVirtualImage(
+        graph,
+        width,
+        height,
+        vx_df_image_e_VX_DF_IMAGE_U8 as vx_df_image,
+    );
     error_check_object(yuv_image as vx_reference);
     error_check_object(luma_image as vx_reference);
 
     let hyst = vxCreateThreshold(
         context,
-        vx_threshold_type_e_VX_THRESHOLD_TYPE_RANGE as i32,
-        vx_type_e_VX_TYPE_UINT8 as i32,
+        vx_threshold_type_e_VX_THRESHOLD_TYPE_RANGE as vx_enum,
+        vx_type_e_VX_TYPE_UINT8 as vx_enum,
     );
     let lower: vx_int32 = 130;
     let upper: vx_int32 = 150;
@@ -106,23 +125,23 @@ unsafe fn run() -> Result<()> {
     imshow("Input Image", &resized)?;
 
     let cv_rgb_image_region = vx_rectangle_t {
-        start_x: 0,
-        start_y: 0,
+        start_x: 0 as vx_uint32,
+        start_y: 0 as vx_uint32,
         end_x: width,
         end_y: height,
     };
 
     let cv_rgb_image_layout = vx_imagepatch_addressing_t {
-        stride_x: 3,
-        stride_y: *resized.mat_step().first().unwrap() as i32,
+        stride_x: 3 as vx_int32,
+        stride_y: *resized.mat_step().first().unwrap() as vx_int32,
         // Default isn't implemented; not sure about these, but zeros seem to work.
-        dim_x: 0,
-        dim_y: 0,
-        scale_x: 0,
-        scale_y: 0,
-        step_x: 0,
-        step_y: 0,
-        stride_x_bits: 0,
+        dim_x: 0 as vx_uint32,
+        dim_y: 0 as vx_uint32,
+        scale_x: 0 as vx_uint32,
+        scale_y: 0 as vx_uint32,
+        step_x: 0 as vx_uint32,
+        step_y: 0 as vx_uint16,
+        stride_x_bits: 0 as vx_uint16,
     };
 
     let cv_rgb_image_buffer: *mut vx_uint8 = resized.data_mut();
@@ -132,8 +151,8 @@ unsafe fn run() -> Result<()> {
         0,
         &cv_rgb_image_layout,
         cv_rgb_image_buffer as *mut std::ffi::c_void,
-        vx_accessor_e_VX_WRITE_ONLY as i32,
-        vx_memory_type_e_VX_MEMORY_TYPE_HOST as i32,
+        vx_accessor_e_VX_WRITE_ONLY as vx_enum,
+        vx_memory_type_e_VX_MEMORY_TYPE_HOST as vx_enum,
     ));
 
     error_check_status(vxProcessGraph(graph));
@@ -147,27 +166,27 @@ unsafe fn run() -> Result<()> {
 
     let mut map_id: vx_map_id = 0usize;
     let mut addr: vx_imagepatch_addressing_t = vx_imagepatch_addressing_t {
-        dim_x: 0,
-        dim_y: 0,
-        stride_x: 0,
-        stride_y: 0,
-        scale_x: 0,
-        scale_y: 0,
-        step_x: 0,
-        step_y: 0,
-        stride_x_bits: 0,
+        dim_x: 0 as vx_uint32,
+        dim_y: 0 as vx_uint32,
+        stride_x: 0 as vx_int32,
+        stride_y: 0 as vx_int32,
+        scale_x: 0 as vx_uint32,
+        scale_y: 0 as vx_uint32,
+        step_x: 0 as vx_uint32,
+        step_y: 0 as vx_uint16,
+        stride_x_bits: 0 as vx_uint16,
     };
     let mut ptr: *mut std::ffi::c_void = std::ptr::null_mut();
     error_check_status(vxMapImagePatch(
         output_filtered_image,
         &rect,
-        0,
+        0 as vx_uint32,
         &mut map_id,
         &mut addr,
         &mut ptr,
-        vx_accessor_e_VX_READ_ONLY as i32,
-        vx_memory_type_e_VX_MEMORY_TYPE_HOST as i32,
-        vx_map_flag_e_VX_NOGAP_X,
+        vx_accessor_e_VX_READ_ONLY as vx_enum,
+        vx_memory_type_e_VX_MEMORY_TYPE_HOST as vx_enum,
+        vx_map_flag_e_VX_NOGAP_X as vx_uint32,
     ));
 
     let mat = Mat::new_rows_cols_with_data(

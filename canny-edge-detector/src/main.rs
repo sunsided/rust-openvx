@@ -108,7 +108,7 @@ unsafe fn run() -> Result<()> {
     let cv_rgb_image_layout = vx_imagepatch_addressing_t {
         stride_x: 3,
         stride_y: *resized.mat_step().first().unwrap() as i32,
-        // Not sure about these, but they do seem to work.
+        // Default isn't implemented; not sure about these, but zeros seem to work.
         dim_x: 0,
         dim_y: 0,
         scale_x: 0,

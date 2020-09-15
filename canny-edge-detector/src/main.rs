@@ -1,5 +1,10 @@
 // canny-edge-detector sample from https://github.com/KhronosGroup/openvx-samples
 
+mod names;
+mod print_attributes;
+
+use crate::names::{set_graph_name, set_node_name};
+use crate::print_attributes::{print_graph_attributes, print_node_attributes};
 use libopenvx_sys::*;
 use opencv::core::CV_8U;
 use opencv::{
@@ -24,12 +29,7 @@ unsafe fn run() -> Result<()> {
     let mut graph = vxCreateGraph(context);
     error_check_object(graph as vx_reference);
 
-    vxSetReferenceName(
-        graph as vx_reference,
-        std::ffi::CString::new("CANNY_GRAPH")
-            .expect("CString::new failed")
-            .as_ptr(),
-    );
+    set_graph_name(graph, "CANNY_GRAPH");
 
     let mut input_rgb_image = vxCreateImage(
         context,
@@ -84,29 +84,40 @@ unsafe fn run() -> Result<()> {
 
     let gradient_size: vx_int32 = 3;
     let mut nodes = vec![
-        vxColorConvertNode(graph, input_rgb_image, yuv_image),
-        vxChannelExtractNode(
-            graph,
-            yuv_image,
-            vx_channel_e_VX_CHANNEL_Y as i32,
-            luma_image,
+        set_node_name(
+            vxColorConvertNode(graph, input_rgb_image, yuv_image),
+            "RGB_TO_YUV",
         ),
-        vxCannyEdgeDetectorNode(
-            graph,
-            luma_image,
-            hyst,
-            gradient_size,
-            vx_norm_type_e_VX_NORM_L1 as i32,
-            output_filtered_image,
+        set_node_name(
+            vxChannelExtractNode(
+                graph,
+                yuv_image,
+                vx_channel_e_VX_CHANNEL_Y as vx_enum,
+                luma_image,
+            ),
+            "EXTRACT_LUMA",
+        ),
+        set_node_name(
+            vxCannyEdgeDetectorNode(
+                graph,
+                luma_image,
+                hyst,
+                gradient_size,
+                vx_norm_type_e_VX_NORM_L1 as vx_enum,
+                output_filtered_image,
+            ),
+            "CANNY_EDGE",
         ),
     ];
 
     for node in nodes.iter_mut() {
+        print_node_attributes(*node);
         error_check_object(*node as vx_reference);
         error_check_status(vxReleaseNode(node));
     }
 
     error_check_status(vxVerifyGraph(graph));
+    print_graph_attributes(graph);
 
     let image = imread(".images/selfie.jpg", IMREAD_COLOR)?;
     let mut resized = Mat::default()?;
@@ -158,8 +169,8 @@ unsafe fn run() -> Result<()> {
     error_check_status(vxProcessGraph(graph));
 
     let rect = vx_rectangle_t {
-        start_x: 0,
-        start_y: 0,
+        start_x: 0 as vx_uint32,
+        start_y: 0 as vx_uint32,
         end_x: width,
         end_y: height,
     };
@@ -259,5 +270,5 @@ fn error_check_status(status: vx_status) {
 }
 
 fn main() {
-    unsafe { run() };
+    unsafe { run().unwrap() };
 }

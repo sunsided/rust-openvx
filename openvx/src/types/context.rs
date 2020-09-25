@@ -1,10 +1,10 @@
 use crate::types::{AsVxReference, VxReference};
-use crate::{AsRaw, Release, Result, VxStatus};
+use crate::{AsRaw, Release, Result, VxGraph, VxStatus};
 use libopenvx_sys::*;
 
 /// An opaque reference to the implementation context.
 pub struct VxContext {
-    context: vx_context,
+    raw: vx_context,
 }
 
 /*
@@ -14,7 +14,7 @@ type LogCallbackFn =
 
 impl VxContext {
     fn wrap(context: vx_context) -> Self {
-        Self { context }
+        Self { raw: context }
     }
 
     pub fn create() -> Self {
@@ -37,6 +37,11 @@ impl VxContext {
         unsafe {
             vxRegisterLogCallback(self.as_raw(), None, vx_bool_e_vx_false_e as vx_enum);
         }
+    }
+
+    pub fn create_graph(&self) -> VxGraph {
+        let graph = unsafe { vxCreateGraph(self.raw) };
+        VxGraph::from(graph)
     }
 }
 
@@ -76,25 +81,25 @@ impl AsRaw for VxContext {
     type Result = vx_context;
 
     fn as_raw(&mut self) -> Self::Result {
-        self.context
+        self.raw
     }
 }
 
 impl AsVxReference for VxContext {
     fn as_reference(&mut self) -> VxReference {
-        assert!(!self.context.is_null());
-        VxReference::from(self.context as vx_reference)
+        assert!(!self.raw.is_null());
+        VxReference::from(self.raw as vx_reference)
     }
 }
 
 impl Release for VxContext {
     fn release(&mut self) -> Result<()> {
-        if self.context.is_null() {
+        if self.raw.is_null() {
             return Ok(());
         }
 
-        let status = unsafe { vxReleaseContext(&mut self.context) };
-        self.context = std::ptr::null_mut();
+        let status = unsafe { vxReleaseContext(&mut self.raw) };
+        self.raw = std::ptr::null_mut();
 
         VxStatus::new_result(status, ())
     }

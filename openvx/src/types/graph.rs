@@ -2,7 +2,7 @@ use crate::{AsVxReference, VxReference};
 use libopenvx_sys::vx_graph;
 
 /// An opaque reference to a graph.
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Debug, Hash, PartialEq, Eq, Copy, Clone)]
 pub struct VxGraph {
     raw: vx_graph,
 }

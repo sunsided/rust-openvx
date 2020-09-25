@@ -3,7 +3,7 @@ use libopenvx_sys::vx_distribution;
 
 /// The Distribution object. This has a user-defined number of bins over
 /// a user-defined range (within a uint32_t range).
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Debug, Hash, PartialEq, Eq, Copy, Clone)]
 pub struct VxDistribution {
     raw: vx_distribution,
 }

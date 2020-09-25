@@ -2,7 +2,7 @@ use crate::{AsVxReference, VxReference};
 use libopenvx_sys::vx_matrix;
 
 /// The Matrix Object. An MxN matrix of some unit type.
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Debug, Hash, PartialEq, Eq, Copy, Clone)]
 pub struct VxMatrix {
     raw: vx_matrix,
 }

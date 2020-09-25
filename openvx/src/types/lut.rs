@@ -2,7 +2,7 @@ use crate::{AsVxReference, VxReference};
 use libopenvx_sys::vx_lut;
 
 /// The Look-Up Table (LUT) Object.
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Debug, Hash, PartialEq, Eq, Copy, Clone)]
 pub struct VxLut {
     raw: vx_lut,
 }

@@ -3,7 +3,7 @@
 mod names;
 mod print_attributes;
 
-use crate::names::{set_graph_name, set_node_name};
+use crate::names::set_node_name;
 use crate::print_attributes::{print_graph_attributes, print_node_attributes};
 use libopenvx_sys::*;
 use opencv::core::CV_8U;
@@ -26,10 +26,9 @@ unsafe fn run() -> Result<()> {
     error_check_object(context.as_reference().into());
     context.enable_logging();
 
-    let mut graph = vxCreateGraph(context.as_raw());
-    error_check_object(graph as vx_reference);
-
-    set_graph_name(graph, "CANNY_GRAPH");
+    let mut graph = context.create_graph();
+    error_check_object(graph.as_reference().into());
+    graph.set_name("CANNY_GRAPH");
 
     let mut input_rgb_image = vxCreateImage(
         context.as_raw(),
@@ -47,13 +46,13 @@ unsafe fn run() -> Result<()> {
     error_check_object(output_filtered_image as vx_reference);
 
     let mut yuv_image = vxCreateVirtualImage(
-        graph,
+        graph.into(),
         width,
         height,
         vx_df_image_e_VX_DF_IMAGE_IYUV as vx_df_image,
     );
     let mut luma_image = vxCreateVirtualImage(
-        graph,
+        graph.into(),
         width,
         height,
         vx_df_image_e_VX_DF_IMAGE_U8 as vx_df_image,
@@ -85,12 +84,12 @@ unsafe fn run() -> Result<()> {
     let gradient_size: vx_int32 = 3;
     let mut nodes = vec![
         set_node_name(
-            vxColorConvertNode(graph, input_rgb_image, yuv_image),
+            vxColorConvertNode(graph.into(), input_rgb_image, yuv_image),
             "RGB_TO_YUV",
         ),
         set_node_name(
             vxChannelExtractNode(
-                graph,
+                graph.into(),
                 yuv_image,
                 vx_channel_e_VX_CHANNEL_Y as vx_enum,
                 luma_image,
@@ -99,7 +98,7 @@ unsafe fn run() -> Result<()> {
         ),
         set_node_name(
             vxCannyEdgeDetectorNode(
-                graph,
+                graph.into(),
                 luma_image,
                 hyst,
                 gradient_size,
@@ -116,8 +115,8 @@ unsafe fn run() -> Result<()> {
         error_check_status(vxReleaseNode(node));
     }
 
-    error_check_status(vxVerifyGraph(graph));
-    print_graph_attributes(graph);
+    error_check_status(vxVerifyGraph(graph.into()));
+    print_graph_attributes(graph.into());
 
     let image = imread(".images/selfie.jpg", IMREAD_COLOR)?;
     let mut resized = Mat::default()?;
@@ -166,7 +165,7 @@ unsafe fn run() -> Result<()> {
         vx_memory_type_e_VX_MEMORY_TYPE_HOST as vx_enum,
     ));
 
-    error_check_status(vxProcessGraph(graph));
+    error_check_status(vxProcessGraph(graph.into()));
 
     let rect = vx_rectangle_t {
         start_x: 0 as vx_uint32,
@@ -214,7 +213,7 @@ unsafe fn run() -> Result<()> {
 
     error_check_status(vxUnmapImagePatch(output_filtered_image, map_id));
 
-    error_check_status(vxReleaseGraph(&mut graph));
+    error_check_status(vxReleaseGraph(&mut graph.into()));
     error_check_status(vxReleaseImage(&mut yuv_image));
     error_check_status(vxReleaseImage(&mut luma_image));
     error_check_status(vxReleaseImage(&mut input_rgb_image));

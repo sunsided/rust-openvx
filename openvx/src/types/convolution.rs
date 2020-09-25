@@ -2,7 +2,7 @@ use crate::{AsVxReference, VxReference};
 use libopenvx_sys::vx_convolution;
 
 /// The Convolution Object. A user-defined convolution kernel of MxM elements.
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Debug, Hash, PartialEq, Eq, Copy, Clone)]
 pub struct VxConvolution {
     raw: vx_convolution,
 }

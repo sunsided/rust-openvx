@@ -1,7 +1,7 @@
 use crate::{AsVxReference, VxReference};
 use libopenvx_sys::vx_pyramid;
 
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Debug, Hash, PartialEq, Eq, Copy, Clone)]
 pub struct VxPyramid {
     raw: vx_pyramid,
 }

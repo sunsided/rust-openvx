@@ -2,7 +2,7 @@ use crate::{AsVxReference, VxReference};
 use libopenvx_sys::vx_image;
 
 /// An opaque reference to an image.
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Debug, Hash, PartialEq, Eq, Copy, Clone)]
 pub struct VxImage {
     raw: vx_image,
 }

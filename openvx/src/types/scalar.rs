@@ -4,7 +4,7 @@ use libopenvx_sys::vx_scalar;
 /// An opaque reference to a scalar.
 ///
 /// A scalar can be up to 64 bits wide.
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Debug, Hash, PartialEq, Eq, Copy, Clone)]
 pub struct VxScalar {
     raw: vx_scalar,
 }

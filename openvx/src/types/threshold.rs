@@ -3,7 +3,7 @@ use libopenvx_sys::vx_threshold;
 
 /// The Threshold Object. A thresholding object contains the types and
 /// limit values of the thresholding required.
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Debug, Hash, PartialEq, Eq, Copy, Clone)]
 pub struct VxThreshold {
     raw: vx_threshold,
 }

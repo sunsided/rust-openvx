@@ -3,7 +3,7 @@ use libopenvx_sys::vx_delay;
 
 /// The delay object. This is like a ring buffer of objects that is
 /// maintained by the OpenVX implementation.
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Debug, Hash, PartialEq, Eq, Copy, Clone)]
 pub struct VxDelay {
     raw: vx_delay,
 }

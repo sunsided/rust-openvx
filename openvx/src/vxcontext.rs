@@ -1,16 +1,16 @@
 use crate::{AsRaw, AsVxReference, Release, Result, VxStatus};
 use libopenvx_sys::*;
 
-pub struct Context {
+pub struct VxContext {
     context: vx_context,
 }
 
 /*
 type LogCallbackFn =
-    fn(context: &Context, reference: vx_reference, status: VxStatus, string: String);
+    fn(context: &Context, reference: VxReference, status: VxStatus, string: String);
  */
 
-impl Context {
+impl VxContext {
     fn wrap(context: vx_context) -> Self {
         Self { context }
     }
@@ -70,7 +70,7 @@ extern "C" fn log_callback(
     }
 }
 
-impl AsRaw for Context {
+impl AsRaw for VxContext {
     type Result = vx_context;
 
     fn as_raw(&mut self) -> Self::Result {
@@ -78,14 +78,14 @@ impl AsRaw for Context {
     }
 }
 
-impl AsVxReference for Context {
+impl AsVxReference for VxContext {
     fn as_reference(&mut self) -> vx_reference {
         assert!(!self.context.is_null());
         self.context as vx_reference
     }
 }
 
-impl Release for Context {
+impl Release for VxContext {
     fn release(&mut self) -> Result<()> {
         if self.context.is_null() {
             return Ok(());
@@ -98,7 +98,7 @@ impl Release for Context {
     }
 }
 
-impl Drop for Context {
+impl Drop for VxContext {
     fn drop(&mut self) {
         self.release().unwrap();
     }

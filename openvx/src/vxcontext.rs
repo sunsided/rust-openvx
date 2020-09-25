@@ -1,3 +1,4 @@
+use crate::reference::VxReference;
 use crate::{AsRaw, AsVxReference, Release, Result, VxStatus};
 use libopenvx_sys::*;
 
@@ -79,9 +80,9 @@ impl AsRaw for VxContext {
 }
 
 impl AsVxReference for VxContext {
-    fn as_reference(&mut self) -> vx_reference {
+    fn as_reference(&mut self) -> VxReference {
         assert!(!self.context.is_null());
-        self.context as vx_reference
+        VxReference::from(self.context as vx_reference)
     }
 }
 

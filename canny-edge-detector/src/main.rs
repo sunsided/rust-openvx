@@ -23,7 +23,7 @@ unsafe fn run() -> Result<()> {
     let height: vx_uint32 = 512;
 
     let mut context = VxContext::create();
-    error_check_object(context.as_reference());
+    error_check_object(context.as_reference().into());
     context.enable_logging();
 
     let mut graph = vxCreateGraph(context.as_raw());

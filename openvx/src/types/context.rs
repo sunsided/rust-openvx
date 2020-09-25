@@ -1,7 +1,8 @@
-use crate::reference::VxReference;
-use crate::{AsRaw, AsVxReference, Release, Result, VxStatus};
+use crate::types::{AsVxReference, VxReference};
+use crate::{AsRaw, Release, Result, VxStatus};
 use libopenvx_sys::*;
 
+/// An opaque reference to the implementation context.
 pub struct VxContext {
     context: vx_context,
 }

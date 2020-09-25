@@ -1,4 +1,4 @@
-use crate::AsVxReference;
+use crate::types::AsVxReference;
 use libopenvx_sys::{vxSetReferenceName, vx_reference};
 use std::borrow::Borrow;
 

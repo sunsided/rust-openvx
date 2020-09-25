@@ -3,21 +3,19 @@ pub mod macros;
 
 mod asraw;
 mod checkstatus;
-mod reference;
 mod release;
 mod result;
 pub mod setname;
-mod vxcontext;
+pub mod types;
 mod vxerror;
 mod vxstatus;
 
 pub use crate::asraw::AsRaw;
 pub use crate::checkstatus::CheckStatus;
-pub use crate::reference::AsVxReference;
 pub use crate::release::Release;
 pub use crate::result::Result;
 pub use crate::setname::SetName;
-pub use crate::vxcontext::VxContext;
+pub use crate::types::*;
 pub use crate::vxerror::VxError;
 pub use crate::vxstatus::VxStatus;
 

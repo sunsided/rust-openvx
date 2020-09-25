@@ -1,25 +1,7 @@
-use crate::vxerror::VxError;
+use crate::{Result, VxError};
 use core::fmt;
 use libopenvx_sys::*;
 use std::cmp::Ordering;
-
-/// [`Result<T>`][`Result`] is the type used for returning and propagating
-/// errors. It is an enum with the variants, [`Ok(T)`], representing
-/// success and containing a value, and [`Err(VxError)`], representing error
-/// and containing an error value.
-///
-/// ```
-/// # #[allow(dead_code)]
-/// enum Result<T> {
-///    Ok(T),
-///    Err(openvx::VxError),
-/// }
-/// ```
-///
-/// [`Result`]: type.Result.html
-/// [`Ok(T)`]: type.Result.html#variant.Ok
-/// [`Err(VxError)`]: type.Result.html#variant.Err
-pub type Result<T> = std::result::Result<T, VxError>;
 
 #[derive(Debug, Eq, Copy, Clone, Ord, Hash)]
 pub enum VxStatus {
@@ -30,12 +12,18 @@ pub enum VxStatus {
 }
 
 impl VxStatus {
-    /// Constructs a
     const fn new(status: vx_status_e) -> Self {
         #[allow(non_upper_case_globals)]
         match status {
             vx_status_e_VX_SUCCESS => VxStatus::Success,
             n => VxStatus::Error(VxError::new_unchecked(n)),
+        }
+    }
+
+    pub fn new_result<T>(status: vx_status_e, value: T) -> Result<T> {
+        match VxStatus::new(status) {
+            VxStatus::Success => Ok(value),
+            VxStatus::Error(error) => Err(error),
         }
     }
 
@@ -136,15 +124,6 @@ impl fmt::Display for VxStatus {
             VxStatus::Success => write!(f, "VX_SUCCESS"),
             VxStatus::Error(err) => err.fmt(f),
         }
-    }
-}
-
-impl<T> Into<VxStatus> for Result<T> {
-    fn into(self) -> VxStatus {
-        if let Err(error) = self {
-            return VxStatus::Error(error);
-        }
-        VxStatus::Success
     }
 }
 

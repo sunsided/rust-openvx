@@ -22,23 +22,27 @@ unsafe fn run() -> Result<()> {
     let width: vx_uint32 = 512;
     let height: vx_uint32 = 512;
 
-    let mut context = vxCreateContext();
-    error_check_object(context as vx_reference);
-    vxRegisterLogCallback(context, Some(log_callback), vx_bool_e_vx_false_e as vx_enum);
+    let mut context = Context::create();
+    error_check_object(context.as_reference());
+    vxRegisterLogCallback(
+        context.as_raw(),
+        Some(log_callback),
+        vx_bool_e_vx_false_e as vx_enum,
+    );
 
-    let mut graph = vxCreateGraph(context);
+    let mut graph = vxCreateGraph(context.as_raw());
     error_check_object(graph as vx_reference);
 
     set_graph_name(graph, "CANNY_GRAPH");
 
     let mut input_rgb_image = vxCreateImage(
-        context,
+        context.as_raw(),
         width,
         height,
         vx_df_image_e_VX_DF_IMAGE_RGB as vx_df_image,
     );
     let mut output_filtered_image = vxCreateImage(
-        context,
+        context.as_raw(),
         width,
         height,
         vx_df_image_e_VX_DF_IMAGE_U8 as vx_df_image,
@@ -62,7 +66,7 @@ unsafe fn run() -> Result<()> {
     error_check_object(luma_image as vx_reference);
 
     let hyst = vxCreateThreshold(
-        context,
+        context.as_raw(),
         vx_threshold_type_e_VX_THRESHOLD_TYPE_RANGE as vx_enum,
         vx_type_e_VX_TYPE_UINT8 as vx_enum,
     );
@@ -219,7 +223,7 @@ unsafe fn run() -> Result<()> {
     error_check_status(vxReleaseImage(&mut luma_image));
     error_check_status(vxReleaseImage(&mut input_rgb_image));
     error_check_status(vxReleaseImage(&mut output_filtered_image));
-    error_check_status(vxReleaseContext(&mut context));
+    context.release().check_status();
 
     Ok(())
 }

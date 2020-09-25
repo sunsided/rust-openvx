@@ -1,11 +1,25 @@
 #[macro_use]
 pub mod macros;
 
+mod asraw;
+mod checkstatus;
+mod context;
+mod reference;
+mod release;
+mod result;
+pub mod setname;
 mod vxerror;
 mod vxstatus;
 
+pub use crate::asraw::AsRaw;
+pub use crate::checkstatus::CheckStatus;
+pub use crate::context::Context;
+pub use crate::reference::AsVxReference;
+pub use crate::release::Release;
+pub use crate::result::Result;
+pub use crate::setname::SetName;
 pub use crate::vxerror::VxError;
-pub use crate::vxstatus::{Result, VxStatus};
+pub use crate::vxstatus::VxStatus;
 
 use libopenvx_sys::*;
 

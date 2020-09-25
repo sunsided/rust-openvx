@@ -24,11 +24,7 @@ unsafe fn run() -> Result<()> {
 
     let mut context = Context::create();
     error_check_object(context.as_reference());
-    vxRegisterLogCallback(
-        context.as_raw(),
-        Some(log_callback),
-        vx_bool_e_vx_false_e as vx_enum,
-    );
+    context.enable_logging();
 
     let mut graph = vxCreateGraph(context.as_raw());
     error_check_object(graph as vx_reference);
@@ -226,36 +222,6 @@ unsafe fn run() -> Result<()> {
     context.release().check_status();
 
     Ok(())
-}
-
-#[allow(unused_variables)]
-extern "C" fn log_callback(
-    context: vx_context,
-    r#ref: vx_reference,
-    status: vx_status,
-    string: *const vx_char,
-) {
-    debug_assert_ne!(status, vx_status_e_VX_SUCCESS);
-    let status = VxStatus::from(status);
-
-    if string.is_null() {
-        return;
-    }
-
-    let string = unsafe { std::ffi::CStr::from_ptr(string) }
-        .to_string_lossy()
-        .into_owned();
-
-    if string.len() == 0 {
-        return;
-    }
-
-    eprint!("ERROR: {} - {}", status, string);
-
-    let require_linebreak = string.chars().last().unwrap() != '\n';
-    if require_linebreak {
-        eprintln!();
-    }
 }
 
 fn error_check_object(r#ref: vx_reference) {

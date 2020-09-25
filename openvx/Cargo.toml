@@ -8,3 +8,4 @@ edition = "2018"
 
 [dependencies]
 openvx-sys = { path ="../openvx-sys" }
+static_assertions = "1.1.0"

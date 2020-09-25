@@ -12,7 +12,5 @@ links = "openvx"
 name = "libopenvx_sys"
 path = "src/lib.rs"
 
-[dependencies]
-
 [build-dependencies]
 bindgen = "0.55.1"

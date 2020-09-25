@@ -1,31 +1,110 @@
+use crate::vxerror::VxError;
 use core::fmt;
 use libopenvx_sys::*;
+use std::cmp::Ordering;
 
+/// [`Result<T>`][`Result`] is the type used for returning and propagating
+/// errors. It is an enum with the variants, [`Ok(T)`], representing
+/// success and containing a value, and [`Err(VxError)`], representing error
+/// and containing an error value.
+///
+/// ```
+/// # #[allow(dead_code)]
+/// enum Result<T> {
+///    Ok(T),
+///    Err(openvx::VxError),
+/// }
+/// ```
+///
+/// [`Result`]: type.Result.html
+/// [`Ok(T)`]: type.Result.html#variant.Ok
+/// [`Err(VxError)`]: type.Result.html#variant.Err
+pub type Result<T> = std::result::Result<T, VxError>;
+
+#[derive(Debug, Eq, Copy, Clone, Ord, Hash)]
 pub enum VxStatus {
-    /// No error.
+    /// Encodes the success value.
     Success,
-    /// Indicates a generic error code, used when no other describes the error.
-    Failure,
-    /// Indicates that the requested kernel is missing.
-    Error(vx_status_e),
+    /// Contains the error value.
+    Error(VxError),
 }
 
 impl VxStatus {
-    fn new(status: vx_status_e) -> Self {
+    /// Constructs a
+    const fn new(status: vx_status_e) -> Self {
         #[allow(non_upper_case_globals)]
         match status {
             vx_status_e_VX_SUCCESS => VxStatus::Success,
-            vx_status_e_VX_FAILURE => VxStatus::Failure,
-            n => VxStatus::Error(n),
+            n => VxStatus::Error(VxError::new_unchecked(n)),
         }
     }
 
-    pub fn as_isize(&self) -> isize {
+    /// Converts this instance into a [`vx_status_e`].
+    ///
+    /// [`vx_status_e`]: ../libopenvx_sys/type.c.html
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use openvx::{VxStatus, VxError};
+    ///
+    /// let x: vxstatus = VxStatus::Success;
+    /// assert_eq!(x.to_raw(), libopenvx_sys::vx_status_e_VX_SUCCESS);
+    ///
+    /// let x: vxstatus = VxStatus::Error(VxError::Failure);
+    /// assert_eq!(x.to_raw(), libopenvx_sys::vx_status_e_VX_FAILURE);
+    /// ```
+    pub const fn to_raw(&self) -> vx_status_e {
         match self {
-            VxStatus::Success => vx_status_e_VX_SUCCESS as isize,
-            VxStatus::Failure => vx_status_e_VX_FAILURE as isize,
-            VxStatus::Error(n) => *n as isize,
+            VxStatus::Success => vx_status_e_VX_SUCCESS,
+            VxStatus::Error(err) => err.to_raw(),
         }
+    }
+
+    /// Returns `true` if the status is [`Success`].
+    ///
+    /// [`Success`]: enum.VxStatus.html#variant.Success
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use openvx::{VxStatus, VxError};
+    ///
+    /// let x: VxStatus = VxStatus::Success;
+    /// assert_eq!(x.is_ok(), true);
+    ///
+    /// let x: VxStatus = VxStatus::Error(VxError::Failure);
+    /// assert_eq!(x.is_ok(), false);
+    /// ```
+    pub fn is_ok(&self) -> bool {
+        *self == VxStatus::Success
+    }
+
+    /// Returns `true` if the status is [`Error`].
+    ///
+    /// [`Error`]: enum.VxStatus.html#variant.Error
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use openvx::{VxStatus, VxError};
+    ///
+    /// let x: VxStatus = VxStatus::Success;
+    /// assert_eq!(x.is_err(), false);
+    ///
+    /// let x: VxStatus = VxStatus::Error(VxError::Failure);
+    /// assert_eq!(x.is_err(), true);
+    /// ```
+    #[must_use]
+    #[inline]
+    pub fn is_err(&self) -> bool {
+        !self.is_ok()
     }
 }
 
@@ -35,49 +114,37 @@ impl From<vx_status_e> for VxStatus {
     }
 }
 
-impl Eq for VxStatus {}
-
 impl PartialEq for VxStatus {
     fn eq(&self, other: &Self) -> bool {
-        let left = self.as_isize();
-        let right = other.as_isize();
+        let left = self.to_raw();
+        let right = other.to_raw();
         left == right
     }
 }
 
-impl fmt::Debug for VxStatus {
+impl PartialOrd for VxStatus {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        let left = self.to_raw();
+        let right = other.to_raw();
+        left.partial_cmp(&right)
+    }
+}
+
+impl fmt::Display for VxStatus {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             VxStatus::Success => write!(f, "VX_SUCCESS"),
-            VxStatus::Failure => write!(f, "VX_FAILURE"),
-            #[allow(non_upper_case_globals)]
-            VxStatus::Error(n) => match n {
-                vx_status_e_VX_ERROR_NOT_IMPLEMENTED => write!(f, "VX_ERROR_NOT_IMPLEMENTED"), // -2
-                vx_status_e_VX_ERROR_NOT_SUPPORTED => write!(f, "VX_ERROR_NOT_SUPPORTED"),     // -3
-                vx_status_e_VX_ERROR_NOT_SUFFICIENT => write!(f, "VX_ERROR_NOT_SUFFICIENT"),   // -4
-                vx_status_e_VX_ERROR_NOT_ALLOCATED => write!(f, "VX_ERROR_NOT_ALLOCATED"),     // -5
-                vx_status_e_VX_ERROR_NOT_COMPATIBLE => write!(f, "VX_ERROR_NOT_COMPATIBLE"),   // -6
-                vx_status_e_VX_ERROR_NO_RESOURCES => write!(f, "VX_ERROR_NO_RESOURCES"),       // -7
-                vx_status_e_VX_ERROR_NO_MEMORY => write!(f, "VX_ERROR_NO_MEMORY"),             // -8
-                vx_status_e_VX_ERROR_OPTIMIZED_AWAY => write!(f, "VX_ERROR_OPTIMIZED_AWAY"),   // -9
-                vx_status_e_VX_ERROR_INVALID_PARAMETERS => write!(f, "VX_ERROR_INVALID_PARAMETERS"), // -10
-                vx_status_e_VX_ERROR_INVALID_MODULE => write!(f, "VX_ERROR_INVALID_MODULE"), // -11
-                vx_status_e_VX_ERROR_INVALID_REFERENCE => write!(f, "VX_ERROR_INVALID_REFERENCE"), // -12
-                vx_status_e_VX_ERROR_INVALID_LINK => write!(f, "VX_ERROR_INVALID_LINK"), // -13
-                vx_status_e_VX_ERROR_INVALID_FORMAT => write!(f, "VX_ERROR_INVALID_FORMAT"), // -14
-                vx_status_e_VX_ERROR_INVALID_DIMENSION => write!(f, "VX_ERROR_INVALID_DIMENSION"), // -15
-                vx_status_e_VX_ERROR_INVALID_VALUE => write!(f, "VX_ERROR_INVALID_VALUE"), // -16
-                vx_status_e_VX_ERROR_INVALID_TYPE => write!(f, "VX_ERROR_INVALID_TYPE"),   // -17
-                vx_status_e_VX_ERROR_INVALID_GRAPH => write!(f, "VX_ERROR_INVALID_GRAPH"), // -18
-                vx_status_e_VX_ERROR_INVALID_NODE => write!(f, "VX_ERROR_INVALID_NODE"),   // -19
-                vx_status_e_VX_ERROR_INVALID_SCOPE => write!(f, "VX_ERROR_INVALID_SCOPE"), // -20
-                vx_status_e_VX_ERROR_GRAPH_SCHEDULED => write!(f, "VX_ERROR_GRAPH_SCHEDULED"), // -21
-                vx_status_e_VX_ERROR_GRAPH_ABANDONED => write!(f, "VX_ERROR_GRAPH_ABANDONED"), // -22
-                vx_status_e_VX_ERROR_MULTIPLE_WRITERS => write!(f, "VX_ERROR_MULTIPLE_WRITERS"), // -23
-                vx_status_e_VX_ERROR_REFERENCE_NONZERO => write!(f, "VX_ERROR_REFERENCE_NONZERO"), // -24
-                _ => write!(f, "unknown error ({})", n),
-            },
+            VxStatus::Error(err) => err.fmt(f),
         }
+    }
+}
+
+impl<T> Into<VxStatus> for Result<T> {
+    fn into(self) -> VxStatus {
+        if let Err(error) = self {
+            return VxStatus::Error(error);
+        }
+        VxStatus::Success
     }
 }
 
@@ -85,23 +152,14 @@ impl fmt::Debug for VxStatus {
 mod tests {
     #![macro_use]
     use super::*;
-    use libopenvx_sys::*;
+
+    #[test]
+    fn vx_status_min() {
+        assert_eq!(vx_status_e_VX_STATUS_MIN, -25);
+    }
 
     #[test]
     fn vx_status_e_success() {
         assert_eq!(VxStatus::from(vx_status_e_VX_SUCCESS), VxStatus::Success);
-    }
-
-    #[test]
-    fn vx_status_e_failure() {
-        assert_eq!(VxStatus::from(vx_status_e_VX_FAILURE), VxStatus::Failure);
-    }
-
-    #[test]
-    fn vx_status_e_not_implemented() {
-        assert_eq!(
-            VxStatus::from(vx_status_e_VX_ERROR_NOT_IMPLEMENTED),
-            VxStatus::Error(vx_status_e_VX_ERROR_NOT_IMPLEMENTED)
-        );
     }
 }

@@ -246,7 +246,7 @@ extern "C" fn log_callback(
         return;
     }
 
-    eprint!("ERROR: {:#?} - {}", status, string);
+    eprint!("ERROR: {} - {}", status, string);
 
     let require_linebreak = string.chars().last().unwrap() != '\n';
     if require_linebreak {
@@ -258,14 +258,14 @@ fn error_check_object(r#ref: vx_reference) {
     let status = unsafe { vxGetStatus(r#ref) };
     let status = VxStatus::from(status);
     if status != VxStatus::Success {
-        panic!("ERROR: failed with status {:#?}", status);
+        panic!("ERROR: failed with status {}", status);
     }
 }
 
 fn error_check_status(status: vx_status) {
     let status = VxStatus::from(status);
     if status != VxStatus::Success {
-        panic!("ERROR: failed with status {:#?}", status);
+        panic!("ERROR: failed with status {}", status);
     }
 }
 

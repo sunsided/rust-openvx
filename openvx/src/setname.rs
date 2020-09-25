@@ -21,10 +21,12 @@ where
     }
 }
 
-pub fn set_name<S>(reference: vx_reference, name: S) -> vx_reference
+pub fn set_name<R, S>(reference: R, name: S) -> vx_reference
 where
+    R: Into<vx_reference>,
     S: Borrow<str>,
 {
+    let reference: vx_reference = reference.into();
     assert!(!reference.is_null());
     unsafe {
         vxSetReferenceName(

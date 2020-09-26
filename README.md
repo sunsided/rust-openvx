@@ -1,4 +1,4 @@
-# OpenVX meets Rust
+# OpenVX 1.3 meets Rust
 
 This repo consists of the following parts:
 

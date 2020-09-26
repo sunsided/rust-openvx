@@ -74,13 +74,13 @@ unsafe fn run() -> Result<()> {
     let upper: vx_int32 = 150;
     vxSetThresholdAttribute(
         hyst,
-        VX_THRESHOLD_ATTRIBUTE_THRESHOLD_LOWER,
+        constants::thresholds::VX_THRESHOLD_ATTRIBUTE_THRESHOLD_LOWER,
         &lower as *const _ as *const std::ffi::c_void,
         std::mem::size_of_val(&lower) as vx_size,
     );
     vxSetThresholdAttribute(
         hyst,
-        VX_THRESHOLD_ATTRIBUTE_THRESHOLD_UPPER,
+        constants::thresholds::VX_THRESHOLD_ATTRIBUTE_THRESHOLD_UPPER,
         &upper as *const _ as *const std::ffi::c_void,
         std::mem::size_of_val(&upper) as vx_size,
     );

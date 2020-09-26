@@ -9,30 +9,14 @@ pub unsafe fn print_graph_attributes(graph: &VxGraph) {
     let ref_count = graph.as_reference().get_reference_count();
     let state = graph.get_state();
     let ref_name = graph.get_name();
-    let mut perf = vx_perf_t {
-        min: 0,
-        max: 0,
-        beg: 0,
-        end: 0,
-        num: 0,
-        sum: 0,
-        avg: 0,
-        tmp: 0,
-    };
-
-    vxQueryGraph(
-        graph.as_raw(),
-        vx_graph_attribute_e_VX_GRAPH_PERFORMANCE as vx_enum,
-        &mut perf as *mut _ as *mut std::ffi::c_void,
-        std::mem::size_of_val(&perf) as vx_size,
-    );
+    let perf = graph.get_performance();
 
     println!(
         "VX_TYPE_GRAPH: {}, {} nodes, {}, avg perf {}, {} parameters, {} refs",
         ref_name,
         num_nodes,
         state,
-        perf.avg as f64 / 1000000000.0f64,
+        perf.avg.as_secs_f64(),
         num_params,
         ref_count
     );

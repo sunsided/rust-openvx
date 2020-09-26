@@ -1,9 +1,11 @@
+use crate::performance::Performance;
 use crate::{AsVxReference, Release, Result, VxGraphState, VxReference, VxStatus};
 use libopenvx_sys::{
     vxQueryGraph, vxReleaseGraph, vx_enum, vx_graph, vx_graph_attribute_e_VX_GRAPH_NUMNODES,
     vx_graph_attribute_e_VX_GRAPH_NUMPARAMETERS, vx_graph_attribute_e_VX_GRAPH_PERFORMANCE,
     vx_graph_attribute_e_VX_GRAPH_STATE, vx_graph_state_e, vx_perf_t, vx_size, vx_uint32,
 };
+use static_assertions::_core::time::Duration;
 
 /// An opaque reference to a graph.
 #[derive(Debug, Hash, PartialEq, Eq)]
@@ -72,9 +74,8 @@ impl VxGraph {
     /// Returns the overall performance of the graph.
     ///
     /// The accuracy of timing information is platform dependent.
-    /// Performance tracking must have been enabled.
-    /// TODO: \\ref vx_directive_e
-    pub fn get_performance(&self) -> () {
+    /// Performance tracking must have been enabled through [`VxContext.enable_performance_counters`](struct.VxContext.html#method.enable_performance_counters).
+    pub fn get_performance(&self) -> Performance {
         let mut perf = vx_perf_t {
             min: 0,
             max: 0,
@@ -95,7 +96,16 @@ impl VxGraph {
             );
         }
 
-        unimplemented!()
+        Performance {
+            tmp: Duration::from_nanos(perf.tmp),
+            beg: Duration::from_nanos(perf.beg),
+            end: Duration::from_nanos(perf.end),
+            sum: Duration::from_nanos(perf.sum),
+            avg: Duration::from_nanos(perf.avg),
+            min: Duration::from_nanos(perf.min),
+            num: Duration::from_nanos(perf.num),
+            max: Duration::from_nanos(perf.max),
+        }
     }
 }
 

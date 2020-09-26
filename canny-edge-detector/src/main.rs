@@ -23,10 +23,16 @@ unsafe fn run() -> Result<()> {
     let height: vx_uint32 = 512;
 
     let mut context = VxContext::create();
-    context.check_status().enable_logging();
+    context
+        .check_status()
+        .expect("Context was invalid")
+        .enable_logging();
 
     let mut graph = context.create_graph();
-    graph.check_status().set_name("CANNY_GRAPH");
+    graph
+        .check_status()
+        .expect("Graph was invalid")
+        .set_name("CANNY_GRAPH");
 
     vxDirective(
         graph.as_reference().into(),

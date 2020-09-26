@@ -2,21 +2,16 @@ use libopenvx_sys::*;
 use openvx::*;
 
 pub unsafe fn print_graph_attributes(graph: &VxGraph) {
-    let num_nodes = graph.get_num_nodes();
-    let num_params = graph.get_num_parameters();
-    let ref_count = graph.get_reference_count();
-    let state = graph.get_state();
-    let ref_name = graph.get_name();
     let perf = graph.get_performance();
 
     println!(
         "VX_TYPE_GRAPH: {}, {} nodes, {}, avg perf {}, {} parameters, {} refs",
-        ref_name,
-        num_nodes,
-        state,
+        graph.get_name(),
+        graph.get_num_nodes(),
+        graph.get_state(),
         perf.avg.as_secs_f64(),
-        num_params,
-        ref_count
+        graph.get_num_parameters(),
+        graph.get_reference_count()
     );
 }
 

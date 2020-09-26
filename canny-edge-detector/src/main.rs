@@ -30,6 +30,11 @@ unsafe fn run() -> Result<()> {
     error_check_object(graph.as_reference().into());
     graph.set_name("CANNY_GRAPH");
 
+    vxDirective(
+        graph.as_reference().into(),
+        vx_directive_e_VX_DIRECTIVE_ENABLE_PERFORMANCE as vx_enum,
+    );
+
     let mut input_rgb_image = vxCreateImage(
         context.as_raw(),
         width,
@@ -110,13 +115,10 @@ unsafe fn run() -> Result<()> {
     ];
 
     for node in nodes.iter_mut() {
-        print_node_attributes(*node);
         error_check_object(*node as vx_reference);
-        error_check_status(vxReleaseNode(node));
     }
 
     error_check_status(vxVerifyGraph(graph.into()));
-    print_graph_attributes(&mut graph);
 
     let image = imread(".images/selfie.jpg", IMREAD_COLOR)?;
     let mut resized = Mat::default()?;
@@ -206,6 +208,12 @@ unsafe fn run() -> Result<()> {
         ptr,
         addr.stride_y as usize,
     )?;
+
+    print_graph_attributes(&mut graph);
+    for node in nodes.iter_mut() {
+        print_node_attributes(*node);
+        error_check_status(vxReleaseNode(node));
+    }
 
     imshow("Canny Edge Detection", &mat)?;
     wait_key(0)?;

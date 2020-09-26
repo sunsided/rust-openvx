@@ -1,5 +1,5 @@
 #[macro_use]
-pub mod macros;
+mod macros;
 
 mod asraw;
 mod checkstatus;

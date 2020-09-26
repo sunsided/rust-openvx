@@ -124,6 +124,14 @@ mod tests {
     use libopenvx_sys::*;
 
     #[test]
+    fn constants_are_enum_directive() {
+        assert_eq!(
+            vx_enum_type!(constants::VX_DIRECTIVE_DISABLE_LOGGING),
+            vx_enum_e_VX_ENUM_DIRECTIVE
+        );
+    }
+
+    #[test]
     fn directives_new() {
         assert_eq!(
             VxDirective::new(vx_directive_e_VX_DIRECTIVE_DISABLE_LOGGING),

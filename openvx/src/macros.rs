@@ -9,7 +9,6 @@ macro_rules! vx_type {
 
 /// A macro to extract the enum type from an enumerated value.
 #[allow(unused_macros)]
-// TODO: Needs testing
 macro_rules! vx_enum_type {
     ($e:expr) => {
         (($e as libopenvx_sys::vx_uint32) & libopenvx_sys::VX_ENUM_TYPE_MASK) >> 12
@@ -43,7 +42,6 @@ macro_rules! vx_kernel_base {
 }
 
 /// Defines the manner in which to combine the Vendor and Object IDs to get the base value of the enumeration.
-// TODO: Needs testing
 macro_rules! vx_enum_base {
     ($type:tt, $vendor:expr, $id:expr) => {
         ((($vendor as libopenvx_sys::vx_uint32) << 20) | (($id as libopenvx_sys::vx_uint32) << 12))

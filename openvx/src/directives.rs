@@ -4,12 +4,12 @@ use libopenvx_sys::{vxDirective, vx_directive_e, vx_enum, vx_enum_e_VX_ENUM_DIRE
 /// Constants for the `vxDirective` API.
 pub mod constants {
     use libopenvx_sys::{
-        vx_directive_e, vx_enum_e, vx_enum_e_VX_ENUM_DIRECTIVE, vx_vendor_id_e_VX_ID_KHRONOS,
+        vx_directive_e, vx_enum_e_VX_ENUM_DIRECTIVE, vx_vendor_id_e_VX_ID_KHRONOS,
     };
 
     /// Base value for directive values.
-    pub const VX_ENUM_DIRECTIVE_BASE: vx_enum_e = vx_enum_base!(
-        vx_enum_e,
+    pub const VX_ENUM_DIRECTIVE_BASE: vx_directive_e = vx_enum_base!(
+        vx_directive_e,
         vx_vendor_id_e_VX_ID_KHRONOS,
         vx_enum_e_VX_ENUM_DIRECTIVE
     );

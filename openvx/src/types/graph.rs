@@ -1,9 +1,12 @@
 use crate::performance::Performance;
-use crate::{AsVxReference, Release, Result, VxGraphState, VxReference, VxStatus};
+use crate::{
+    AsRaw, AsVxReference, Release, Result, VxContext, VxGraphState, VxReference, VxStatus,
+};
 use libopenvx_sys::{
-    vxQueryGraph, vxReleaseGraph, vx_enum, vx_graph, vx_graph_attribute_e_VX_GRAPH_NUMNODES,
-    vx_graph_attribute_e_VX_GRAPH_NUMPARAMETERS, vx_graph_attribute_e_VX_GRAPH_PERFORMANCE,
-    vx_graph_attribute_e_VX_GRAPH_STATE, vx_graph_state_e, vx_perf_t, vx_size, vx_uint32,
+    vxCreateGraph, vxQueryGraph, vxReleaseGraph, vx_enum, vx_graph,
+    vx_graph_attribute_e_VX_GRAPH_NUMNODES, vx_graph_attribute_e_VX_GRAPH_NUMPARAMETERS,
+    vx_graph_attribute_e_VX_GRAPH_PERFORMANCE, vx_graph_attribute_e_VX_GRAPH_STATE,
+    vx_graph_state_e, vx_perf_t, vx_size, vx_uint32,
 };
 
 /// An opaque reference to a graph.
@@ -13,6 +16,15 @@ pub struct VxGraph {
 }
 
 impl VxGraph {
+    /// Creates a new [`VxGraph`] by calling [`vxCreateGraph`].
+    ///
+    /// [`VxGraph`]: struct.VxGraph.html
+    /// [`vxCreateGraph`]: ../../libopenvx_sys/fn.vxCreateGraph.html
+    pub fn create(context: &VxContext) -> VxGraph {
+        let graph = unsafe { vxCreateGraph(context.as_raw()) };
+        VxGraph::from(graph)
+    }
+
     pub fn as_raw(&self) -> vx_graph {
         self.raw
     }

@@ -29,7 +29,7 @@ unsafe fn run() -> Result<()> {
         .enable_performance_counters()
         .expect("Unable to enable performance counters");
 
-    let mut graph = context.create_graph();
+    let mut graph = VxGraph::create(&context);
     graph
         .check_status()
         .expect("Graph was invalid")

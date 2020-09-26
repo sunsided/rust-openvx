@@ -1,5 +1,5 @@
 use crate::types::{AsVxReference, VxReference};
-use crate::{AsRaw, Release, Result, SetDirective, VxDirective, VxGraph, VxStatus};
+use crate::{AsRaw, Release, Result, SetDirective, VxDirective, VxStatus};
 use libopenvx_sys::*;
 
 /// An opaque reference to the implementation context.
@@ -12,6 +12,10 @@ impl VxContext {
         Self { raw: context }
     }
 
+    /// Creates a new [`VxContext`] by calling [`vxCreateContext`].
+    ///
+    /// [`VxContext`]: struct.VxContext.html
+    /// [`vxCreateContext`]: ../../libopenvx_sys/fn.vxCreateContext.html
     pub fn create() -> Self {
         let context = unsafe { vxCreateContext() };
         Self::wrap(context)
@@ -52,11 +56,6 @@ impl VxContext {
     pub fn disable_performance_counters(&self) -> Result<&Self> {
         self.set_directive(VxDirective::DisablePerformance)?;
         Ok(self)
-    }
-
-    pub fn create_graph(&self) -> VxGraph {
-        let graph = unsafe { vxCreateGraph(self.raw) };
-        VxGraph::from(graph)
     }
 }
 

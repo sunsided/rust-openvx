@@ -35,33 +35,17 @@ unsafe fn run() -> Result<()> {
         .expect("Graph was invalid")
         .set_name("CANNY_GRAPH");
 
-    let mut input_rgb_image = vxCreateImage(
-        context.as_raw(),
-        width,
-        height,
-        vx_df_image_e_VX_DF_IMAGE_RGB as vx_df_image,
-    );
-    let mut output_filtered_image = vxCreateImage(
-        context.as_raw(),
-        width,
-        height,
-        vx_df_image_e_VX_DF_IMAGE_U8 as vx_df_image,
-    );
+    let mut input_rgb_image =
+        vxCreateImage(context.as_raw(), width, height, ImageType::RGB.to_raw());
+    let mut output_filtered_image =
+        vxCreateImage(context.as_raw(), width, height, ImageType::U8.to_raw());
     error_check_object(input_rgb_image as vx_reference);
     error_check_object(output_filtered_image as vx_reference);
 
-    let mut yuv_image = vxCreateVirtualImage(
-        graph.as_raw(),
-        width,
-        height,
-        vx_df_image_e_VX_DF_IMAGE_IYUV as vx_df_image,
-    );
-    let mut luma_image = vxCreateVirtualImage(
-        graph.as_raw(),
-        width,
-        height,
-        vx_df_image_e_VX_DF_IMAGE_U8 as vx_df_image,
-    );
+    let mut yuv_image =
+        vxCreateVirtualImage(graph.as_raw(), width, height, ImageType::IYUV.to_raw());
+    let mut luma_image =
+        vxCreateVirtualImage(graph.as_raw(), width, height, ImageType::U8.to_raw());
     error_check_object(yuv_image as vx_reference);
     error_check_object(luma_image as vx_reference);
 

@@ -4,6 +4,7 @@ mod macros;
 mod asraw;
 mod checkstatus;
 mod directives;
+mod imagetype;
 pub mod name;
 mod performance;
 mod release;
@@ -16,6 +17,7 @@ mod vxstatus;
 pub use crate::asraw::AsRaw;
 pub use crate::checkstatus::CheckStatus;
 pub use crate::directives::{SetDirective, VxDirective};
+pub use crate::imagetype::ImageType;
 pub use crate::name::{GetName, SetName};
 pub use crate::performance::Performance;
 pub use crate::reference::{AsVxReference, ReferenceCount, VxReference};
@@ -28,6 +30,7 @@ pub use crate::vxstatus::VxStatus;
 
 pub mod constants {
     pub use crate::directives::constants as directives;
+    pub use crate::imagetype::constants as images;
 
     // TODO: The following values should be moved to more appropriate locations.
     pub mod assorted {

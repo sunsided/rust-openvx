@@ -14,6 +14,7 @@ mod vxstatus;
 pub use crate::asraw::AsRaw;
 pub use crate::checkstatus::CheckStatus;
 pub use crate::name::{GetName, SetName};
+pub use crate::reference::{AsVxReference, Check, VxReference};
 pub use crate::release::Release;
 pub use crate::result::Result;
 pub use crate::types::*;

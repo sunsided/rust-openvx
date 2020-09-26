@@ -6,7 +6,7 @@ use libopenvx_sys::{
 use std::borrow::Borrow;
 
 pub trait SetName {
-    fn set_name<S>(&mut self, name: S) -> &mut Self
+    fn set_name<S>(&self, name: S) -> &Self
     where
         S: Borrow<str>;
 }
@@ -19,7 +19,7 @@ impl<P> SetName for P
 where
     P: AsVxReference,
 {
-    fn set_name<S>(&mut self, name: S) -> &mut Self
+    fn set_name<S>(&self, name: S) -> &Self
     where
         S: Borrow<str>,
     {

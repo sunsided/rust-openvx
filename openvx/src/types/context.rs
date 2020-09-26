@@ -22,7 +22,7 @@ impl VxContext {
         Self::wrap(context)
     }
 
-    pub fn enable_logging(&mut self) {
+    pub fn enable_logging(&self) -> &Self {
         // https://www.khronos.org/registry/OpenVX/specs/1.3/html/OpenVX_Specification_1_3.html#group_log
         unsafe {
             vxRegisterLogCallback(
@@ -31,12 +31,14 @@ impl VxContext {
                 vx_bool_e_vx_true_e as vx_enum, // TODO: Pass re-entrancy flag to caller
             );
         }
+        self
     }
 
-    pub fn disable_logging(&mut self) {
+    pub fn disable_logging(&mut self) -> &Self {
         unsafe {
             vxRegisterLogCallback(self.as_raw(), None, vx_bool_e_vx_false_e as vx_enum);
         }
+        self
     }
 
     pub fn create_graph(&self) -> VxGraph {
@@ -80,7 +82,7 @@ extern "C" fn log_callback(
 impl AsRaw for VxContext {
     type Result = vx_context;
 
-    fn as_raw(&mut self) -> Self::Result {
+    fn as_raw(&self) -> Self::Result {
         self.raw
     }
 }

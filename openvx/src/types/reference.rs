@@ -1,9 +1,10 @@
 use crate::name::set_name;
-use crate::SetName;
+use crate::{SetName, VxStatus};
 use libopenvx_sys::{
-    vxQueryReference, vx_context, vx_convolution, vx_delay, vx_distribution, vx_enum, vx_graph,
-    vx_image, vx_kernel, vx_lut, vx_matrix, vx_node, vx_parameter, vx_pyramid, vx_reference,
-    vx_reference_attribute_e_VX_REFERENCE_COUNT, vx_scalar, vx_size, vx_threshold, vx_uint32,
+    vxGetStatus, vxQueryReference, vx_context, vx_convolution, vx_delay, vx_distribution, vx_enum,
+    vx_graph, vx_image, vx_kernel, vx_lut, vx_matrix, vx_node, vx_parameter, vx_pyramid,
+    vx_reference, vx_reference_attribute_e_VX_REFERENCE_COUNT, vx_scalar, vx_size, vx_threshold,
+    vx_uint32,
 };
 use std::borrow::Borrow;
 
@@ -36,10 +37,36 @@ impl VxReference {
 
         ref_count as usize
     }
+
+    pub fn check(&self) {
+        let status = unsafe { vxGetStatus(self.raw) };
+        let status = VxStatus::from(status);
+        if status != VxStatus::Success {
+            panic!("ERROR: failed with status {}", status);
+        }
+    }
+}
+
+pub trait Check {
+    fn check_status(&self) -> &Self;
+}
+
+impl<P> Check for P
+where
+    P: AsVxReference,
+{
+    fn check_status(&self) -> &Self {
+        let status = unsafe { vxGetStatus(self.as_reference().raw) };
+        let status = VxStatus::from(status);
+        if status != VxStatus::Success {
+            panic!("ERROR: failed with status {}", status);
+        }
+        self
+    }
 }
 
 impl SetName for VxReference {
-    fn set_name<S>(&mut self, name: S) -> &mut Self
+    fn set_name<S>(&self, name: S) -> &Self
     where
         S: Borrow<str>,
     {

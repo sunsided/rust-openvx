@@ -28,7 +28,7 @@ pub unsafe fn print_graph_attributes(graph: &VxGraph) {
     );
 
     println!(
-        " VX_TYPE_GRAPH: {}, {} nodes, {}, avg perf {}, {} parameters, {} refs",
+        "VX_TYPE_GRAPH: {}, {} nodes, {}, avg perf {}, {} parameters, {} refs",
         ref_name,
         num_nodes,
         state,
@@ -96,7 +96,7 @@ pub unsafe fn print_node_attributes(node: vx_node) {
     let ref_name = ref_name_from_cstr(ref_name);
 
     println!(
-        " VX_TYPE_NODE: {}, {} params, avg perf {}, {}, {} refs",
+        "VX_TYPE_NODE: {}, {} params, avg perf {}, {}, {} refs",
         ref_name,
         num_params,
         perf.avg as f64 / 1000000000.0f64,

@@ -1,4 +1,4 @@
-use crate::{CheckStatus, VxError, VxStatus};
+use crate::{VxError, VxStatus};
 
 /// [`Result<T>`][`Result`] is the type used for returning and propagating
 /// errors. It is an enum with the variants, [`Ok(T)`], representing
@@ -17,14 +17,6 @@ use crate::{CheckStatus, VxError, VxStatus};
 /// [`Ok(T)`]: type.Result.html#variant.Ok
 /// [`Err(VxError)`]: type.Result.html#variant.Err
 pub type Result<T> = std::result::Result<T, VxError>;
-
-impl<T> CheckStatus for Result<T> {
-    fn check_status(&self) {
-        if let Err(err) = self {
-            panic!("ERROR: failed with status {}", err);
-        }
-    }
-}
 
 impl<T> Into<VxStatus> for Result<T> {
     fn into(self) -> VxStatus {

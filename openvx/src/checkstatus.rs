@@ -1,3 +1,5 @@
+use crate::Result;
+
 pub trait CheckStatus {
-    fn check_status(&self);
+    fn check_status(&self) -> Result<&Self>;
 }

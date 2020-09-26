@@ -3,6 +3,7 @@ pub mod macros;
 
 mod asraw;
 mod checkstatus;
+mod directives;
 pub mod name;
 mod release;
 mod result;
@@ -13,14 +14,19 @@ mod vxstatus;
 
 pub use crate::asraw::AsRaw;
 pub use crate::checkstatus::CheckStatus;
+pub use crate::directives::{SetDirective, VxDirective};
 pub use crate::name::{GetName, SetName};
-pub use crate::reference::{AsVxReference, Check, VxReference};
+pub use crate::reference::{AsVxReference, VxReference};
 pub use crate::release::Release;
 pub use crate::result::Result;
 pub use crate::types::*;
 pub use crate::vxerror::VxError;
 pub use crate::vxgraphstate::VxGraphState;
 pub use crate::vxstatus::VxStatus;
+
+pub mod constants {
+    pub use crate::directives::constants as directives;
+}
 
 use libopenvx_sys::*;
 
@@ -109,8 +115,11 @@ pub const VX_THRESHOLD_INPUT_FORMAT: vx_int32 =
 pub const VX_THRESHOLD_OUTPUT_FORMAT: vx_int32 =
     vx_attribute_base!(vx_vendor_id_e_VX_ID_KHRONOS, vx_type_e_VX_TYPE_THRESHOLD) + 0x8;
 
-pub const VX_BIDIRECTIONAL: vx_int32 =
-    vx_enum_base!(vx_vendor_id_e_VX_ID_KHRONOS, vx_enum_e_VX_ENUM_DIRECTION) + 0x2;
+pub const VX_BIDIRECTIONAL: vx_enum_e = vx_enum_base!(
+    vx_enum_e,
+    vx_vendor_id_e_VX_ID_KHRONOS,
+    vx_enum_e_VX_ENUM_DIRECTION
+) + 0x2;
 
 #[cfg(test)]
 mod tests {

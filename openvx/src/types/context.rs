@@ -1,16 +1,11 @@
 use crate::types::{AsVxReference, VxReference};
-use crate::{AsRaw, Release, Result, VxGraph, VxStatus};
+use crate::{AsRaw, Release, Result, SetDirective, VxDirective, VxGraph, VxStatus};
 use libopenvx_sys::*;
 
 /// An opaque reference to the implementation context.
 pub struct VxContext {
     raw: vx_context,
 }
-
-/*
-type LogCallbackFn =
-    fn(context: &Context, reference: VxReference, status: VxStatus, string: String);
- */
 
 impl VxContext {
     fn wrap(context: vx_context) -> Self {
@@ -22,7 +17,10 @@ impl VxContext {
         Self::wrap(context)
     }
 
-    pub fn enable_logging(&self) -> &Self {
+    /// Enables recording information for graph debugging.
+    pub fn enable_logging(&self) -> Result<&Self> {
+        self.set_directive(VxDirective::EnableLogging)?;
+
         // https://www.khronos.org/registry/OpenVX/specs/1.3/html/OpenVX_Specification_1_3.html#group_log
         unsafe {
             vxRegisterLogCallback(
@@ -31,14 +29,29 @@ impl VxContext {
                 vx_bool_e_vx_true_e as vx_enum, // TODO: Pass re-entrancy flag to caller
             );
         }
-        self
+        Ok(self)
     }
 
-    pub fn disable_logging(&mut self) -> &Self {
+    /// Disables recording information for graph debugging.
+    pub fn disable_logging(&self) -> Result<&Self> {
+        self.set_directive(VxDirective::DisableLogging)?;
+
         unsafe {
             vxRegisterLogCallback(self.as_raw(), None, vx_bool_e_vx_false_e as vx_enum);
         }
-        self
+        Ok(self)
+    }
+
+    /// Enables performance counters for the context.
+    pub fn enable_performance_counters(&self) -> Result<&Self> {
+        self.set_directive(VxDirective::EnablePerformance)?;
+        Ok(self)
+    }
+
+    /// Disables performance counters for the context. By default performance counters are disabled.
+    pub fn disable_performance_counters(&self) -> Result<&Self> {
+        self.set_directive(VxDirective::DisablePerformance)?;
+        Ok(self)
     }
 
     pub fn create_graph(&self) -> VxGraph {

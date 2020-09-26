@@ -23,21 +23,17 @@ unsafe fn run() -> Result<()> {
     let height: vx_uint32 = 512;
 
     let mut context = VxContext::create();
+    context.check_status().expect("Context was invalid");
+    context.enable_logging().expect("Unable to enable logging");
     context
-        .check_status()
-        .expect("Context was invalid")
-        .enable_logging();
+        .enable_performance_counters()
+        .expect("Unable to enable performance counters");
 
     let mut graph = context.create_graph();
     graph
         .check_status()
         .expect("Graph was invalid")
         .set_name("CANNY_GRAPH");
-
-    vxDirective(
-        graph.as_reference().into(),
-        vx_directive_e_VX_DIRECTIVE_ENABLE_PERFORMANCE as vx_enum,
-    );
 
     let mut input_rgb_image = vxCreateImage(
         context.as_raw(),
@@ -225,12 +221,12 @@ unsafe fn run() -> Result<()> {
 
     error_check_status(vxUnmapImagePatch(output_filtered_image, map_id));
 
-    graph.release().check_status();
+    graph.release().expect("Releasing graph failed");
     error_check_status(vxReleaseImage(&mut yuv_image));
     error_check_status(vxReleaseImage(&mut luma_image));
     error_check_status(vxReleaseImage(&mut input_rgb_image));
     error_check_status(vxReleaseImage(&mut output_filtered_image));
-    context.release().check_status();
+    context.release().expect("Releasing context failed");
 
     Ok(())
 }

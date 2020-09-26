@@ -3,6 +3,7 @@ use core::fmt;
 use libopenvx_sys::*;
 use std::cmp::Ordering;
 
+/// The enumeration of all status codes.
 #[derive(Debug, Eq, Copy, Clone, Ord, Hash)]
 pub enum VxStatus {
     /// Encodes the success value.
@@ -29,7 +30,7 @@ impl VxStatus {
 
     /// Converts this instance into a [`vx_status_e`].
     ///
-    /// [`vx_status_e`]: ../libopenvx_sys/type.c.html
+    /// [`vx_status_e`]: ../libopenvx_sys/type.vx_status_e.html
     ///
     /// # Examples
     ///
@@ -38,10 +39,10 @@ impl VxStatus {
     /// ```
     /// use openvx::{VxStatus, VxError};
     ///
-    /// let x: vxstatus = VxStatus::Success;
+    /// let x: VxStatus = VxStatus::Success;
     /// assert_eq!(x.to_raw(), libopenvx_sys::vx_status_e_VX_SUCCESS);
     ///
-    /// let x: vxstatus = VxStatus::Error(VxError::Failure);
+    /// let x: VxStatus = VxStatus::Error(VxError::Failure);
     /// assert_eq!(x.to_raw(), libopenvx_sys::vx_status_e_VX_FAILURE);
     /// ```
     pub const fn to_raw(&self) -> vx_status_e {

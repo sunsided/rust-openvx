@@ -1,5 +1,5 @@
 use crate::name::set_name;
-use crate::{Result, SetName, VxStatus};
+use crate::{CheckStatus, Result, SetName, VxStatus};
 use libopenvx_sys::{
     vxGetStatus, vxQueryReference, vx_context, vx_convolution, vx_delay, vx_distribution, vx_enum,
     vx_graph, vx_image, vx_kernel, vx_lut, vx_matrix, vx_node, vx_parameter, vx_pyramid,
@@ -39,11 +39,7 @@ impl VxReference {
     }
 }
 
-pub trait Check {
-    fn check_status(&self) -> Result<&Self>;
-}
-
-impl<P> Check for P
+impl<P> CheckStatus for P
 where
     P: AsVxReference,
 {

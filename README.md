@@ -11,6 +11,13 @@ Here's an example input and output of the Canny Edge Detection sample.
 
 ![](.readme/canny.png)
 
+```text
+VX_TYPE_GRAPH: CANNY_GRAPH, 3 nodes, VX_GRAPH_STATE_COMPLETED, avg perf 0.044175636, 0 parameters, 1 refs
+VX_TYPE_NODE: RGB_TO_YUV, 2 params, avg perf 0.002818527, VX_SUCCESS, 1 refs
+VX_TYPE_NODE: EXTRACT_LUMA, 3 params, avg perf 0.002013746, VX_SUCCESS, 1 refs
+VX_TYPE_NODE: CANNY_EDGE, 5 params, avg perf 0.039333154, VX_SUCCESS, 1 refs
+```
+
 Note that for some reason the graph release operation 
 
 ```rust

@@ -6,6 +6,7 @@ use std::cmp::Ordering;
 use std::convert::TryFrom;
 use std::fmt::Display;
 
+/// The enumeration of all error status codes.
 #[derive(Debug, Eq, Copy, Clone, Ord, Hash)]
 pub enum VxError {
     /// Indicates a generic error code, used when no other describes the error.
@@ -111,7 +112,21 @@ impl VxError {
         }
     }
 
-    pub const fn to_raw(self) -> vx_status_e {
+    /// Converts this instance into a [`vx_status_e`].
+    ///
+    /// [`vx_status_e`]: ../libopenvx_sys/type.vx_status_e.html
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use openvx::{VxStatus, VxError};
+    ///
+    /// let x: VxStatus = VxStatus::Error(VxError::Failure);
+    /// assert_eq!(x.to_raw(), libopenvx_sys::vx_status_e_VX_FAILURE);
+    /// ```
+    pub const fn to_raw(&self) -> vx_status_e {
         match self {
             VxError::NotImplemented => vx_status_e_VX_ERROR_NOT_IMPLEMENTED,
             VxError::NotSupported => vx_status_e_VX_ERROR_NOT_SUPPORTED,
@@ -137,7 +152,7 @@ impl VxError {
             VxError::MultipleWriters => vx_status_e_VX_ERROR_MULTIPLE_WRITERS,
             VxError::ReferenceNonzero => vx_status_e_VX_ERROR_REFERENCE_NONZERO,
             VxError::Failure => vx_status_e_VX_FAILURE,
-            VxError::Unknown { code } => code,
+            VxError::Unknown { code } => *code,
         }
     }
 }

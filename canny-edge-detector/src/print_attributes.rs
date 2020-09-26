@@ -2,11 +2,9 @@ use libopenvx_sys::*;
 use openvx::*;
 
 pub unsafe fn print_graph_attributes(graph: &VxGraph) {
-    // http://software-dl.ti.com/jacinto7/esd/processor-sdk-rtos-jacinto7/latest/exports/docs/tiovx/docs/user_guide/vx__tutorial__image__color__convert_8c_source.html
-
     let num_nodes = graph.get_num_nodes();
     let num_params = graph.get_num_parameters();
-    let ref_count = graph.as_reference().get_reference_count();
+    let ref_count = graph.get_reference_count();
     let state = graph.get_state();
     let ref_name = graph.get_name();
     let perf = graph.get_performance();

@@ -21,14 +21,24 @@ impl VxReference {
     pub fn is_null(&self) -> bool {
         self.raw.is_null()
     }
+}
 
+pub trait ReferenceCount {
     /// Returns the reference count of the object.
-    pub fn get_reference_count(&self) -> usize {
+    fn get_reference_count(&self) -> usize;
+}
+
+impl<P> ReferenceCount for P
+where
+    P: AsVxReference,
+{
+    /// Returns the reference count of the object.
+    fn get_reference_count(&self) -> usize {
         let mut ref_count: vx_uint32 = 0;
 
         unsafe {
             vxQueryReference(
-                self.raw,
+                self.as_reference().raw,
                 vx_reference_attribute_e_VX_REFERENCE_COUNT as vx_enum,
                 &mut ref_count as *mut _ as *mut std::ffi::c_void,
                 std::mem::size_of_val(&ref_count) as vx_size,

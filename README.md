@@ -3,7 +3,10 @@
 This repo consists of the following parts:
 
 - [openvx-sys](openvx-sys) is the bindgen-generated Rust wrapper around OpenVX,
-- [openvx](openvx) contains some Rusty helpers
+- [openvx](openvx) contains a Rust-y wrapper around the sys crate.
+
+Test applications:
+
 - [canny-edge-detector](canny-edge-detector/src/main.rs) contains a port of the Canny Edge Detector sample
   of the [OpenVX Samples](https://github.com/KhronosGroup/openvx-samples).
 

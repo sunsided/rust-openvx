@@ -15,7 +15,7 @@ impl VxKernel {
 }
 
 impl AsVxReference for VxKernel {
-    fn as_reference(&mut self) -> VxReference {
+    fn as_reference(&self) -> VxReference {
         VxReference::from(self.raw)
     }
 }

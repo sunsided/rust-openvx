@@ -51,13 +51,13 @@ unsafe fn run() -> Result<()> {
     error_check_object(output_filtered_image as vx_reference);
 
     let mut yuv_image = vxCreateVirtualImage(
-        graph.into(),
+        graph.as_raw(),
         width,
         height,
         vx_df_image_e_VX_DF_IMAGE_IYUV as vx_df_image,
     );
     let mut luma_image = vxCreateVirtualImage(
-        graph.into(),
+        graph.as_raw(),
         width,
         height,
         vx_df_image_e_VX_DF_IMAGE_U8 as vx_df_image,
@@ -89,12 +89,12 @@ unsafe fn run() -> Result<()> {
     let gradient_size: vx_int32 = 3;
     let mut nodes = vec![
         set_node_name(
-            vxColorConvertNode(graph.into(), input_rgb_image, yuv_image),
+            vxColorConvertNode(graph.as_raw(), input_rgb_image, yuv_image),
             "RGB_TO_YUV",
         ),
         set_node_name(
             vxChannelExtractNode(
-                graph.into(),
+                graph.as_raw(),
                 yuv_image,
                 vx_channel_e_VX_CHANNEL_Y as vx_enum,
                 luma_image,
@@ -103,7 +103,7 @@ unsafe fn run() -> Result<()> {
         ),
         set_node_name(
             vxCannyEdgeDetectorNode(
-                graph.into(),
+                graph.as_raw(),
                 luma_image,
                 hyst,
                 gradient_size,
@@ -118,7 +118,7 @@ unsafe fn run() -> Result<()> {
         error_check_object(*node as vx_reference);
     }
 
-    error_check_status(vxVerifyGraph(graph.into()));
+    error_check_status(vxVerifyGraph(graph.as_raw()));
 
     let image = imread(".images/selfie.jpg", IMREAD_COLOR)?;
     let mut resized = Mat::default()?;
@@ -167,7 +167,7 @@ unsafe fn run() -> Result<()> {
         vx_memory_type_e_VX_MEMORY_TYPE_HOST as vx_enum,
     ));
 
-    error_check_status(vxProcessGraph(graph.into()));
+    error_check_status(vxProcessGraph(graph.as_raw()));
 
     let rect = vx_rectangle_t {
         start_x: 0 as vx_uint32,
@@ -221,7 +221,7 @@ unsafe fn run() -> Result<()> {
 
     error_check_status(vxUnmapImagePatch(output_filtered_image, map_id));
 
-    error_check_status(vxReleaseGraph(&mut graph.into()));
+    graph.release().check_status();
     error_check_status(vxReleaseImage(&mut yuv_image));
     error_check_status(vxReleaseImage(&mut luma_image));
     error_check_status(vxReleaseImage(&mut input_rgb_image));

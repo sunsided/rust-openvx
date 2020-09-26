@@ -14,7 +14,7 @@ impl VxPyramid {
 }
 
 impl AsVxReference for VxPyramid {
-    fn as_reference(&mut self) -> VxReference {
+    fn as_reference(&self) -> VxReference {
         VxReference::from(self.raw)
     }
 }

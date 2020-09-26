@@ -1,7 +1,7 @@
 use libopenvx_sys::*;
 use openvx::*;
 
-pub unsafe fn print_graph_attributes(graph: &mut VxGraph) {
+pub unsafe fn print_graph_attributes(graph: &VxGraph) {
     // http://software-dl.ti.com/jacinto7/esd/processor-sdk-rtos-jacinto7/latest/exports/docs/tiovx/docs/user_guide/vx__tutorial__image__color__convert_8c_source.html
 
     let num_nodes = graph.get_num_nodes();
@@ -21,7 +21,7 @@ pub unsafe fn print_graph_attributes(graph: &mut VxGraph) {
     };
 
     vxQueryGraph(
-        (*graph).into(),
+        graph.as_raw(),
         vx_graph_attribute_e_VX_GRAPH_PERFORMANCE as vx_enum,
         &mut perf as *mut _ as *mut std::ffi::c_void,
         std::mem::size_of_val(&perf) as vx_size,

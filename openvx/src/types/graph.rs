@@ -1,17 +1,21 @@
-use crate::{AsVxReference, VxGraphState, VxReference};
+use crate::{AsVxReference, Release, Result, VxGraphState, VxReference, VxStatus};
 use libopenvx_sys::{
-    vxQueryGraph, vx_enum, vx_graph, vx_graph_attribute_e_VX_GRAPH_NUMNODES,
+    vxQueryGraph, vxReleaseGraph, vx_enum, vx_graph, vx_graph_attribute_e_VX_GRAPH_NUMNODES,
     vx_graph_attribute_e_VX_GRAPH_NUMPARAMETERS, vx_graph_attribute_e_VX_GRAPH_PERFORMANCE,
     vx_graph_attribute_e_VX_GRAPH_STATE, vx_graph_state_e, vx_perf_t, vx_size, vx_uint32,
 };
 
 /// An opaque reference to a graph.
-#[derive(Debug, Hash, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, Hash, PartialEq, Eq)]
 pub struct VxGraph {
     raw: vx_graph,
 }
 
 impl VxGraph {
+    pub fn as_raw(&self) -> vx_graph {
+        self.raw
+    }
+
     #[allow(dead_code)]
     pub fn is_null(&self) -> bool {
         self.raw.is_null()
@@ -95,8 +99,27 @@ impl VxGraph {
     }
 }
 
+impl Release for VxGraph {
+    fn release(&mut self) -> Result<()> {
+        if self.raw.is_null() {
+            return Ok(());
+        }
+
+        let status = unsafe { vxReleaseGraph(&mut self.raw) };
+        self.raw = std::ptr::null_mut();
+
+        VxStatus::new_result(status, ())
+    }
+}
+
+impl Drop for VxGraph {
+    fn drop(&mut self) {
+        self.release().unwrap();
+    }
+}
+
 impl AsVxReference for VxGraph {
-    fn as_reference(&mut self) -> VxReference {
+    fn as_reference(&self) -> VxReference {
         VxReference::from(self.raw)
     }
 }

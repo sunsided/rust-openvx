@@ -86,7 +86,7 @@ impl AsRaw for VxContext {
 }
 
 impl AsVxReference for VxContext {
-    fn as_reference(&mut self) -> VxReference {
+    fn as_reference(&self) -> VxReference {
         assert!(!self.raw.is_null());
         VxReference::from(self.raw as vx_reference)
     }

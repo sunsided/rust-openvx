@@ -15,7 +15,7 @@ impl VxLut {
 }
 
 impl AsVxReference for VxLut {
-    fn as_reference(&mut self) -> VxReference {
+    fn as_reference(&self) -> VxReference {
         VxReference::from(self.raw)
     }
 }

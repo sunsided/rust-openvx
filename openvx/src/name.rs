@@ -12,7 +12,7 @@ pub trait SetName {
 }
 
 pub trait GetName {
-    fn get_name(&mut self) -> String;
+    fn get_name(&self) -> String;
 }
 
 impl<P> SetName for P
@@ -32,7 +32,7 @@ impl<P> GetName for P
 where
     P: AsVxReference,
 {
-    fn get_name(&mut self) -> String {
+    fn get_name(&self) -> String {
         let mut ref_name: *mut vx_char = std::ptr::null_mut();
 
         unsafe {

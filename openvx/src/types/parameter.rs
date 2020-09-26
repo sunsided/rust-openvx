@@ -15,7 +15,7 @@ impl VxParameter {
 }
 
 impl AsVxReference for VxParameter {
-    fn as_reference(&mut self) -> VxReference {
+    fn as_reference(&self) -> VxReference {
         VxReference::from(self.raw)
     }
 }

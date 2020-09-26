@@ -16,7 +16,7 @@ impl VxDistribution {
 }
 
 impl AsVxReference for VxDistribution {
-    fn as_reference(&mut self) -> VxReference {
+    fn as_reference(&self) -> VxReference {
         VxReference::from(self.raw)
     }
 }

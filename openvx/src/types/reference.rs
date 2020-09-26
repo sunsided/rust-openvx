@@ -8,7 +8,7 @@ use libopenvx_sys::{
 use std::borrow::Borrow;
 
 pub trait AsVxReference {
-    fn as_reference(&mut self) -> VxReference;
+    fn as_reference(&self) -> VxReference;
 }
 
 #[derive(Debug, Hash, PartialEq, Eq)]

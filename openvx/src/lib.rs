@@ -3,20 +3,22 @@ pub mod macros;
 
 mod asraw;
 mod checkstatus;
+pub mod name;
 mod release;
 mod result;
-pub mod setname;
 pub mod types;
 mod vxerror;
+mod vxgraphstate;
 mod vxstatus;
 
 pub use crate::asraw::AsRaw;
 pub use crate::checkstatus::CheckStatus;
+pub use crate::name::{GetName, SetName};
 pub use crate::release::Release;
 pub use crate::result::Result;
-pub use crate::setname::SetName;
 pub use crate::types::*;
 pub use crate::vxerror::VxError;
+pub use crate::vxgraphstate::VxGraphState;
 pub use crate::vxstatus::VxStatus;
 
 use libopenvx_sys::*;

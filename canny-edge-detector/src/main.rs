@@ -116,7 +116,7 @@ unsafe fn run() -> Result<()> {
     }
 
     error_check_status(vxVerifyGraph(graph.into()));
-    print_graph_attributes(graph.into());
+    print_graph_attributes(&mut graph);
 
     let image = imread(".images/selfie.jpg", IMREAD_COLOR)?;
     let mut resized = Mat::default()?;

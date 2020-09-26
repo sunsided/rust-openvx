@@ -5,7 +5,6 @@ use libopenvx_sys::{
     vx_graph_attribute_e_VX_GRAPH_NUMPARAMETERS, vx_graph_attribute_e_VX_GRAPH_PERFORMANCE,
     vx_graph_attribute_e_VX_GRAPH_STATE, vx_graph_state_e, vx_perf_t, vx_size, vx_uint32,
 };
-use static_assertions::_core::time::Duration;
 
 /// An opaque reference to a graph.
 #[derive(Debug, Hash, PartialEq, Eq)]
@@ -96,16 +95,7 @@ impl VxGraph {
             );
         }
 
-        Performance {
-            tmp: Duration::from_nanos(perf.tmp),
-            beg: Duration::from_nanos(perf.beg),
-            end: Duration::from_nanos(perf.end),
-            sum: Duration::from_nanos(perf.sum),
-            avg: Duration::from_nanos(perf.avg),
-            min: Duration::from_nanos(perf.min),
-            num: Duration::from_nanos(perf.num),
-            max: Duration::from_nanos(perf.max),
-        }
+        Performance::from(perf)
     }
 }
 

@@ -78,12 +78,13 @@ pub unsafe fn print_node_attributes(node: vx_node) {
     let status = VxStatus::from(status);
 
     let ref_name = ref_name_from_cstr(ref_name);
+    let perf = Performance::from(perf);
 
     println!(
         "VX_TYPE_NODE: {}, {} params, avg perf {}, {}, {} refs",
         ref_name,
         num_params,
-        perf.avg as f64 / 1000000000.0f64,
+        perf.avg.as_secs_f64(),
         status,
         ref_count
     );

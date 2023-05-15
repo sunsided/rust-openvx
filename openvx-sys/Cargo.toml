@@ -1,10 +1,12 @@
 [package]
 name = "openvx-sys"
 version = "0.1.0"
+description = "Native bindings to the OpenVX library"
 authors = ["Markus Mayer <widemeadows@gmail.com>"]
 edition = "2021"
-description = "Native bindings to the OpenVX library"
 keywords = ["openvx"]
+categories = ["computer-vision", "external-ffi-bindings"]
+license = "MIT"
 build = "build.rs"
 links = "openvx"
 

@@ -2,6 +2,7 @@
 name = "canny-edge-detector"
 version = "0.1.0"
 authors = ["Markus Mayer <widemeadows@gmail.com>"]
+license = "MIT"
 edition = "2021"
 publish = false
 

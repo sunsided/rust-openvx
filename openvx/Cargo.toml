@@ -1,9 +1,13 @@
 [package]
 name = "openvx"
 version = "0.1.0"
+description = "OpenVX wrapper"
 authors = ["Markus Mayer <widemeadows@gmail.com>"]
+keywords = ["openvx"]
+categories = ["computer-vision", "api-bindings"]
+license = "MIT"
 edition = "2021"
 
 [dependencies]
-openvx-sys = { path ="../openvx-sys" }
+openvx-sys = { path ="../openvx-sys", version="0.1.0" }
 static_assertions = "1.1.0"

@@ -56,12 +56,8 @@ where
     let reference: vx_reference = reference.into();
     assert!(!reference.is_null());
     unsafe {
-        vxSetReferenceName(
-            reference,
-            std::ffi::CString::new(name.borrow())
-                .expect("CString::new failed")
-                .as_ptr(),
-        );
+        let name = std::ffi::CString::new(name.borrow()).expect("CString::new failed");
+        vxSetReferenceName(reference, name.as_ptr());
     }
 
     reference

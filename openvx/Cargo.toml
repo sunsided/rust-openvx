@@ -5,6 +5,7 @@ description = "OpenVX wrapper"
 authors = ["Markus Mayer <widemeadows@gmail.com>"]
 keywords = ["openvx"]
 categories = ["computer-vision", "api-bindings"]
+repository = "https://github.com/sunsided/rust-openvx"
 license = "MIT"
 edition = "2021"
 

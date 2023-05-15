@@ -6,6 +6,7 @@ authors = ["Markus Mayer <widemeadows@gmail.com>"]
 edition = "2021"
 keywords = ["openvx"]
 categories = ["computer-vision", "external-ffi-bindings"]
+repository = "https://github.com/sunsided/rust-openvx"
 license = "MIT"
 build = "build.rs"
 links = "openvx"

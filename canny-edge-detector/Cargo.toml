@@ -4,9 +4,7 @@ version = "0.1.0"
 authors = ["Markus Mayer <widemeadows@gmail.com>"]
 edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 openvx-sys = { path ="../openvx-sys" }
 openvx = { path ="../openvx" }
-opencv = {version = "0.45", features = ["opencv-4", "buildtime-bindgen", "clang-runtime"]}
+opencv = { version = "0.81.3", default-features = false, features = ["imgproc", "highgui", "imgcodecs"] }

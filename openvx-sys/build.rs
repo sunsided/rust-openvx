@@ -22,11 +22,11 @@ fn main() {
         .header("wrapper.h")
         .detect_include_paths(true)
         // Create bindings for everything magical.
-        .whitelist_function("vx.*")
-        .whitelist_var("VX.*")
-        .whitelist_type("vx.*")
-        .whitelist_type("vxu.*")
-        .whitelist_recursively(true)
+        .allowlist_function("vx.*")
+        .allowlist_var("VX.*")
+        .allowlist_type("vx.*")
+        .allowlist_type("vxu.*")
+        .allowlist_recursively(true)
         // Doesn't appear to work right now, but maybe some day ...
         .generate_comments(true)
         // Suppress linter warnings.

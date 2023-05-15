@@ -1,5 +1,5 @@
 use crate::Result;
 
-pub trait Release: Drop {
+pub trait Release {
     fn release(&mut self) -> Result<()>;
 }

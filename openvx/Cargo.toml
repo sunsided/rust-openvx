@@ -1,11 +1,12 @@
 [package]
 name = "openvx"
-version = "0.1.0"
+version = "0.1.1"
 description = "OpenVX wrapper"
 authors = ["Markus Mayer <widemeadows@gmail.com>"]
 keywords = ["openvx"]
 categories = ["computer-vision", "api-bindings"]
 repository = "https://github.com/sunsided/rust-openvx"
+readme = "../README.md"
 license = "MIT"
 edition = "2021"
 

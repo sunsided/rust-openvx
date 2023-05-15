@@ -1,0 +1,3 @@
+[submodule "vendor/openvx-sample-impl"]
+	path = vendor/openvx-sample-impl
+	url = https://github.com/KhronosGroup/OpenVX-sample-impl.git

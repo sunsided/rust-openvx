@@ -71,8 +71,10 @@ python Build.py \
     --streaming --pipelining
 ```
 
+The commit was added as a git submodule at [vendor/openvx-sample-impl](vendor/openvx-sample-impl) for convenience.
+
 Building using `--conf_nnef` (the Neural Network Exchange Format) didn't work for some
-reason, and specifying `--opencl` always targeted NEON architecture, so didn't work. 
+reason, and specifying `--opencl` always targeted NEON architecture, so didn't work.
 
 To build the Rust projects, make sure the OpenVX library and headers are in scope:
 

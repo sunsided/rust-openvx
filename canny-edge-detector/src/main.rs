@@ -129,7 +129,7 @@ unsafe fn run() -> Result<()> {
 
     let cv_rgb_image_layout = vx_imagepatch_addressing_t {
         stride_x: 3 as vx_int32,
-        stride_y: *resized.mat_step().first().unwrap() as vx_int32,
+        stride_y: resized.mat_step().get(0) as vx_int32,
         // Default isn't implemented; not sure about these, but zeros seem to work.
         dim_x: 0 as vx_uint32,
         dim_y: 0 as vx_uint32,
@@ -185,7 +185,7 @@ unsafe fn run() -> Result<()> {
         vx_map_flag_e_VX_NOGAP_X as vx_uint32,
     ));
 
-    let mat = Mat::new_rows_cols_with_data(
+    let mat = Mat::new_rows_cols_with_data_unsafe(
         height as i32,
         width as i32,
         CV_8U,

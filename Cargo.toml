@@ -4,3 +4,4 @@ members = [
     "openvx",
     "canny-edge-detector"
 ]
+resolver = "2"

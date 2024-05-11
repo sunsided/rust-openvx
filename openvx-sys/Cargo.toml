@@ -16,6 +16,6 @@ name = "libopenvx_sys"
 path = "src/lib.rs"
 
 [build-dependencies]
-bindgen = "0.65.1"
+bindgen = "0.69.4"
 clang = { version = "2.0.0", features = ["runtime"] }
 

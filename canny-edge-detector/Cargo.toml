@@ -9,4 +9,4 @@ publish = false
 [dependencies]
 openvx-sys = { path ="../openvx-sys" }
 openvx = { path ="../openvx" }
-opencv = { version = "0.81.3", default-features = false, features = ["imgproc", "highgui", "imgcodecs"] }
+opencv = { version = "0.91.3", default-features = false, features = ["imgproc", "highgui", "imgcodecs"] }

@@ -1,0 +1,87 @@
+---
+name: Rust
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  openvx_setup:
+    name: Setup OpenVX
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Get commit hash of submodule
+        id: get-hash
+        run: echo "hash=$(git -C vendor/openvx-sample-impl rev-parse HEAD)" >> GITHUB_OUTPUT
+
+      - name: Setup caching
+        uses: actions/cache@v4
+        id: cache
+        with:
+          path: vendor/openvx-sample-impl/install
+          key: OpenVXCacheKey-${{ steps.get-hash.outputs.hash }}
+
+      - name: Install OpenCL
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ocl-icd-opencl-dev intel-opencl-icd cmake
+
+      - name: Build OpenVX
+        if: steps.cache.outputs.cache-hit != 'true'
+        working-directory: vendor/openvx-sample-impl
+        run: |
+          python Build.py \
+            --os=Linux --arch=64 --conf=Release \
+            --c=clang --cpp=clang \
+            --conf_vision --conf_nn \
+            --opencl_interop --enh_vision --ix \
+            --streaming --pipelining
+
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: openvx_artifacts
+          path: vendor/openvx-sample-impl/install/Linux
+
+  test:
+    name: Run tests
+    needs:
+      - openvx_setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download OpenVX artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: openvx_artifacts
+          path: vendor/openvx-sample-impl/install/Linux
+
+      - name: Set OpenVX path
+        run: |
+          echo "OPENVX_DIR=${GITHUB_WORKSPACE}/vendor/openvx-sample-impl/install/Linux/x64/Release" >> $GITHUB_ENV
+
+      - name: Set OpenVX library paths
+        run: |
+          echo "LIBRARY_PATH=${OPENVX_DIR}/bin" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=${OPENVX_DIR}/bin" >> $GITHUB_ENV
+
+      - name: Install OpenCL
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libclang-dev libopencv-dev ocl-icd-opencl-dev intel-opencl-icd
+
+      - run: env
+
+      - name: Run Tests
+        run: cargo test

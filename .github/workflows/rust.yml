@@ -81,7 +81,20 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libclang-dev libopencv-dev ocl-icd-opencl-dev intel-opencl-icd
 
-      - run: env
+      - name: Build libraries and sample
+        run: cargo build
 
-      - name: Run Tests
-        run: cargo test
+      - name: Run Docests
+        run: cargo test --doc
+
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
+      - name: Generate code coverage
+        run: cargo llvm-cov --all-features --workspace --lcov --output-path lcov.info
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4.0.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: lcov.info
+          fail_ci_if_error: true
+

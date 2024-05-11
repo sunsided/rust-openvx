@@ -19,6 +19,15 @@ pub const VX_FMT_REF: &[u8; 3] = b"%p\0";
 pub const VX_FMT_SIZE: &[u8; 4] = b"%zu\0";
 pub const VX_SCALE_UNITY: u32 = 1024;
 pub const VX_SCALE_PYRAMID_HALF: f64 = 0.5;
+pub const VX_ENUM_IX_USE: u32 = 24;
+pub const VX_TYPE_IMPORT: u32 = 2068;
+pub const VX_LIBRARY_KHR_CLASS_EXTENSION: u32 = 2;
+pub const VX_LIBRARY_KHR_PIPELINING_EXTENSION: u32 = 1;
+pub const VX_IMAGE_RAW_MAX_EXPOSURES: u32 = 3;
+pub const VX_KERNEL_SWAP_NAME: &[u8; 24] = b"org.khronos.openvx.swap\0";
+pub const VX_KERNEL_MOVE_NAME: &[u8; 24] = b"org.khronos.openvx.move\0";
+pub const VX_MAX_TILING_PLANES: u32 = 4;
+pub const VX_TYPE_USER_DATA_OBJECT: u32 = 2070;
 #[doc = "< \\brief The Khronos Group"]
 pub const vx_vendor_id_e_VX_ID_KHRONOS: vx_vendor_id_e = 0;
 #[doc = "< \\brief Texas Instruments, Inc."]
@@ -4856,4 +4865,1398 @@ extern "C" {
 extern "C" {
     #[doc = " \\brief [Immediate] Copy data from one object to another.\n \\param [in] context The reference to the overall context.\n \\param [in] input The input data object.\n \\param [out] output The output data object.\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_SUCCESS Success\n \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>.\n \\ingroup group_vision_function_copy"]
     pub fn vxuCopy(context: vx_context, input: vx_reference, output: vx_reference) -> vx_status;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _vx_import {
+    _unused: [u8; 0],
+}
+#[doc = " \\brief The Import Object. Import is a container of OpenVX objects, which may be retreived\n by name\n \\ingroup group_import"]
+pub type vx_import = *mut _vx_import;
+extern "C" {
+    #[doc = " \\brief Imports objects into a context from a vendor-specific format in memory.\\n\n\n \\details This function imports objects from a memory blob previously created using <tt>\\ref vxExportObjectsToMemory</tt>[*REQ*].\\n\n A pointer to memory is given where a list of references is stored, together with the list\n of uses which describes how the references are used. The number of references given and the\n list of uses must match that given upon export, or this function will not be sucessful[*REQ*].\\n\n The *uses* array specifies how the objects in the corresponding *refs* array will be imported:\n - <tt>\\ref VX_IX_USE_APPLICATION_CREATE</tt>\\n\n The application must create the object and supply the reference; the\n  meta-data of the object must match exactly the meta-data of the object when it was exported,\n  except that the name need not match[*REQ*].\\n\n  If the supplied reference has a different name to that stored, the supplied name is used[*REQ*].\n - <tt>\\ref VX_IX_USE_EXPORT_VALUES</tt>\\n\n The implementation will create the object and set the data in it[*REQ*].\\n\n Any data not defined at the time of export of the object will be set to a default value (zero in the\n absence of any other definition) upon import[*REQ*].\n - <tt>\\ref VX_IX_USE_NO_EXPORT_VALUES</tt>\\n\n The implementation will create the object and the importing application will set values as applicable[*REQ*].\n\n References are obtained from the import API for those objects whose references were listed at the time of export.\n These are not the same objects; they are equivalent objects created by the framework at import time.\n The implementation guarantees that references will be available and valid for all objects listed at the time\n of export, or the import will fail[*REQ*].\\n\n The import operation will fail if more than one object whose reference is listed at *refs*\n has been given the same non-zero length name (via <tt>\\ref vxSetReferenceName</tt>)[*REQ*].\\n\n The import will be unsuccessful if any of the parameters supplied is NULL[*REQ*].\\n\n After completion of the function the memory at *ptr* may be deallocated by the application as it will\n not be used by any of the created objects[*REQ*].\\n\n Any delays imported with graphs for which they are registered for auto-aging remain registered\n for auto-aging[*REQ*].\\n\n After import, a graph must execute with exactly the same effect with respect to its visible parameters\n as before export[*REQ*].\n \\note The *refs* array must be the correct length to hold all references of the import; this will be the same length\n that was supplied at the time of export. Only references for objects created by the application, where the\n corresponding *uses* entry is <tt>\\ref VX_IX_USE_APPLICATION_CREATE</tt> should be filled in by the application;\n all other entries will be supplied by the framework and may be initialised by the application to NULL. The *uses* array\n must have the identical length and content as given at the time of export, and the value of *numrefs* must also match;\n these measures increase confidence that the import contains the correct data.\n \\note Graph parameters may be changed after import by using the <tt>\\ref vxSetGraphParameterByIndex</tt> API, and\n images may also be changed by using the <tt>\\ref vxSwapImageHandle</tt> API.\n When <tt>\\ref vxSetGraphParameterByIndex</tt> is used, the framework will check that the new parameter is of the\n correct type to run with the graph, which cannot be re-verified. If the reference supplied is not suitable, an error\n will be returned, but there may be circumstances where changing graph parameters for unsuitable ones is not detected\n and could lead to implementation-dependent behaviour; one such circumstance is when the new parameters are images\n corresponding to overlapping regions of interest. The user should avoid these circumstances.\n In other words,\n  - The meta data of the new graph parameter must match the meta data of the graph parameter it replaces [*REQ*].\n  - A graph parameter must not be NULL [*REQ*].\n \\param [in] context context into which to import objects, must be valid [*REQ*].\n \\param [in] numrefs number of references to import, must match export[*REQ*].\n \\param [in,out] refs references imported or application-created data which must match\n meta-data of the export[*REQ*]\n \\param [in] uses how to import the references, must match export values[*REQ*]\n \\param [in] ptr pointer to binary buffer containing a valid binary export[*REQ*]\n \\param [in] length number of bytes at \\*ptr, i.e. the length of the export[*REQ*]\n \\return A <tt>\\ref vx_import</tt>[*REQ*].\n Calling <tt>\\ref vxGetStatus</tt> with the vx_import as a parameter will return VX_SUCCESS if the\n function was successful[*REQ*].\\n\n Another value is given to indicate that there was an error[*REQ*].\\n\n An implementation may provide several different error codes to give useful diagnostic information\n in the event of failure to import objects, but these are not required to indicate\n possibly recovery mechanisms, and for safety critical use assume errors are not recoverable.\n \\post <tt>\\ref vxReleaseImport</tt> is used to release the import object.\n \\post Use <tt>\\ref vxReleaseReference</tt> or an appropriate specific release function to release\n the references in the array refs when they are no longer required.\n \\ingroup group_import"]
+    pub fn vxImportObjectsFromMemory(
+        context: vx_context,
+        numrefs: vx_size,
+        refs: *mut vx_reference,
+        uses: *const vx_enum,
+        ptr: *const vx_uint8,
+        length: vx_size,
+    ) -> vx_import;
+}
+extern "C" {
+    #[doc = " \\brief Releases an import object when no longer required.\\n\n \\details This function releases the reference to the import object [*REQ*].\\n\n Other objects including those imported at the time of creation of the import object are unaffected[*REQ*].\\n\n \\param [in,out] import The pointer to the reference to the import object[*REQ*].\n \\post After returning sucessfully from this function the reference is zeroed[*REQ*].\n \\return A <tt>\\ref vx_status</tt> value.\n \\retval VX_SUCCESS If no errors occurred and the import was sucessfully released[*REQ*].\\n\n An error is indicated when the return value is not VX_SUCCESS[*REQ*].\\n\n An implementation may provide several different return values to give useful diagnostic\n information in the event of failure to export, but these are not required to indicate\n possibly recovery mechanisms, and for safety critical use assume errors are not recoverable.\n \\pre <tt>\\ref vxImportObjectsFromMemory</tt> is used to create an import object.\n \\ingroup group_import"]
+    pub fn vxReleaseImport(import: *mut vx_import) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Get a reference from the import object by name.\\n\n\n \\details All accessible references of the import object created using <tt>\\ref vxImportObjectsFromMemory</tt> are\n in the array *refs*, which is populated partly by the application before import, and partly by the\n framework. However, it may be more convenient to access the references in the import object without\n referring to this array, for example if the import object is passed as a parameter to another function.\n In this case, references may be retreived by name, assuming that <tt>\\ref vxSetReferenceName</tt>\n was called to assign a name to the reference.\n This function searches the given import for the given name and returns the associated reference[*REQ*].\\n\n The reference may have been named either before export or after import[*REQ*].\\n\n If more than one reference exists in the import with the given name, this is an error[*REQ*].\\n\n Only references in the array *refs* after calling <tt>\\ref vxImportObjectsFromMemory</tt> may be retrieved\n using this function[*REQ*].\\n\n A reference to a named object may be obtained from a valid import object using this API even if all other\n references to the object have been released[*REQ*].\n \\param [in] import The import object in which to find the name; the function will fail if this parameter\n is not valid[*REQ*].\n \\param [in] name The name to find, points to a string of at least one and less than VX_MAX_REFERENCE_NAME bytes\n followed by a zero byte; the function will fail if this is not valid[*REQ*].\n \\return A <tt>\\ref vx_reference</tt>[*REQ*].\\n\n Calling <tt>\\ref vxGetStatus</tt> with the reference as a parameter will return VX_SUCCESS if the function\n was successful[*REQ*].\\n\n Another value is given to indicate that there was an error[*REQ*].\\n\n On success, the reference count of the object in question is incremented[*REQ*].\\n\n An implementation may provide several different error codes to give useful diagnostic information\n in the event of failure to retrieve a reference, but these are not required to indicate\n possibly recovery mechanisms, and for safety critical use assume errors are not recoverable.\n \\pre <tt>\\ref vxSetReferenceName</tt> was used to name the reference.\n \\post use <tt>ref vxReleaseReference</tt> or appropriate specific release function to release a reference\n obtained by this method.\n \\ingroup group_import"]
+    pub fn vxGetImportReferenceByName(import: vx_import, name: *const vx_char) -> vx_reference;
+}
+#[doc = "< \\brief Buffer aliasing type enumeration."]
+pub const vx_buffer_aliasing_enum_e_VX_ENUM_BUFFER_ALIASING_TYPE: vx_buffer_aliasing_enum_e = 31;
+#[doc = " \\brief Extra enums.\n\n \\ingroup group_buffer_aliasing"]
+pub type vx_buffer_aliasing_enum_e = ::std::os::raw::c_uint;
+#[doc = " \\brief Dense processing on the buffer that can be aliased"]
+pub const vx_buffer_aliasing_processing_type_e_VX_BUFFER_ALIASING_PROCESSING_TYPE_DENSE:
+    vx_buffer_aliasing_processing_type_e = 126976;
+#[doc = " \\brief Sparse processing on the buffer that can be aliased"]
+pub const vx_buffer_aliasing_processing_type_e_VX_BUFFER_ALIASING_PROCESSING_TYPE_SPARSE:
+    vx_buffer_aliasing_processing_type_e = 126977;
+#[doc = " \\brief Type of processing the kernel will perform on the buffer\n\n Indicates what type of processing the kernel will perform on the buffer. The framework may use this information to\n arbitrate between requests.  For example, if there are two or three conflicting requests for buffer aliasing,\n then the framework may choose to prioritize a request which gives a performance improvement as compared with one\n that only saves memory but otherwise doesn't give a performance improvement.  For example, a kernel which performs\n sparse processing may need to first do a buffer copy before processing if the buffers are not aliased. However a kernel\n which performs dense processing will not need to do this.  So priority of the alias request may be given to the\n kernel which performs sparse processing.\n\n \\ingroup group_buffer_aliasing"]
+pub type vx_buffer_aliasing_processing_type_e = ::std::os::raw::c_uint;
+extern "C" {
+    #[doc = " \\brief Notifies framework that the kernel supports buffer aliasing of specified parameters\n\n This is intended to be called from within the vx_publish_kernels_f callback, for applicable\n kernels in between the call to the <tt>\\ref vxAddUserKernel</tt> function and the <tt>\\ref vxFinalizeKernel(kernel)</tt>\n function for the corresponding kernel.\n\n If a kernel can not support buffer aliasing of its parameters (for in-place processing),\n then it should not call this function.  However, if a kernel can support buffer aliasing of\n a pair of its parameters, then it may call this function with the appropriate parameter indices and\n priority value.\n\n Note that calling this function does not guarantee that the buffers will ultimatly be aliased by\n the framework. The framework may consider this hint as part of performance or memory optimization\n logic along with other factors such as graph topology, other competing hints, and if the parameters\n are virtual objects or not.\n\n \\param [in] kernel Kernel reference\n \\param [in] parameter_index_a Index of a kernel parameter to request for aliasing\n \\param [in] parameter_index_b Index of another kernel paramter to request to alias with parameter_index_a\n \\param [in] processing_type Indicate the type of processing on this buffer from the kernel\n              (See <tt>\\ref vx_buffer_aliasing_processing_type_e</tt>)\n\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_SUCCESS No errors.\n \\retval VX_ERROR_INVALID_REFERENCE kernel is not a valid reference\n \\retval VX_ERROR_INVALID_PARAMETERS parameter_index_a or parameter_index_b is NOT a valid kernel parameter index\n \\retval VX_FAILURE priority is not a supported enumeration value.\n\n \\ingroup group_buffer_aliasing"]
+    pub fn vxAliasParameterIndexHint(
+        kernel: vx_kernel,
+        parameter_index_a: vx_uint32,
+        parameter_index_b: vx_uint32,
+        processing_type: vx_enum,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Query framework if the specified parameters are aliased\n\n This is intended to be called from the vx_kernel_initialize_f or vx_kernel_f callback functions.\n\n If a kernel has called the vxAliasParameterIndexHint function during the vx_publish_kernels_f callback,\n then vxIsParameterAliased is the function that can be called in the init or processing function to\n query if the framework was able to alias the buffers specified.  Based on this information, the kernel\n may execute the kernel differently.\n\n \\param [in] node Node reference\n \\param [in] parameter_index_a Index of a kernel parameter to query for aliasing\n \\param [in] parameter_index_b Index of another kernel paramter to query to alias with parameter_index_a\n\n \\return A <tt>\\ref vx_bool</tt> value.\n \\retval vx_true_e The parameters are aliased.\n \\retval vx_false_e The parameters are not aliased.\n\n \\ingroup group_buffer_aliasing"]
+    pub fn vxIsParameterAliased(
+        node: vx_node,
+        parameter_index_a: vx_uint32,
+        parameter_index_b: vx_uint32,
+    ) -> vx_bool;
+}
+#[doc = " \\brief The Classifier Extension scan kernel.\n \\see group_classifier"]
+pub const vx_kernel_nn_ext_e_VX_KERNEL_SCAN_CLASSIFIER: vx_kernel_nn_ext_e = 8192;
+#[doc = " \\brief The list of Classifier Extension Kernels.\n \\ingroup group_classifier"]
+pub type vx_kernel_nn_ext_e = ::std::os::raw::c_uint;
+#[doc = "< \\brief Classifier model"]
+pub const vx_class_enum_e_VX_ENUM_CLASSIFIER_MODEL: vx_class_enum_e = 30;
+#[doc = " \\brief Classifier Extension type enums.\n \\ingroup group_classifier"]
+pub type vx_class_enum_e = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _vx_classifier_model {
+    _unused: [u8; 0],
+}
+#[doc = " \\brief classification model to be used in <tt>\\ref vxScanClassifierNode</tt>.\n The classification models are loadable by undefined binary format see <tt>\\ref vxImportClassifierModel</tt>.\n Extensions will be added to the specification, to support a defined binary format.\n \\ingroup group_object_classifier_model"]
+pub type vx_classifier_model = *mut _vx_classifier_model;
+#[doc = " \\brief Undefined binary format.\n Using this enumeration will result in an implementation defined behaviour."]
+pub const vx_classifier_model_format_e_VX_CLASSIFIER_MODEL_UNDEFINED: vx_classifier_model_format_e =
+    122880;
+#[doc = " \\brief Classifier model format enums.\n In the main specification only undefined binary format is supported. Extensions to the specification will be added in order to support specific binary format.\n \\ingroup group_object_classifier_model"]
+pub type vx_classifier_model_format_e = ::std::os::raw::c_uint;
+#[doc = "< \\brief A <tt>\\ref vx_classifier_model</tt>. type"]
+pub const vx_classifier_type_e_VX_TYPE_CLASSIFER_MODEL: vx_classifier_type_e = 44;
+#[doc = " \\brief The type enumeration lists all classifier extension types.\n \\ingroup group_object_classifier_model"]
+pub type vx_classifier_type_e = ::std::os::raw::c_uint;
+extern "C" {
+    #[doc = " \\brief Creates an opaque reference classifier model\n This function creates a classifier model to be used in <tt>\\ref vxScanClassifierNode</tt>. The object classifier object is a read-only constant object. It cannot be changed during graph execution.\n \\param [in] context Reference to the context where to create the ClassifierModel.\n \\param [in] format The binary format which contain the classifier model. See <tt>\\ref vx_classifier_model_format_e</tt>. Currently only undefined binary format is supported.\n Extensions will be added to the specification, to support a classification model defined binary format.\n \\param [in] ptr A memory pointer to the binary format.\n \\param [in] length size in bytes of binary format data.\n \\returns A ClassifierModel reference <tt>\\ref vx_classifier_model</tt>. Any possible errors preventing a\n successful creation should be checked using <tt>\\ref vxGetStatus</tt>.\n \\ingroup group_object_classifier_model"]
+    pub fn vxImportClassifierModel(
+        context: vx_context,
+        format: vx_enum,
+        ptr: *const vx_uint8,
+        length: vx_size,
+    ) -> vx_classifier_model;
+}
+extern "C" {
+    #[doc = " \\brief Releases a reference of an ClassifierModel object.\n The object may not be garbage collected until its total reference and its contained objects\n count is zero. After returning from this function the reference is zeroed/cleared.\n \\param [in] model The pointer to the ClassifierModel to release.\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval <tt>\\ref VX_SUCCESS</tt> No errors; all other values indicate failure\n \\retval * An error occurred. See <tt\\ref >vx_status_e</tt>.\n \\ingroup group_object_classifier_model"]
+    pub fn vxReleaseClassifierModel(model: *mut vx_classifier_model) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief [Graph] Scans a feature-map (input_feature_map) and detect the classification for each scan-window.\n \\param [in] graph The reference to the graph\n \\param [in] input_feature_map The Feature-map, example is the output of <tt>\\ref vxHOGFeaturesNode</tt>.\n \\param [in] model The pre-trained model loaded. Loaded using <tt>\\ref vxImportClassifierModel</tt>\n \\param [in] scan_window_width Width of the scan window\n \\param [in] scan_window_height Height of the scan window\n \\param [in] step_x Horizontal step-size (along x-axis)\n \\param [in] step_y Vertical step-size (along y-axis)\n \\param [out] object_confidences [Optional] An array of confidences measure, the measure is of type <tt>\\ref VX_TYPE_UINT16</tt>. The confidence measure is defined by the extensions which define classification model with defined binary format.\n This output can be used as class index as well. In case we detect several different classes in single execution. The output will be an array of indexes of the classes.\n \\param [out] object_rectangles An array of object positions, in <tt>\\ref VX_TYPE_RECTANGLE</tt>\n \\param [out] num_objects [optional] The number of object detected in a <tt>\\ref VX_SIZE</tt> scalar\n \\note The border mode <tt>\\ref VX_NODE_BORDER</tt> value <tt>\\ref VX_BORDER_UNDEFINED</tt> is supported.\n \\ingroup group_vision_function_classifier\n \\return <tt>\\ref vx_node</tt>.\n \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    pub fn vxScanClassifierNode(
+        graph: vx_graph,
+        input_feature_map: vx_tensor,
+        model: vx_classifier_model,
+        scanwindow_width: vx_int32,
+        scanwindow_height: vx_int32,
+        step_x: vx_int32,
+        step_y: vx_int32,
+        object_confidences: vx_array,
+        object_rectangles: vx_array,
+        num_objects: vx_scalar,
+    ) -> vx_node;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _vx_platform {
+    _unused: [u8; 0],
+}
+#[doc = " \\brief Platform handle of an implementation.\n  \\ingroup group_icd"]
+pub type vx_platform = *mut _vx_platform;
+extern "C" {
+    #[doc = " \\brief Queries list of available platforms.\n \\param [in] capacity Maximum number of items that platform[] can hold.\n \\param [out] platform[] List of platform handles.\n \\param [out] pNumItems Number of platform handles returned.\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_SUCCESS No errors.\n \\retval VX_FAILURE If no platforms are found.\n \\ingroup group_icd"]
+    pub fn vxIcdGetPlatforms(
+        capacity: vx_size,
+        platform: *mut vx_platform,
+        pNumItems: *mut vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Queries the platform for some specific information.\n \\param [in] platform The platform handle.\n \\param [in] attribute The attribute to query. Use one of the following:\n               <tt>\\ref VX_CONTEXT_VENDOR_ID</tt>,\n               <tt>\\ref VX_CONTEXT_VERSION</tt>,\n               <tt>\\ref VX_CONTEXT_EXTENSIONS_SIZE</tt>,\n               <tt>\\ref VX_CONTEXT_EXTENSIONS</tt>.\n \\param [out] ptr The location at which to store the resulting value.\n \\param [in] size The size in bytes of the container to which \\a ptr points.\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_SUCCESS No errors.\n \\retval VX_ERROR_INVALID_REFERENCE If the platform is not a <tt>\\ref vx_platform</tt>.\n \\retval VX_ERROR_INVALID_PARAMETERS If any of the other parameters are incorrect.\n \\retval VX_ERROR_NOT_SUPPORTED If the attribute is not supported on this implementation.\n \\ingroup group_icd"]
+    pub fn vxQueryPlatform(
+        platform: vx_platform,
+        attribute: vx_enum,
+        ptr: *mut ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Creates a <tt>\\ref vx_context</tt> from a <tt>\\ref vx_platform</tt>.\n \\details This creates a top-level object context for OpenVX from a platform handle.\n \\returns The reference to the implementation context <tt>\\ref vx_context</tt>. Any possible errors\n preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>.\n \\ingroup group_icd"]
+    pub fn vxCreateContextFromPlatform(platform: vx_platform) -> vx_context;
+}
+extern "C" {
+    #[doc = " \\brief Import a kernel from binary specified by URL.\n\n The name of kernel parameters can be queried using the vxQueryReference API\n with vx_parameter as ref and VX_REFERENCE_NAME as attribute.\n\n \\param context [in] The OpenVX context\n \\param type [in] Vendor-specific identifier that indicates to the implementation\n   how to interpret the url. For example, if an implementation can interpret the url\n   as a file, a folder a symbolic label, or a pointer, then a vendor may choose\n   to use \"vx_<vendor>_file\", \"vx_<vendor>_folder\", \"vx_<vendor>_label\", and\n   \"vx_<vendor>_pointer\", respectively for this field. Container types starting\n   with \"vx_khr_\" are reserved. Refer to vendor documentation for list of\n   container types supported\n \\param url [in] URL to binary container.\n\n \\retval On success, a valid vx_kernel object. Calling vxGetStatus with the return value\n   as a parameter will return VX_SUCCESS if the function was successful.\n\n \\ingroup group_import_kernel"]
+    pub fn vxImportKernelFromURL(
+        context: vx_context,
+        type_: *const vx_char,
+        url: *const vx_char,
+    ) -> vx_kernel;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _cl_context {
+    _unused: [u8; 0],
+}
+pub type cl_context = *mut _cl_context;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _cl_command_queue {
+    _unused: [u8; 0],
+}
+pub type cl_command_queue = *mut _cl_command_queue;
+extern "C" {
+    #[doc = " \\brief Create an OpenVX context with specified OpenCL context and global coordination command queue.\n\n This function creates a top-level object context for OpenVX and uses the OpenCL context and\n global coordination command queue created by the application for the interop.\n\n This OpenCL context and global coordination command queue can be queried using\n the VX_CONTEXT_CL_CONTEXT and VX_CONTEXT_CL_COMMAND_QUEUE attributes of vx_context.\n\n If the OpenVX context is created using vxCreateContext or vxCreateContextFromCL with\n opencl_context as NULL, the OpenCL context used by OpenVX is implementation dependent.\n If the opencl_command_queue is NULL, the global coordination command queue used by\n OpenVX is implementation dependent.\n\n The global coordination command queue must be created using the OpenCL context used by OpenVX.\n\n \\param opencl_context [in] The OpenCL context\n \\param opencl_command_queue [in] The global coordination command queue\n\n \\retval On success, a valid vx_context object. Calling vxGetStatus with the return value\n         as a parameter will return VX_SUCCESS if the function was successful.\n\n \\ingroup group_opencl_interop"]
+    pub fn vxCreateContextFromCL(
+        opencl_context: cl_context,
+        opencl_command_queue: cl_command_queue,
+    ) -> vx_context;
+}
+#[doc = "< \\brief Graph schedule mode type enumeration."]
+pub const vx_graph_schedule_mode_enum_e_VX_ENUM_GRAPH_SCHEDULE_MODE_TYPE:
+    vx_graph_schedule_mode_enum_e = 33;
+#[doc = " \\brief Extra enums.\n\n \\ingroup group_pipelining"]
+pub type vx_graph_schedule_mode_enum_e = ::std::os::raw::c_uint;
+#[doc = " \\brief Schedule graph in non-queueing mode"]
+pub const vx_graph_schedule_mode_type_e_VX_GRAPH_SCHEDULE_MODE_NORMAL:
+    vx_graph_schedule_mode_type_e = 135168;
+#[doc = " \\brief Schedule graph in queueing mode with auto scheduling"]
+pub const vx_graph_schedule_mode_type_e_VX_GRAPH_SCHEDULE_MODE_QUEUE_AUTO:
+    vx_graph_schedule_mode_type_e = 135169;
+#[doc = " \\brief Schedule graph in queueing mode with manual scheduling"]
+pub const vx_graph_schedule_mode_type_e_VX_GRAPH_SCHEDULE_MODE_QUEUE_MANUAL:
+    vx_graph_schedule_mode_type_e = 135170;
+#[doc = " \\brief Type of graph scheduling mode\n\n See <tt>\\ref vxSetGraphScheduleConfig</tt> and <tt>\\ref vxGraphParameterEnqueueReadyRef</tt> for details about each mode.\n\n \\ingroup group_pipelining"]
+pub type vx_graph_schedule_mode_type_e = ::std::os::raw::c_uint;
+#[doc = " \\brief Returns the schedule mode of a graph. Read-only. Use a <tt>\\ref vx_enum</tt> parameter.\n See <tt>\\ref vx_graph_schedule_mode_type_e </tt> enum."]
+pub const vx_graph_attribute_pipelining_e_VX_GRAPH_SCHEDULE_MODE: vx_graph_attribute_pipelining_e =
+    524805;
+#[doc = " \\brief The graph attributes added by this extension.\n \\ingroup group_pipelining"]
+pub type vx_graph_attribute_pipelining_e = ::std::os::raw::c_uint;
+#[doc = " \\brief Queueing parameters for a specific graph parameter\n\n See <tt>\\ref vxSetGraphScheduleConfig</tt> for additional details.\n\n  \\ingroup group_pipelining"]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct vx_graph_parameter_queue_params_t {
+    pub graph_parameter_index: u32,
+    pub refs_list_size: vx_uint32,
+    pub refs_list: *mut vx_reference,
+}
+#[test]
+fn bindgen_test_layout_vx_graph_parameter_queue_params_t() {
+    const UNINIT: ::std::mem::MaybeUninit<vx_graph_parameter_queue_params_t> =
+        ::std::mem::MaybeUninit::uninit();
+    let ptr = UNINIT.as_ptr();
+    assert_eq!(
+        ::std::mem::size_of::<vx_graph_parameter_queue_params_t>(),
+        16usize,
+        concat!("Size of: ", stringify!(vx_graph_parameter_queue_params_t))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<vx_graph_parameter_queue_params_t>(),
+        8usize,
+        concat!(
+            "Alignment of ",
+            stringify!(vx_graph_parameter_queue_params_t)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).graph_parameter_index) as usize - ptr as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(vx_graph_parameter_queue_params_t),
+            "::",
+            stringify!(graph_parameter_index)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).refs_list_size) as usize - ptr as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(vx_graph_parameter_queue_params_t),
+            "::",
+            stringify!(refs_list_size)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).refs_list) as usize - ptr as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(vx_graph_parameter_queue_params_t),
+            "::",
+            stringify!(refs_list)
+        )
+    );
+}
+extern "C" {
+    #[doc = " \\brief Sets the graph scheduler config\n\n This API is used to set the graph scheduler config to\n allow user to schedule multiple instances of a graph for execution.\n\n For legacy applications that don't need graph pipelining or batch processing,\n this API need not be used.\n\n Using this API, the application specifies the graph schedule mode, as well as\n queueing parameters for all graph parameters that need to allow enqueueing of references.\n A single monolithic API is provided instead of discrete APIs, since this allows\n the implementation to get all information related to scheduling in one shot and\n then optimize the subsequent graph scheduling based on this information.\n <b> This API MUST be called before graph verify </b> since\n in this case it allows implementations the opportunity to optimize resources based on\n information provided by the application.\n\n 'graph_schedule_mode' selects how input and output references are provided to a graph and\n how the next graph schedule is triggered by an implementation.\n\n Below scheduling modes are supported:\n\n When graph schedule mode is <tt>\\ref VX_GRAPH_SCHEDULE_MODE_QUEUE_AUTO</tt>:\n - Application needs to explicitly call <tt>\\ref vxVerifyGraph</tt> before enqueing data references\n - Application should not call <tt>\\ref vxScheduleGraph</tt> or <tt>\\ref vxProcessGraph</tt>\n - When enough references are enqueued at various graph parameters, the implementation\n   could trigger the next graph schedule.\n - Here, not all graph parameters need to have enqueued references for a graph schedule to begin.\n   An implementation is expected to execute the graph as much as possible until a enqueued reference\n   is not available at which time it will stall the graph until the reference becomes available.\n   This allows application to schedule a graph even when all parameters references are\n   not yet available, i.e do a 'late' enqueue. However, exact behaviour is implementation specific.\n\n When graph schedule mode is <tt>\\ref VX_GRAPH_SCHEDULE_MODE_QUEUE_MANUAL</tt>:\n - Application needs to explicitly call <tt>\\ref vxScheduleGraph</tt>\n - Application should not call <tt>\\ref vxProcessGraph</tt>\n - References for all graph parameters of the graph needs to enqueued before <tt>\\ref vxScheduleGraph</tt>\n   is called on the graph else an error is returned by <tt>\\ref vxScheduleGraph</tt>\n - Application can enqueue multiple references at the same graph parameter.\n   When <tt>\\ref vxScheduleGraph</tt> is called, all enqueued references get processed in a 'batch'.\n - User can use <tt>\\ref vxWaitGraph</tt> to wait for the previous <tt>\\ref vxScheduleGraph</tt>\n   to complete.\n\n When graph schedule mode is <tt>\\ref VX_GRAPH_SCHEDULE_MODE_NORMAL</tt>:\n - 'graph_parameters_list_size' MUST be 0 and\n - 'graph_parameters_queue_params_list' MUST be NULL\n - This mode is equivalent to non-queueing scheduling mode as defined by OpenVX v1.2 and earlier.\n\n By default all graphs are in VX_GRAPH_SCHEDULE_MODE_NORMAL mode until this API is called.\n\n 'graph_parameters_queue_params_list' allows to specify below information:\n - For the graph parameter index that is specified, it enables queueing mode of operation\n - Further it allows the application to specify the list of references that it could later\n   enqueue at this graph parameter.\n\n For graph parameters listed in 'graph_parameters_queue_params_list',\n application MUST use <tt>\\ref vxGraphParameterEnqueueReadyRef</tt> to\n set references at the graph parameter.  Using other data access API's on\n these parameters or corresponding data objects will return an error.\n For graph parameters not listed in 'graph_parameters_queue_params_list'\n application MUST use the <tt>\\ref vxSetGraphParameterByIndex</tt> to set the reference\n at the graph parameter.  Using other data access API's on these parameters or\n corresponding data objects will return an error.\n\n This API also allows application to provide a list of references which could be later\n enqueued at the graph parameter. This allows implementation to do meta-data checking\n up front rather than during each reference enqueue.\n\n When this API is called before <tt>\\ref vxVerifyGraph</tt>, the 'refs_list' field\n can be NULL, if the reference handles are not available yet at the application.\n However 'refs_list_size' MUST always be specified by the application.\n Application can call <tt>\\ref vxSetGraphScheduleConfig</tt> again after verify graph\n with all parameters remaining the same except with 'refs_list' field providing\n the list of references that can be enqueued at the graph parameter.\n\n \\param [in] graph Graph reference\n \\param [in] graph_schedule_mode Graph schedule mode. See <tt>\\ref vx_graph_schedule_mode_type_e</tt>\n \\param [in] graph_parameters_list_size Number of elements in graph_parameters_queue_params_list\n \\param [in] graph_parameters_queue_params_list Array containing queuing properties at graph parameters that need to support queueing.\n\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_SUCCESS No errors.\n \\retval VX_ERROR_INVALID_REFERENCE graph is not a valid reference\n \\retval VX_ERROR_INVALID_PARAMETERS Invalid graph parameter queueing parameters\n \\retval VX_FAILURE Any other failure.\n\n \\ingroup group_pipelining"]
+    pub fn vxSetGraphScheduleConfig(
+        graph: vx_graph,
+        graph_schedule_mode: vx_enum,
+        graph_parameters_list_size: vx_uint32,
+        graph_parameters_queue_params_list: *const vx_graph_parameter_queue_params_t,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Enqueues new references into a graph parameter for processing\n\n This new reference will take effect on the next graph schedule.\n\n In case of a graph parameter which is input to a graph, this function provides\n a data reference with new input data to the graph.\n In case of a graph parameter which is not input to a graph, this function provides\n a 'empty' reference into which a graph execution can write new data into.\n\n This function essentially transfers ownership of the reference from the application to the graph.\n\n User MUST use <tt>vxGraphParameterDequeueDoneRef</tt> to get back the\n processed or consumed references.\n\n The references that are enqueued MUST be the references listed during\n <tt>\\ref vxSetGraphScheduleConfig</tt>. If a reference outside this list is provided then\n behaviour is undefined.\n\n \\param [in] graph Graph reference\n \\param [in] graph_parameter_index Graph parameter index\n \\param [in] refs The array of references to enqueue into the graph parameter\n \\param [in] num_refs Number of references to enqueue\n\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_SUCCESS No errors.\n \\retval VX_ERROR_INVALID_REFERENCE graph is not a valid reference OR reference is not a valid reference\n \\retval VX_ERROR_INVALID_PARAMETERS graph_parameter_index is NOT a valid graph parameter index\n \\retval VX_FAILURE Reference could not be enqueued.\n\n \\ingroup group_pipelining"]
+    pub fn vxGraphParameterEnqueueReadyRef(
+        graph: vx_graph,
+        graph_parameter_index: vx_uint32,
+        refs: *mut vx_reference,
+        num_refs: vx_uint32,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Dequeues 'consumed' references from a graph parameter\n\n This function dequeues references from a graph parameter of a graph.\n The reference that is dequeued is a reference that had been previously enqueued into a graph,\n and after subsequent graph execution is considered as processed or consumed by the graph.\n This function essentially transfers ownership of the reference from the graph to the application.\n\n <b> IMPORTANT </b> : This API will block until at least one reference is dequeued.\n\n In case of a graph parameter which is input to a graph, this function provides\n a 'consumed' buffer to the application so that new input data can filled\n and later enqueued to the graph.\n In case of a graph parameter which is not input to a graph, this function provides\n a reference filled with new data based on graph execution. User can then use this\n newly generated data with their application. Typically when this new data is\n consumed by the application the 'empty' reference is again enqueued to the graph.\n\n This API returns an array of references up to a maximum of 'max_refs'. Application MUST ensure\n the array pointer ('refs') passed as input can hold 'max_refs'.\n 'num_refs' is actual number of references returned and will be <= 'max_refs'.\n\n\n \\param [in] graph Graph reference\n \\param [in] graph_parameter_index Graph parameter index\n \\param [out] refs Dequeued references filled in the array\n \\param [in] max_refs Max number of references to dequeue\n \\param [out] num_refs Actual number of references dequeued.\n\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_SUCCESS No errors.\n \\retval VX_ERROR_INVALID_REFERENCE graph is not a valid reference\n \\retval VX_ERROR_INVALID_PARAMETERS graph_parameter_index is NOT a valid graph parameter index\n \\retval VX_FAILURE Reference could not be dequeued.\n\n \\ingroup group_pipelining"]
+    pub fn vxGraphParameterDequeueDoneRef(
+        graph: vx_graph,
+        graph_parameter_index: vx_uint32,
+        refs: *mut vx_reference,
+        max_refs: vx_uint32,
+        num_refs: *mut vx_uint32,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Checks and returns the number of references that are ready for dequeue\n\n This function checks the number of references that can be dequeued and\n returns the value to the application.\n\n See also <tt>\\ref vxGraphParameterDequeueDoneRef</tt>.\n\n \\param [in] graph Graph reference\n \\param [in] graph_parameter_index Graph parameter index\n \\param [out] num_refs Number of references that can be dequeued using <tt>\\ref vxGraphParameterDequeueDoneRef</tt>\n\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_SUCCESS No errors.\n \\retval VX_ERROR_INVALID_REFERENCE graph is not a valid reference\n \\retval VX_ERROR_INVALID_PARAMETERS graph_parameter_index is NOT a valid graph parameter index\n \\retval VX_FAILURE Any other failure.\n\n \\ingroup group_pipelining"]
+    pub fn vxGraphParameterCheckDoneRef(
+        graph: vx_graph,
+        graph_parameter_index: vx_uint32,
+        num_refs: *mut vx_uint32,
+    ) -> vx_status;
+}
+#[doc = "< \\brief Event Type enumeration."]
+pub const vx_event_enum_e_VX_ENUM_EVENT_TYPE: vx_event_enum_e = 34;
+#[doc = " \\brief Extra enums.\n\n \\ingroup group_event"]
+pub type vx_event_enum_e = ::std::os::raw::c_uint;
+#[doc = " \\brief Graph parameter consumed event\n\n This event is generated when a data reference at a graph parameter\n is consumed during a graph execution.\n It is used to indicate that a given data reference is no longer used by the graph and can be\n dequeued and accessed by the application.\n\n \\note Graph execution could still be \"in progress\" for rest of the graph that does not use\n this data reference."]
+pub const vx_event_type_e_VX_EVENT_GRAPH_PARAMETER_CONSUMED: vx_event_type_e = 139264;
+#[doc = " \\brief Graph completion event\n\n This event is generated every time a graph execution completes.\n Graph completion event is generated for both successful execution of a graph\n or abandoned execution of a graph."]
+pub const vx_event_type_e_VX_EVENT_GRAPH_COMPLETED: vx_event_type_e = 139265;
+#[doc = " \\brief Node completion event\n\n This event is generated every time a node within a graph completes execution."]
+pub const vx_event_type_e_VX_EVENT_NODE_COMPLETED: vx_event_type_e = 139266;
+#[doc = " \\brief Node error event\n\n This event is generated every time a node returns error within a graph."]
+pub const vx_event_type_e_VX_EVENT_NODE_ERROR: vx_event_type_e = 139267;
+#[doc = " \\brief User defined event\n\n This event is generated by user application outside of OpenVX framework using the \\ref vxSendUserEvent API.\n User events allow application to have single centralized 'wait-for' loop to handle\n both framework generated events as well as user generated events.\n\n \\note Since the application initiates user events and not the framework, the application\n does NOT register user events using \\ref vxRegisterEvent."]
+pub const vx_event_type_e_VX_EVENT_USER: vx_event_type_e = 139268;
+#[doc = " \\brief Type of event that can be generated during system execution\n\n \\ingroup group_event"]
+pub type vx_event_type_e = ::std::os::raw::c_uint;
+#[doc = " \\brief Parameter structure returned with event of type VX_EVENT_GRAPH_PARAMETER_CONSUMED\n\n \\ingroup group_event"]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _vx_event_graph_parameter_consumed {
+    pub graph: vx_graph,
+    pub graph_parameter_index: vx_uint32,
+}
+#[test]
+fn bindgen_test_layout__vx_event_graph_parameter_consumed() {
+    const UNINIT: ::std::mem::MaybeUninit<_vx_event_graph_parameter_consumed> =
+        ::std::mem::MaybeUninit::uninit();
+    let ptr = UNINIT.as_ptr();
+    assert_eq!(
+        ::std::mem::size_of::<_vx_event_graph_parameter_consumed>(),
+        16usize,
+        concat!("Size of: ", stringify!(_vx_event_graph_parameter_consumed))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<_vx_event_graph_parameter_consumed>(),
+        8usize,
+        concat!(
+            "Alignment of ",
+            stringify!(_vx_event_graph_parameter_consumed)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).graph) as usize - ptr as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_event_graph_parameter_consumed),
+            "::",
+            stringify!(graph)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).graph_parameter_index) as usize - ptr as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_event_graph_parameter_consumed),
+            "::",
+            stringify!(graph_parameter_index)
+        )
+    );
+}
+#[doc = " \\brief Parameter structure returned with event of type VX_EVENT_GRAPH_PARAMETER_CONSUMED\n\n \\ingroup group_event"]
+pub type vx_event_graph_parameter_consumed = _vx_event_graph_parameter_consumed;
+#[doc = " \\brief Parameter structure returned with event of type VX_EVENT_GRAPH_COMPLETED\n\n \\ingroup group_event"]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _vx_event_graph_completed {
+    pub graph: vx_graph,
+}
+#[test]
+fn bindgen_test_layout__vx_event_graph_completed() {
+    const UNINIT: ::std::mem::MaybeUninit<_vx_event_graph_completed> =
+        ::std::mem::MaybeUninit::uninit();
+    let ptr = UNINIT.as_ptr();
+    assert_eq!(
+        ::std::mem::size_of::<_vx_event_graph_completed>(),
+        8usize,
+        concat!("Size of: ", stringify!(_vx_event_graph_completed))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<_vx_event_graph_completed>(),
+        8usize,
+        concat!("Alignment of ", stringify!(_vx_event_graph_completed))
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).graph) as usize - ptr as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_event_graph_completed),
+            "::",
+            stringify!(graph)
+        )
+    );
+}
+#[doc = " \\brief Parameter structure returned with event of type VX_EVENT_GRAPH_COMPLETED\n\n \\ingroup group_event"]
+pub type vx_event_graph_completed = _vx_event_graph_completed;
+#[doc = " \\brief Parameter structure returned with event of type VX_EVENT_NODE_COMPLETED\n\n \\ingroup group_event"]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _vx_event_node_completed {
+    pub graph: vx_graph,
+    pub node: vx_node,
+}
+#[test]
+fn bindgen_test_layout__vx_event_node_completed() {
+    const UNINIT: ::std::mem::MaybeUninit<_vx_event_node_completed> =
+        ::std::mem::MaybeUninit::uninit();
+    let ptr = UNINIT.as_ptr();
+    assert_eq!(
+        ::std::mem::size_of::<_vx_event_node_completed>(),
+        16usize,
+        concat!("Size of: ", stringify!(_vx_event_node_completed))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<_vx_event_node_completed>(),
+        8usize,
+        concat!("Alignment of ", stringify!(_vx_event_node_completed))
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).graph) as usize - ptr as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_event_node_completed),
+            "::",
+            stringify!(graph)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).node) as usize - ptr as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_event_node_completed),
+            "::",
+            stringify!(node)
+        )
+    );
+}
+#[doc = " \\brief Parameter structure returned with event of type VX_EVENT_NODE_COMPLETED\n\n \\ingroup group_event"]
+pub type vx_event_node_completed = _vx_event_node_completed;
+#[doc = " \\brief Parameter structure returned with event of type VX_EVENT_NODE_ERROR\n\n \\ingroup group_event"]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _vx_event_node_error {
+    pub graph: vx_graph,
+    pub node: vx_node,
+    pub status: vx_status,
+}
+#[test]
+fn bindgen_test_layout__vx_event_node_error() {
+    const UNINIT: ::std::mem::MaybeUninit<_vx_event_node_error> = ::std::mem::MaybeUninit::uninit();
+    let ptr = UNINIT.as_ptr();
+    assert_eq!(
+        ::std::mem::size_of::<_vx_event_node_error>(),
+        24usize,
+        concat!("Size of: ", stringify!(_vx_event_node_error))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<_vx_event_node_error>(),
+        8usize,
+        concat!("Alignment of ", stringify!(_vx_event_node_error))
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).graph) as usize - ptr as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_event_node_error),
+            "::",
+            stringify!(graph)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).node) as usize - ptr as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_event_node_error),
+            "::",
+            stringify!(node)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).status) as usize - ptr as usize },
+        16usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_event_node_error),
+            "::",
+            stringify!(status)
+        )
+    );
+}
+#[doc = " \\brief Parameter structure returned with event of type VX_EVENT_NODE_ERROR\n\n \\ingroup group_event"]
+pub type vx_event_node_error = _vx_event_node_error;
+#[doc = " \\brief Parameter structure returned with event of type VX_EVENT_USER_EVENT\n\n \\ingroup group_event"]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _vx_event_user_event {
+    pub user_event_parameter: *mut ::std::os::raw::c_void,
+}
+#[test]
+fn bindgen_test_layout__vx_event_user_event() {
+    const UNINIT: ::std::mem::MaybeUninit<_vx_event_user_event> = ::std::mem::MaybeUninit::uninit();
+    let ptr = UNINIT.as_ptr();
+    assert_eq!(
+        ::std::mem::size_of::<_vx_event_user_event>(),
+        8usize,
+        concat!("Size of: ", stringify!(_vx_event_user_event))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<_vx_event_user_event>(),
+        8usize,
+        concat!("Alignment of ", stringify!(_vx_event_user_event))
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).user_event_parameter) as usize - ptr as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_event_user_event),
+            "::",
+            stringify!(user_event_parameter)
+        )
+    );
+}
+#[doc = " \\brief Parameter structure returned with event of type VX_EVENT_USER_EVENT\n\n \\ingroup group_event"]
+pub type vx_event_user_event = _vx_event_user_event;
+#[doc = " \\brief Parameter structure associated with an event. Depends on type of the event.\n\n \\ingroup group_event"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union _vx_event_info_t {
+    pub graph_parameter_consumed: vx_event_graph_parameter_consumed,
+    pub graph_completed: vx_event_graph_completed,
+    pub node_completed: vx_event_node_completed,
+    pub node_error: vx_event_node_error,
+    pub user_event: vx_event_user_event,
+}
+#[test]
+fn bindgen_test_layout__vx_event_info_t() {
+    const UNINIT: ::std::mem::MaybeUninit<_vx_event_info_t> = ::std::mem::MaybeUninit::uninit();
+    let ptr = UNINIT.as_ptr();
+    assert_eq!(
+        ::std::mem::size_of::<_vx_event_info_t>(),
+        24usize,
+        concat!("Size of: ", stringify!(_vx_event_info_t))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<_vx_event_info_t>(),
+        8usize,
+        concat!("Alignment of ", stringify!(_vx_event_info_t))
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).graph_parameter_consumed) as usize - ptr as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_event_info_t),
+            "::",
+            stringify!(graph_parameter_consumed)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).graph_completed) as usize - ptr as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_event_info_t),
+            "::",
+            stringify!(graph_completed)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).node_completed) as usize - ptr as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_event_info_t),
+            "::",
+            stringify!(node_completed)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).node_error) as usize - ptr as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_event_info_t),
+            "::",
+            stringify!(node_error)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).user_event) as usize - ptr as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_event_info_t),
+            "::",
+            stringify!(user_event)
+        )
+    );
+}
+#[doc = " \\brief Parameter structure associated with an event. Depends on type of the event.\n\n \\ingroup group_event"]
+pub type vx_event_info_t = _vx_event_info_t;
+#[doc = " \\brief Data structure which holds event information\n\n \\ingroup group_event"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct _vx_event {
+    pub type_: vx_enum,
+    pub timestamp: vx_uint64,
+    pub app_value: vx_uint32,
+    pub event_info: vx_event_info_t,
+}
+#[test]
+fn bindgen_test_layout__vx_event() {
+    const UNINIT: ::std::mem::MaybeUninit<_vx_event> = ::std::mem::MaybeUninit::uninit();
+    let ptr = UNINIT.as_ptr();
+    assert_eq!(
+        ::std::mem::size_of::<_vx_event>(),
+        48usize,
+        concat!("Size of: ", stringify!(_vx_event))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<_vx_event>(),
+        8usize,
+        concat!("Alignment of ", stringify!(_vx_event))
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).type_) as usize - ptr as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_event),
+            "::",
+            stringify!(type_)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).timestamp) as usize - ptr as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_event),
+            "::",
+            stringify!(timestamp)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).app_value) as usize - ptr as usize },
+        16usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_event),
+            "::",
+            stringify!(app_value)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).event_info) as usize - ptr as usize },
+        24usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_event),
+            "::",
+            stringify!(event_info)
+        )
+    );
+}
+#[doc = " \\brief Data structure which holds event information\n\n \\ingroup group_event"]
+pub type vx_event_t = _vx_event;
+extern "C" {
+    #[doc = " \\brief Wait for a single event\n\n After <tt> \\ref vxDisableEvents </tt> is called, if <tt> \\ref vxWaitEvent(.. ,.. , vx_false_e) </tt> is called,\n <tt> \\ref vxWaitEvent </tt> will remain blocked until events are re-enabled using <tt> \\ref vxEnableEvents </tt>\n and a new event is received.\n\n If <tt> \\ref vxReleaseContext </tt> is called while an application is blocked on <tt> \\ref vxWaitEvent </tt>, the\n behavior is not defined by OpenVX.\n\n If <tt> \\ref vxWaitEvent </tt> is called simultaneously from multiple thread/task contexts\n then its behaviour is not defined by OpenVX.\n\n \\param context [in] OpenVX context\n \\param event [out] Data structure which holds information about a received event\n \\param do_not_block [in] When value is vx_true_e API does not block and only checks for the condition\n\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_SUCCESS Event received and event information available in 'event'\n \\retval VX_FAILURE No event is received\n\n \\ingroup group_event"]
+    pub fn vxWaitEvent(
+        context: vx_context,
+        event: *mut vx_event_t,
+        do_not_block: vx_bool,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Enable event generation\n\n Depending on the implementation, events may be either enabled or disabled by default.\n\n \\param context [in] OpenVX context\n\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_SUCCESS No errors; any other value indicates failure.\n\n \\ingroup group_event"]
+    pub fn vxEnableEvents(context: vx_context) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Disable event generation\n\n When events are disabled, any event generated before this API is\n called will still be returned via \\ref vxWaitEvent API.\n However no additional events would be returned via \\ref vxWaitEvent API\n until events are enabled again.\n\n \\param context [in] OpenVX context\n\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_SUCCESS No errors; any other value indicates failure.\n\n \\ingroup group_event"]
+    pub fn vxDisableEvents(context: vx_context) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Generate user defined event\n\n \\param context [in] OpenVX context\n \\param app_value [in] Application-specified value that will be returned to user as part of vx_event_t.app_value\n                       NOT used by implementation.\n \\param parameter [in] User defined event parameter. NOT used by implementation.\n                       Returned to user as part vx_event_t.event_info.user_event.user_event_parameter field\n\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_SUCCESS No errors; any other value indicates failure.\n\n \\ingroup group_event"]
+    pub fn vxSendUserEvent(
+        context: vx_context,
+        app_value: vx_uint32,
+        parameter: *mut ::std::os::raw::c_void,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Register an event to be generated\n\n Generation of event may need additional resources and overheads for an implementation.\n Hence events should be registered for references only when really required by an application.\n\n This API can be called on graph, node or graph parameter.\n This API MUST be called before doing \\ref vxVerifyGraph for that graph.\n\n \\param ref [in] Reference which will generate the event\n \\param type [in] Type or condition on which the event is generated\n \\param param [in] Specifies the graph parameter index when type is VX_EVENT_GRAPH_PARAMETER_CONSUMED\n \\param app_value [in] Application-specified value that will be returned to user as part of \\ref vx_event_t.app_value.\n                       NOT used by implementation.\n\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_SUCCESS No errors; any other value indicates failure.\n \\retval VX_ERROR_INVALID_REFERENCE ref is not a valid <tt>\\ref vx_reference</tt> reference.\n \\retval VX_ERROR_NOT_SUPPORTED type is not valid for the provided reference.\n\n \\ingroup group_event"]
+    pub fn vxRegisterEvent(
+        ref_: vx_reference,
+        type_: vx_event_type_e,
+        param: vx_uint32,
+        app_value: vx_uint32,
+    ) -> vx_status;
+}
+#[doc = "< \\brief Node state type enumeration."]
+pub const vx_node_state_enum_e_VX_ENUM_NODE_STATE_TYPE: vx_node_state_enum_e = 35;
+#[doc = " \\brief Extra enums.\n\n \\ingroup group_streaming"]
+pub type vx_node_state_enum_e = ::std::os::raw::c_uint;
+#[doc = " \\brief Node is in steady state (output expected for each invocation)"]
+pub const vx_node_state_e_VX_NODE_STATE_STEADY: vx_node_state_e = 143360;
+#[doc = " \\brief Node is in pipeup state (output not expected for each invocation)"]
+pub const vx_node_state_e_VX_NODE_STATE_PIPEUP: vx_node_state_e = 143361;
+#[doc = " \\brief Node state\n\n \\ingroup group_streaming"]
+pub type vx_node_state_e = ::std::os::raw::c_uint;
+#[doc = " \\brief Queries the state of the node. Read-only. See <tt>\\ref vx_graph_state_e</tt> enum."]
+pub const vx_node_attribute_streaming_e_VX_NODE_STATE: vx_node_attribute_streaming_e = 525065;
+#[doc = " \\brief The node attributes added by this extension.\n \\ingroup group_streaming"]
+pub type vx_node_attribute_streaming_e = ::std::os::raw::c_uint;
+#[doc = " \\brief The pipeup output depth required by the kernel.\n This is called by kernels that need to be primed with multiple output buffers before it can\n begin to return them.  A typical use case for this is a source node which needs to provide and\n retain multiple empty buffers to a camera driver to fill.  The first time the graph is executed\n after vxVerifyGraph is called, the framework calls the node associated with this kernel\n (pipeup_output_depth - 1) times before 'expecting' a valid output and calling downstream nodes.\n During this PIPEUP state, the framework provides the same set of input parameters for each\n call, but provides different set of output parameters for each call.  During the STEADY state,\n the kernel may return a different set of output parameters than was given during the execution callback.\n Read-write. Can be written only before user-kernel finalization.\n Use a <tt>\\ref vx_uint32</tt> parameter.\n \\note If not set, it will default to 1.\n \\note Setting a value less than 1 shall return VX_ERROR_INVALID_PARAMETERS"]
+pub const vx_kernel_attribute_streaming_e_VX_KERNEL_PIPEUP_OUTPUT_DEPTH:
+    vx_kernel_attribute_streaming_e = 525316;
+#[doc = " \\brief The pipeup input depth required by the kernel.\n This is called by kernels that need to retain one or more input buffers before it can\n begin to return them.  A typical use case for this is a sink node which needs to provide and\n retain one or more filled buffers to a display driver to display.  The first (pipeup_input_depth - 1)\n times the graph is executed after vxVerifyGraph is called, the framework calls the node associated with this kernel\n without 'expecting' an input to have been consumed and returned by the node.\n During this PIPEUP state, the framework does not reuse any of the input bufers it had given to this node.\n During the STEADY state, the kernel may return a different set of input parameters than was given during\n the execution callback.\n Read-write. Can be written only before user-kernel finalization.\n Use a <tt>\\ref vx_uint32</tt> parameter.\n \\note If not set, it will default to 1.\n \\note Setting a value less than 1 shall return VX_ERROR_INVALID_PARAMETERS"]
+pub const vx_kernel_attribute_streaming_e_VX_KERNEL_PIPEUP_INPUT_DEPTH:
+    vx_kernel_attribute_streaming_e = 525317;
+#[doc = " \\brief The kernel attributes added by this extension.\n \\ingroup group_streaming"]
+pub type vx_kernel_attribute_streaming_e = ::std::os::raw::c_uint;
+extern "C" {
+    #[doc = " \\brief Enable streaming mode of graph execution\n\n This API enables streaming mode of graph execution on the given graph. The node given on the API is set as the\n trigger node. A trigger node is defined as the node whose completion causes a new execution of the graph to be\n triggered.\n\n \\param graph [in] Reference to the graph to enable streaming mode of execution.\n \\param trigger_node  [in][optional] Reference to the node to be used for trigger node of the graph.\n\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_SUCCESS No errors; any other value indicates failure.\n \\retval VX_ERROR_INVALID_REFERENCE graph is not a valid <tt>\\ref vx_graph</tt> reference\n\n \\ingroup group_streaming"]
+    pub fn vxEnableGraphStreaming(graph: vx_graph, trigger_node: vx_node) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Start streaming mode of graph execution\n\n In streaming mode of graph execution, once an application starts graph execution\n further intervention of the application is not needed to re-schedule a graph;\n i.e. a graph re-schedules itself and executes continuously until streaming mode of execution is stopped.\n\n When this API is called, the framework schedules the graph via <tt>\\ref vxScheduleGraph</tt> and\n returns.\n This graph gets re-scheduled continuously until <tt>\\ref vxStopGraphStreaming</tt> is called by the user\n or any of the graph nodes return error during execution.\n\n The graph MUST be verified via \\ref vxVerifyGraph before calling this API.\n Also user application MUST ensure no previous executions of the graph are scheduled before calling this API.\n\n After streaming mode of a graph has been started, a <tt>\\ref vxScheduleGraph</tt> should **not** be used on that\n graph by an application.\n\n <tt>\\ref vxWaitGraph</tt> can be used as before to wait for all pending graph executions\n to complete.\n\n \\param graph [in] Reference to the graph to start streaming mode of execution.\n\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_SUCCESS No errors; any other value indicates failure.\n \\retval VX_ERROR_INVALID_REFERENCE graph is not a valid <tt>\\ref vx_graph</tt> reference.\n\n \\ingroup group_streaming"]
+    pub fn vxStartGraphStreaming(graph: vx_graph) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Stop streaming mode of graph execution\n\n This function blocks until graph execution is gracefully stopped at a logical boundary, for example,\n when all internally scheduled graph executions are completed.\n\n \\param graph [in] Reference to the graph to stop streaming mode of execution.\n\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_SUCCESS No errors; any other value indicates failure.\n \\retval VX_FAILURE Graph is not started in streaming execution mode.\n \\retval VX_ERROR_INVALID_REFERENCE graph is not a valid reference.\n\n \\ingroup group_streaming"]
+    pub fn vxStopGraphStreaming(graph: vx_graph) -> vx_status;
+}
+#[doc = " \\brief The raw image format structure that is given to the <tt>\\ref vxCreateRawImage</tt> function.\n \\ingroup group_raw_image"]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _vx_image_raw_format_t {
+    #[doc = "< \\brief Pixel Container, see \\ref vx_image_raw_pixel_container_e"]
+    pub pixel_container: vx_uint32,
+    #[doc = "< \\brief Most significant bit in pixel container"]
+    pub msb: vx_uint32,
+}
+#[test]
+fn bindgen_test_layout__vx_image_raw_format_t() {
+    const UNINIT: ::std::mem::MaybeUninit<_vx_image_raw_format_t> =
+        ::std::mem::MaybeUninit::uninit();
+    let ptr = UNINIT.as_ptr();
+    assert_eq!(
+        ::std::mem::size_of::<_vx_image_raw_format_t>(),
+        8usize,
+        concat!("Size of: ", stringify!(_vx_image_raw_format_t))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<_vx_image_raw_format_t>(),
+        4usize,
+        concat!("Alignment of ", stringify!(_vx_image_raw_format_t))
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).pixel_container) as usize - ptr as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_image_raw_format_t),
+            "::",
+            stringify!(pixel_container)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).msb) as usize - ptr as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_image_raw_format_t),
+            "::",
+            stringify!(msb)
+        )
+    );
+}
+#[doc = " \\brief The raw image format structure that is given to the <tt>\\ref vxCreateRawImage</tt> function.\n \\ingroup group_raw_image"]
+pub type vx_image_raw_format_t = _vx_image_raw_format_t;
+#[doc = " \\brief The raw image create params structure that is given to the <tt>\\ref vxCreateRawImage</tt> function.\n \\ingroup group_raw_image"]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _vx_image_raw_create_params_t {
+    #[doc = "< \\brief The image width in pixels"]
+    pub width: vx_uint32,
+    #[doc = "< \\brief The image height in lines (not including meta rows)."]
+    pub height: vx_uint32,
+    #[doc = "< \\brief The number of exposures contained in the sensor readout for a given timestamp.\nMax supported is \\ref VX_IMAGE_RAW_MAX_EXPOSURES."]
+    pub num_exposures: vx_uint32,
+    #[doc = "< \\brief Indicates the type of exposure interleaving, if any, in memory. see \\ref vx_image_raw_exposure_interleaving_e."]
+    pub exposure_interleaving: vx_uint32,
+    #[doc = "< \\brief Array of vx_image_raw_format_t structures indicating the pixel packing and\nbit alignment format of each exposure.  If line_interleaved == vx_false_e, then the number of\nvalid structures in this array should be equal to the value of num_exposures.  If line_interleaved ==\nvx_true_e, then the format should be the same for each exposure in a single buffer, so the\nnumber of valid structures in this array should equal 1."]
+    pub format: [vx_image_raw_format_t; 3usize],
+    #[doc = "< \\brief Number of lines of meta data at top of sensor readout  (before pixel data)\n(uses the same width as original sensor readout width)"]
+    pub meta_height_before: vx_uint32,
+    #[doc = "< \\brief Number of lines of meta data at bottom of sensor readout  (after pixel data)\n(uses the same width as original sensor readout width)"]
+    pub meta_height_after: vx_uint32,
+}
+#[test]
+fn bindgen_test_layout__vx_image_raw_create_params_t() {
+    const UNINIT: ::std::mem::MaybeUninit<_vx_image_raw_create_params_t> =
+        ::std::mem::MaybeUninit::uninit();
+    let ptr = UNINIT.as_ptr();
+    assert_eq!(
+        ::std::mem::size_of::<_vx_image_raw_create_params_t>(),
+        48usize,
+        concat!("Size of: ", stringify!(_vx_image_raw_create_params_t))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<_vx_image_raw_create_params_t>(),
+        4usize,
+        concat!("Alignment of ", stringify!(_vx_image_raw_create_params_t))
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).width) as usize - ptr as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_image_raw_create_params_t),
+            "::",
+            stringify!(width)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).height) as usize - ptr as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_image_raw_create_params_t),
+            "::",
+            stringify!(height)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).num_exposures) as usize - ptr as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_image_raw_create_params_t),
+            "::",
+            stringify!(num_exposures)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).exposure_interleaving) as usize - ptr as usize },
+        12usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_image_raw_create_params_t),
+            "::",
+            stringify!(exposure_interleaving)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).format) as usize - ptr as usize },
+        16usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_image_raw_create_params_t),
+            "::",
+            stringify!(format)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).meta_height_before) as usize - ptr as usize },
+        40usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_image_raw_create_params_t),
+            "::",
+            stringify!(meta_height_before)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).meta_height_after) as usize - ptr as usize },
+        44usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_image_raw_create_params_t),
+            "::",
+            stringify!(meta_height_after)
+        )
+    );
+}
+#[doc = " \\brief The raw image create params structure that is given to the <tt>\\ref vxCreateRawImage</tt> function.\n \\ingroup group_raw_image"]
+pub type vx_image_raw_create_params_t = _vx_image_raw_create_params_t;
+#[doc = " \\brief For accessing pointer to full allocated buffer (pixel buffer + meta buffer)."]
+pub const vx_image_raw_buffer_access_e_VX_IMAGE_RAW_ALLOC_BUFFER: vx_image_raw_buffer_access_e =
+    147456;
+#[doc = " \\brief For accessing pointer to pixel buffer only"]
+pub const vx_image_raw_buffer_access_e_VX_IMAGE_RAW_PIXEL_BUFFER: vx_image_raw_buffer_access_e =
+    147457;
+#[doc = " \\brief For accessing pointer to meta buffer only"]
+pub const vx_image_raw_buffer_access_e_VX_IMAGE_RAW_META_BEFORE_BUFFER:
+    vx_image_raw_buffer_access_e = 147458;
+#[doc = " \\brief For accessing pointer to meta buffer only"]
+pub const vx_image_raw_buffer_access_e_VX_IMAGE_RAW_META_AFTER_BUFFER:
+    vx_image_raw_buffer_access_e = 147459;
+#[doc = " \\brief The raw image buffer access enum.\n \\ingroup group_raw_image"]
+pub type vx_image_raw_buffer_access_e = ::std::os::raw::c_uint;
+#[doc = " \\brief Two bytes per pixel in memory."]
+pub const vx_image_raw_pixel_container_e_VX_IMAGE_RAW_16_BIT: vx_image_raw_pixel_container_e =
+    151552;
+#[doc = " \\brief One byte per pixel in memory."]
+pub const vx_image_raw_pixel_container_e_VX_IMAGE_RAW_8_BIT: vx_image_raw_pixel_container_e =
+    151553;
+#[doc = " \\brief Packed 12 bit mode; Three bytes per two pixels in memory."]
+pub const vx_image_raw_pixel_container_e_VX_IMAGE_RAW_P12_BIT: vx_image_raw_pixel_container_e =
+    151554;
+#[doc = " \\brief The raw image pixel container enum.\n \\ingroup group_raw_image"]
+pub type vx_image_raw_pixel_container_e = ::std::os::raw::c_uint;
+#[doc = " \\brief Each exposure is readout and stored in separate planes; single exposure per CSI virtual channel."]
+pub const vx_image_raw_exposure_interleaving_e_VX_IMAGE_RAW_PLANAR:
+    vx_image_raw_exposure_interleaving_e = 155648;
+#[doc = " \\brief Each exposure is readout and stored in line interleaved fashion; multiple exposures share same CSI virtual channel."]
+pub const vx_image_raw_exposure_interleaving_e_VX_IMAGE_RAW_LINE_INTERLEAVED:
+    vx_image_raw_exposure_interleaving_e = 155649;
+#[doc = " \\brief Each exposure is readout and stored in pixel interleaved fashion; multiple exposures share same CSI virtual channel."]
+pub const vx_image_raw_exposure_interleaving_e_VX_IMAGE_RAW_PIXEL_INTERLEAVED:
+    vx_image_raw_exposure_interleaving_e = 155650;
+#[doc = " \\brief The raw image exposure interleaving enum.\n \\ingroup group_raw_image"]
+pub type vx_image_raw_exposure_interleaving_e = ::std::os::raw::c_uint;
+extern "C" {
+    #[doc = " \\brief Creates an opaque reference to a raw sensor image (including multi-exposure and metadata).\n \\details Not guaranteed to exist until the <tt>\\ref vx_graph</tt> containing it has been verified.\n\n \\param [in] context         The reference to the implementation context.\n \\param [in] params          The pointer to a \\ref vx_image_raw_create_params_t structure\n \\param [in] size            The size of the structure pointed to by the params pointer, in bytes.\n\n \\returns An image reference <tt>\\ref vx_image</tt>. Any possible errors preventing a successful\n creation should be checked using <tt>\\ref vxGetStatus</tt>.\n\n \\see vxMapImagePatch to obtain direct memory access to the image data.\n\n \\ingroup group_raw_image"]
+    pub fn vxCreateRawImage(
+        context: vx_context,
+        params: *const vx_image_raw_create_params_t,
+        size: vx_size,
+    ) -> vx_image;
+}
+extern "C" {
+    #[doc = " \\brief Creates an opaque reference to a virtual raw sensor image no direct user access (including multi-exposure and metadata).\n \\details Not guaranteed to exist until the <tt>\\ref vx_graph</tt> containing it has been verified.\n\n Virtual Raw Image Objects are useful when the Raw Image is used as internal graph edge.\n Virtual Raw Image Objects are scoped within the parent graph only.\n\n \\param [in] graph           The reference to the parent graph.\n \\param [in] params          The pointer to a \\ref vx_image_raw_create_params_t structure\n \\param [in] size            The size of the structure pointed to by the params pointer, in bytes.\n\n \\returns A raw image reference <tt>\\ref vx_image</tt>. Any possible errors preventing a successful\n creation should be checked using <tt>\\ref vxGetStatus</tt>.\n\n \\see vxMapImagePatch to obtain direct memory access to the image data.\n\n \\ingroup group_raw_image"]
+    pub fn vxCreateVirtualRawImage(
+        graph: vx_graph,
+        params: *const vx_image_raw_create_params_t,
+        size: vx_size,
+    ) -> vx_image;
+}
+extern "C" {
+    #[doc = " \\brief Allows the application to copy a rectangular patch from/into an image object plane.\n \\param [in] image The reference to the image object that is the source or the\n destination of the copy.\n \\param [in] image_rect The coordinates of the image patch. The patch must be within\n the bounds of the image. (start_x, start_y) gives the coordinates of the topleft\n pixel inside the patch, while (end_x, end_y) gives the coordinates of the bottomright\n element out of the patch. Must be 0 <= start < end <= number of pixels in the image dimension.\n \\param [in] image_plane_index The plane index of the image object that is the source or the\n destination of the patch copy.\n \\param [in] user_addr The address of a structure describing the layout of the\n user memory location pointed by user_ptr. In the structure, only dim_x, dim_y,\n stride_x and stride_y fields must be provided, other fields are ignored by the function.\n The layout of the user memory must follow a row major order:\n stride_x >= pixel size in bytes, and stride_y >= stride_x * dim_x.\n \\param [in] user_ptr The address of the memory location where to store the requested data\n if the copy was requested in read mode, or from where to get the data to store into the image\n object if the copy was requested in write mode. The accessible memory must be large enough\n to contain the specified patch with the specified layout:\n accessible memory in bytes >= (end_y - start_y) * stride_y.\n \\param [in] usage This declares the effect of the copy with regard to the image object\n using the <tt>\\ref vx_accessor_e</tt> enumeration. For uniform images, only VX_READ_ONLY\n is supported. For other images, Only <tt>\\ref VX_READ_ONLY</tt> and <tt>\\ref VX_WRITE_ONLY</tt> are supported:\n \\param [in] flags An integer that allows passing options to the copy operation.\n \\arg <tt>\\ref VX_READ_ONLY</tt> means that data is copied from the image object into the application memory\n \\arg <tt>\\ref VX_WRITE_ONLY</tt> means that data is copied into the image object from the application memory\n \\param [in] user_mem_type A <tt>\\ref vx_memory_type_e</tt> enumeration that specifies\n the memory type of the memory referenced by the user_addr.\n \\param [in] flags An integer that allows passing options to the copy operation.\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_SUCCESS No errors; any other value indicates failure.\n \\retval VX_ERROR_OPTIMIZED_AWAY This is a reference to a virtual image that cannot be\n accessed by the application.\n \\retval VX_ERROR_INVALID_REFERENCE image is not a valid <tt>\\ref vx_image</tt> reference.\n \\retval VX_ERROR_INVALID_PARAMETERS An other parameter is incorrect.\n \\note The application may ask for data outside the bounds of the valid region, but\n such data has an undefined value.\n \\note Some special restrictions apply to <tt>\\ref VX_DF_IMAGE_U1</tt> images.\n \\ingroup group_image"]
+    pub fn vxCopyImagePatchWithFlags(
+        image: vx_image,
+        image_rect: *const vx_rectangle_t,
+        image_plane_index: vx_uint32,
+        user_addr: *const vx_imagepatch_addressing_t,
+        user_ptr: *mut ::std::os::raw::c_void,
+        usage: vx_enum,
+        user_mem_type: vx_enum,
+        flags: vx_uint32,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Swap data from one object to another.\n \\note An implementation may optimize away the swap when virtual data objects are used.\n \\param [in] graph The reference to the graph.\n \\param [in, out] first The first data object.\n \\param [in, out] second The second data object with meta-data identical to the input data object.\n \\return <tt>\\ref vx_node</tt>.\n \\retval vx_node A node reference. Any possible errors preventing a successful creation\n should be checked using <tt>\\ref vxGetStatus</tt>\n \\ingroup group_vision_function_swap"]
+    pub fn vxSwapNode(graph: vx_graph, first: vx_reference, second: vx_reference) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief Move data from one object to another. Same as Swap but second parameter is an output\n \\note An implementation may optimize away the move when virtual data objects are used.\n \\param [in] graph The reference to the graph.\n \\param [in, out] first The first data object.\n \\param [out] second The second data object with meta-data identical to the input data object.\n \\return <tt>\\ref vx_node</tt>.\n \\retval vx_node A node reference. Any possible errors preventing a successful creation\n should be checked using <tt>\\ref vxGetStatus</tt>\n \\ingroup group_vision_function_move"]
+    pub fn vxMoveNode(graph: vx_graph, first: vx_reference, second: vx_reference) -> vx_node;
+}
+extern "C" {
+    #[doc = " \\brief Swap data from one object to another.\n \\param [in] context The OpenVX context.\n \\param [in, out] first The first data object.\n \\param [in, out] second The second data object with meta-data identical to the input data object.\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_SUCCESS Success\n \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>.\n \\ingroup group_vision_function_swap"]
+    pub fn vxuSwap(context: vx_context, first: vx_reference, second: vx_reference) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Move data from one object to another.\n \\note In immediate mode identical to Swap.\n \\param [in]  context The OpenVX context.\n \\param [in, out] first The first data object.\n \\param [out] second The second data object with meta-data identical to the input data object.\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_SUCCESS Success\n \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>.\n \\ingroup group_vision_function_move"]
+    pub fn vxuMove(context: vx_context, first: vx_reference, second: vx_reference) -> vx_status;
+}
+#[doc = " \\brief The User Tiling Function tile block size declaration.\n \\details The author of a User Tiling Kernel will use this structure to define\n the dimensionality of the tile block.\n \\ingroup group_tiling"]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _vx_tile_block_size_t {
+    #[doc = "< \\brief Tile block width in pixels."]
+    pub width: vx_int32,
+    #[doc = "< \\brief Tile block height in pixels."]
+    pub height: vx_int32,
+}
+#[test]
+fn bindgen_test_layout__vx_tile_block_size_t() {
+    const UNINIT: ::std::mem::MaybeUninit<_vx_tile_block_size_t> =
+        ::std::mem::MaybeUninit::uninit();
+    let ptr = UNINIT.as_ptr();
+    assert_eq!(
+        ::std::mem::size_of::<_vx_tile_block_size_t>(),
+        8usize,
+        concat!("Size of: ", stringify!(_vx_tile_block_size_t))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<_vx_tile_block_size_t>(),
+        4usize,
+        concat!("Alignment of ", stringify!(_vx_tile_block_size_t))
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).width) as usize - ptr as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_tile_block_size_t),
+            "::",
+            stringify!(width)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).height) as usize - ptr as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_tile_block_size_t),
+            "::",
+            stringify!(height)
+        )
+    );
+}
+#[doc = " \\brief The User Tiling Function tile block size declaration.\n \\details The author of a User Tiling Kernel will use this structure to define\n the dimensionality of the tile block.\n \\ingroup group_tiling"]
+pub type vx_tile_block_size_t = _vx_tile_block_size_t;
+#[doc = " \\brief The User Tiling Function Neighborhood declaration.\n \\details The author of a User Tiling Kernel will use this structure to define\n the neighborhood surrounding the tile block.\n \\ingroup group_tiling"]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _vx_neighborhood_size_t {
+    #[doc = "< \\brief Left of the tile block."]
+    pub left: vx_int32,
+    #[doc = "< \\brief Right of the tile block."]
+    pub right: vx_int32,
+    #[doc = "< \\brief Top of the tile block."]
+    pub top: vx_int32,
+    #[doc = "< \\brief Bottom of the tile block."]
+    pub bottom: vx_int32,
+}
+#[test]
+fn bindgen_test_layout__vx_neighborhood_size_t() {
+    const UNINIT: ::std::mem::MaybeUninit<_vx_neighborhood_size_t> =
+        ::std::mem::MaybeUninit::uninit();
+    let ptr = UNINIT.as_ptr();
+    assert_eq!(
+        ::std::mem::size_of::<_vx_neighborhood_size_t>(),
+        16usize,
+        concat!("Size of: ", stringify!(_vx_neighborhood_size_t))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<_vx_neighborhood_size_t>(),
+        4usize,
+        concat!("Alignment of ", stringify!(_vx_neighborhood_size_t))
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).left) as usize - ptr as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_neighborhood_size_t),
+            "::",
+            stringify!(left)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).right) as usize - ptr as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_neighborhood_size_t),
+            "::",
+            stringify!(right)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).top) as usize - ptr as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_neighborhood_size_t),
+            "::",
+            stringify!(top)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).bottom) as usize - ptr as usize },
+        12usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_neighborhood_size_t),
+            "::",
+            stringify!(bottom)
+        )
+    );
+}
+#[doc = " \\brief The User Tiling Function Neighborhood declaration.\n \\details The author of a User Tiling Kernel will use this structure to define\n the neighborhood surrounding the tile block.\n \\ingroup group_tiling"]
+pub type vx_neighborhood_size_t = _vx_neighborhood_size_t;
+#[doc = " \\brief A structure which describes the tile's parent image.\n \\ingroup group_tiling"]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _vx_image_description_t {
+    #[doc = "< \\brief Width of the image"]
+    pub width: vx_uint32,
+    #[doc = "< \\brief Height of the image"]
+    pub height: vx_uint32,
+    #[doc = "< \\brief The <tt>\\ref vx_df_image_e</tt> of the image"]
+    pub format: vx_df_image,
+    #[doc = "< \\brief The number of planes in the image"]
+    pub planes: vx_uint32,
+    #[doc = "< \\brief The <tt>\\ref vx_channel_range_e</tt> enumeration."]
+    pub range: vx_enum,
+    #[doc = "< \\brief The <tt>\\ref vx_color_space_e</tt> enumeration."]
+    pub space: vx_enum,
+}
+#[test]
+fn bindgen_test_layout__vx_image_description_t() {
+    const UNINIT: ::std::mem::MaybeUninit<_vx_image_description_t> =
+        ::std::mem::MaybeUninit::uninit();
+    let ptr = UNINIT.as_ptr();
+    assert_eq!(
+        ::std::mem::size_of::<_vx_image_description_t>(),
+        24usize,
+        concat!("Size of: ", stringify!(_vx_image_description_t))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<_vx_image_description_t>(),
+        4usize,
+        concat!("Alignment of ", stringify!(_vx_image_description_t))
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).width) as usize - ptr as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_image_description_t),
+            "::",
+            stringify!(width)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).height) as usize - ptr as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_image_description_t),
+            "::",
+            stringify!(height)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).format) as usize - ptr as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_image_description_t),
+            "::",
+            stringify!(format)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).planes) as usize - ptr as usize },
+        12usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_image_description_t),
+            "::",
+            stringify!(planes)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).range) as usize - ptr as usize },
+        16usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_image_description_t),
+            "::",
+            stringify!(range)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).space) as usize - ptr as usize },
+        20usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_image_description_t),
+            "::",
+            stringify!(space)
+        )
+    );
+}
+#[doc = " \\brief A structure which describes the tile's parent image.\n \\ingroup group_tiling"]
+pub type vx_image_description_t = _vx_image_description_t;
+#[doc = " \\brief The tile structure declaration.\n \\ingroup group_tiling"]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _vx_tile_t {
+    #[doc = " \\brief The array of pointers to the tile's image plane."]
+    pub base: [*mut vx_uint8; 4usize],
+    #[doc = " \\brief The top left X pixel index within the width dimension of the image."]
+    pub tile_x: vx_uint32,
+    #[doc = " \\brief The top left Y pixel index within the height dimension of the image."]
+    pub tile_y: vx_uint32,
+    #[doc = " \\brief The array of addressing structure to describe each plane."]
+    pub addr: [vx_imagepatch_addressing_t; 4usize],
+    #[doc = " \\brief The output block size structure."]
+    pub tile_block: vx_tile_block_size_t,
+    #[doc = " \\brief The neighborhood definition."]
+    pub neighborhood: vx_neighborhood_size_t,
+    #[doc = " \\brief The description and attributes of the image."]
+    pub image: vx_image_description_t,
+}
+#[test]
+fn bindgen_test_layout__vx_tile_t() {
+    const UNINIT: ::std::mem::MaybeUninit<_vx_tile_t> = ::std::mem::MaybeUninit::uninit();
+    let ptr = UNINIT.as_ptr();
+    assert_eq!(
+        ::std::mem::size_of::<_vx_tile_t>(),
+        216usize,
+        concat!("Size of: ", stringify!(_vx_tile_t))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<_vx_tile_t>(),
+        8usize,
+        concat!("Alignment of ", stringify!(_vx_tile_t))
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).base) as usize - ptr as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_tile_t),
+            "::",
+            stringify!(base)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).tile_x) as usize - ptr as usize },
+        32usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_tile_t),
+            "::",
+            stringify!(tile_x)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).tile_y) as usize - ptr as usize },
+        36usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_tile_t),
+            "::",
+            stringify!(tile_y)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).addr) as usize - ptr as usize },
+        40usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_tile_t),
+            "::",
+            stringify!(addr)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).tile_block) as usize - ptr as usize },
+        168usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_tile_t),
+            "::",
+            stringify!(tile_block)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).neighborhood) as usize - ptr as usize },
+        176usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_tile_t),
+            "::",
+            stringify!(neighborhood)
+        )
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).image) as usize - ptr as usize },
+        192usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(_vx_tile_t),
+            "::",
+            stringify!(image)
+        )
+    );
+}
+#[doc = " \\brief The tile structure declaration.\n \\ingroup group_tiling"]
+pub type vx_tile_t = _vx_tile_t;
+#[doc = " \\brief This allows a tiling mode kernel to set its input neighborhood."]
+pub const vx_kernel_attribute_tiling_e_VX_KERNEL_INPUT_NEIGHBORHOOD: vx_kernel_attribute_tiling_e =
+    525319;
+#[doc = " \\brief This allows a tiling mode kernel to set its output tile block size."]
+pub const vx_kernel_attribute_tiling_e_VX_KERNEL_OUTPUT_TILE_BLOCK_SIZE:
+    vx_kernel_attribute_tiling_e = 525320;
+#[doc = " \\brief This allows the author to set the border mode on the tiling kernel."]
+pub const vx_kernel_attribute_tiling_e_VX_KERNEL_BORDER: vx_kernel_attribute_tiling_e = 525321;
+#[doc = " \\brief This determines the per tile memory allocation."]
+pub const vx_kernel_attribute_tiling_e_VX_KERNEL_TILE_MEMORY_SIZE: vx_kernel_attribute_tiling_e =
+    525322;
+#[doc = " \\brief The User Kernel Tiling Attributes.\n \\ingroup group_tiling"]
+pub type vx_kernel_attribute_tiling_e = ::std::os::raw::c_uint;
+#[doc = " \\brief This allows a tiling mode node to get its input neighborhood."]
+pub const vx_node_attribute_tiling_e_VX_NODE_INPUT_NEIGHBORHOOD: vx_node_attribute_tiling_e =
+    525067;
+#[doc = " \\brief This allows a tiling mode node to get its output tile block size."]
+pub const vx_node_attribute_tiling_e_VX_NODE_OUTPUT_TILE_BLOCK_SIZE: vx_node_attribute_tiling_e =
+    525068;
+#[doc = " \\brief This is the size of the tile local memory area."]
+pub const vx_node_attribute_tiling_e_VX_NODE_TILE_MEMORY_SIZE: vx_node_attribute_tiling_e = 525069;
+#[doc = " \\brief The User Node Tiling Attributes.\n \\note These are largely unusable by the tiling function, as it doesn't give you the node reference!\n \\ingroup group_tiling"]
+pub type vx_node_attribute_tiling_e = ::std::os::raw::c_uint;
+#[doc = " \\brief This value indicates that the author of the tiling kernel wrote\n code to handle border conditions into the kernel itself. If this mode\n is set, it can not be overriden by a call to the \\ref vxSetNodeAttribute\n with \\ref VX_NODE_BORDER."]
+pub const vx_border_tiling_e_VX_BORDER_MODE_SELF: vx_border_tiling_e = 49155;
+#[doc = " \\brief The tiling border mode extensions\n \\ingroup group_tiling"]
+pub type vx_border_tiling_e = ::std::os::raw::c_uint;
+pub type vx_tiling_kernel_f = ::std::option::Option<
+    unsafe extern "C" fn(
+        parameters: *mut *mut ::std::os::raw::c_void,
+        tile_memory: *mut ::std::os::raw::c_void,
+        tile_memory_size: vx_size,
+    ),
+>;
+extern "C" {
+    #[doc = " \\brief Allows a user to add a tile-able kernel to the OpenVX system.\n \\param [in] context The handle to the implementation context.\n \\param [in] name The string to be used to match the kernel.\n \\param [in] enumeration The enumerated value of the kernel to be used by clients.\n \\param [in] flexible_func_ptr The process-local flexible function pointer to be invoked.\n \\param [in] fast_func_ptr The process-local fast function pointer to be invoked.\n \\param [in] num_params The number of parameters for this kernel.\n \\param [in] input The pointer to a function which will validate the\n input parameters to this kernel.\n \\param [in] output The pointer to a function which will validate the\n output parameters to this kernel.\n \\note Tiling Kernels do not have access to any of the normal node attributes listed\n in \\ref vx_node_attribute_e.\n \\post Call <tt>\\ref vxAddParameterToKernel</tt> for as many parameters as the function has,\n then call <tt>\\ref vxFinalizeKernel</tt>.\n \\retval 0 Indicates that an error occurred when adding the kernel.\n Note that the fast or flexible formula, but not both, can be NULL.\n \\ingroup group_tiling"]
+    pub fn vxAddTilingKernel(
+        context: vx_context,
+        name: *mut vx_char,
+        enumeration: vx_enum,
+        flexible_func_ptr: vx_tiling_kernel_f,
+        fast_func_ptr: vx_tiling_kernel_f,
+        num_params: vx_uint32,
+        input: vx_kernel_input_validate_f,
+        output: vx_kernel_output_validate_f,
+    ) -> vx_kernel;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _vx_user_data_object {
+    _unused: [u8; 0],
+}
+#[doc = " \\brief The User Data Object. User Data Object is a strongly-typed container for other data structures.\n \\ingroup group_user_data_object"]
+pub type vx_user_data_object = *mut _vx_user_data_object;
+#[doc = " \\brief The type name of the user data object. Read-only. Use a <tt>\\ref vx_char</tt>[<tt>\\ref VX_MAX_REFERENCE_NAME</tt>] array."]
+pub const vx_user_data_object_attribute_e_VX_USER_DATA_OBJECT_NAME:
+    vx_user_data_object_attribute_e = 529920;
+#[doc = " \\brief The number of bytes in the user data object. Read-only. Use a <tt>\\ref vx_size</tt> parameter."]
+pub const vx_user_data_object_attribute_e_VX_USER_DATA_OBJECT_SIZE:
+    vx_user_data_object_attribute_e = 529921;
+#[doc = " \\brief The user data object attributes.\n \\ingroup group_user_data_object"]
+pub type vx_user_data_object_attribute_e = ::std::os::raw::c_uint;
+extern "C" {
+    #[doc = " \\brief Creates a reference to a User Data Object.\n\n User data objects can be used to pass a user kernel defined data structure or blob of memory as a parameter\n to a user kernel.\n\n \\param [in] context      The reference to the overall Context.\n \\param [in] type_name    Pointer to the '\\0' terminated string that identifies the type of object.\n                          The string is copied by the function so that it stays the property of the caller.\n                          The length of the string shall be lower than VX_MAX_REFERENCE_NAME bytes.\n                          The string passed here is what shall be returned when passing the\n                          <tt>\\ref VX_USER_DATA_OBJECT_NAME</tt> attribute enum to the <tt>\\ref vxQueryUserDataObject</tt> function.\n                          In the case where NULL is passed to type_name, then the query of the <tt>\\ref VX_USER_DATA_OBJECT_NAME</tt>\n                          attribute enum will return a single character '\\0' string.\n \\param [in] size         The number of bytes required to store this instance of the user data object.\n \\param [in] ptr          The pointer to the initial value of the user data object. If NULL, then entire size bytes of the user data object\n                          is initialized to all 0s, otherwise, <tt>size</tt> bytes is copied into the object\n                          from ptr to initialize the object\n\n \\returns A user data object reference <tt>\\ref vx_user_data_object</tt>. Any possible errors preventing a\n successful creation should be checked using <tt>\\ref vxGetStatus</tt>.\n\n \\ingroup group_user_data_object"]
+    pub fn vxCreateUserDataObject(
+        context: vx_context,
+        type_name: *const vx_char,
+        size: vx_size,
+        ptr: *const ::std::os::raw::c_void,
+    ) -> vx_user_data_object;
+}
+extern "C" {
+    #[doc = " \\brief Creates an opaque reference to a virtual User Data Object with no direct user access.\n\n Virtual User Data Objects are useful when the User Data Object is used as internal graph edge.\n Virtual User Data Objects are scoped within the parent graph only.\n\n \\param [in] graph        The reference to the parent graph.\n \\param [in] type_name    Pointer to the '\\0' terminated string that identifies the type of object.\n                          The string is copied by the function so that it stays the property of the caller.\n                          The length of the string shall be lower than VX_MAX_REFERENCE_NAME bytes.\n                          The string passed here is what shall be returned when passing the\n                          <tt>\\ref VX_USER_DATA_OBJECT_NAME</tt> attribute enum to the <tt>\\ref vxQueryUserDataObject</tt> function.\n                          In the case where NULL is passed to type_name, then the query of the <tt>\\ref VX_USER_DATA_OBJECT_NAME</tt>\n                          attribute enum will return a single character '\\0' string.\n \\param [in] size         The number of bytes required to store this instance of the user data object.\n\n \\returns A user data object reference <tt>\\ref vx_user_data_object</tt>. Any possible errors preventing a\n successful creation should be checked using <tt>\\ref vxGetStatus</tt>.\n\n \\ingroup group_user_data_object"]
+    pub fn vxCreateVirtualUserDataObject(
+        graph: vx_graph,
+        type_name: *const vx_char,
+        size: vx_size,
+    ) -> vx_user_data_object;
+}
+extern "C" {
+    #[doc = " \\brief Releases a reference of a User data object.\n The object may not be garbage collected until its total reference count is zero.\n After returning from this function the reference is zeroed.\n \\param [in] user_data_object  The pointer to the User Data Object to release.\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_SUCCESS No errors.\n \\retval VX_ERROR_INVALID_REFERENCE If user_data_object is not a <tt>\\ref vx_user_data_object</tt>.\n \\ingroup group_user_data_object"]
+    pub fn vxReleaseUserDataObject(user_data_object: *mut vx_user_data_object) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Queries the User data object for some specific information.\n\n \\param [in] user_data_object  The reference to the User data object.\n \\param [in] attribute         The attribute to query. Use a <tt>\\ref vx_user_data_object_attribute_e</tt>.\n \\param [out] ptr              The location at which to store the resulting value.\n \\param [in] size              The size in bytes of the container to which \\a ptr points.\n\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_SUCCESS                   No errors.\n \\retval VX_ERROR_INVALID_REFERENCE   If the \\a user_data_object is not a <tt>\\ref vx_user_data_object</tt>.\n \\retval VX_ERROR_NOT_SUPPORTED       If the \\a attribute is not a value supported on this implementation.\n \\retval VX_ERROR_INVALID_PARAMETERS  If any of the other parameters are incorrect.\n\n \\ingroup group_user_data_object"]
+    pub fn vxQueryUserDataObject(
+        user_data_object: vx_user_data_object,
+        attribute: vx_enum,
+        ptr: *mut ::std::os::raw::c_void,
+        size: vx_size,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allows the application to copy a subset from/into a user data object.\n \\param [in] user_data_object   The reference to the user data object that is the source or the\n                                destination of the copy.\n \\param [in] offset             The byte offset into the user data object to copy.\n \\param [in] size               The number of bytes to copy.  The size must be within the bounds of the user data object:\n                                0 <= (offset + size) <= size of the user data object. If zero, then copy until the end of the object.\n \\param [in] user_ptr           The address of the memory location where to store the requested data\n                                if the copy was requested in read mode, or from where to get the data to store into the user data object\n                                if the copy was requested in write mode. The accessible memory must be large enough\n                                to contain the specified size.\n \\param [in] usage               This declares the effect of the copy with regard to the user data object\n                                using the <tt>\\ref vx_accessor_e</tt> enumeration. Only VX_READ_ONLY and VX_WRITE_ONLY\n                                are supported:\n                                \\arg VX_READ_ONLY means that data are copied from the user data object into the user memory.\n                                \\arg VX_WRITE_ONLY means that data are copied into the user data object from the user memory.\n \\param [in] user_mem_type      A <tt>\\ref vx_memory_type_e</tt> enumeration that specifies\n                                the memory type of the memory referenced by the user_addr.\n\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_ERROR_OPTIMIZED_AWAY This is a reference to a virtual user data object that cannot be\n accessed by the application.\n \\retval VX_ERROR_INVALID_REFERENCE The user_data_object reference is not actually a user data object reference.\n \\retval VX_ERROR_INVALID_PARAMETERS Another parameter is incorrect.\n \\ingroup group_user_data_object"]
+    pub fn vxCopyUserDataObject(
+        user_data_object: vx_user_data_object,
+        offset: vx_size,
+        size: vx_size,
+        user_ptr: *mut ::std::os::raw::c_void,
+        usage: vx_enum,
+        user_mem_type: vx_enum,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Allows the application to get direct access to a subset of the user data object.\n \\param [in] user_data_object   The reference to the user data object that contains the subset to map.\n \\param [in] offset             The byte offset into the user data object to map.\n \\param [in] size               The number of bytes to map.  The size must be within the bounds of the user data object:\n                                0 <= (offset + size) <= size of the user data object. If zero, then map until the end of the object.\n \\param [out] map_id            The address of a vx_map_id variable where the function returns a map identifier.\n                                \\arg (*map_id) must eventually be provided as the map_id parameter of a call to\n                                <tt>\\ref vxUnmapUserDataObject</tt>.\n \\param [out] ptr               The address of a pointer that the function sets to the\n                                address where the requested data can be accessed. The returned (*ptr) address\n                                is only valid between the call to the function and the corresponding call to\n                                <tt>\\ref vxUnmapUserDataObject</tt>.\n \\param [in] usage              This declares the access mode for the user data object subset, using\n                                the <tt>\\ref vx_accessor_e</tt> enumeration.\n                                \\arg VX_READ_ONLY: after the function call, the content of the memory location\n                                pointed by (*ptr) contains the user data object subset data. Writing into this memory location\n                                is forbidden and its behavior is implementation specific.\n                                \\arg VX_READ_AND_WRITE : after the function call, the content of the memory\n                                location pointed by (*ptr) contains the user data object subset data; writing into this memory\n                                is allowed only for the location of data and will result in a modification of the\n                                affected data in the user data object once the subset is unmapped.\n                                \\arg VX_WRITE_ONLY: after the function call, the memory location pointed by (*ptr)\n                                contains undefined data; writing to all data in the subset is required prior to\n                                unmapping. Data values not written by the application before unmap may be defined differently in\n                                different implementations after unmap, even if they were well defined before map.\n \\param [in] mem_type           A <tt>\\ref vx_memory_type_e</tt> enumeration that\n                                specifies the type of the memory where the user data object subset is requested to be mapped.\n \\param [in] flags              An integer that allows passing options to the map operation.\n                                Use the <tt>\\ref vx_map_flag_e</tt> enumeration.\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_ERROR_OPTIMIZED_AWAY This is a reference to a virtual user data object that cannot be accessed by the application.\n \\retval VX_ERROR_INVALID_REFERENCE The user_data_object reference is not actually a user data object reference.\n \\retval VX_ERROR_INVALID_PARAMETERS An other parameter is incorrect.\n \\ingroup group_user_data_object\n \\post <tt>\\ref vxUnmapUserDataObject </tt> with same (*map_id) value."]
+    pub fn vxMapUserDataObject(
+        user_data_object: vx_user_data_object,
+        offset: vx_size,
+        size: vx_size,
+        map_id: *mut vx_map_id,
+        ptr: *mut *mut ::std::os::raw::c_void,
+        usage: vx_enum,
+        mem_type: vx_enum,
+        flags: vx_uint32,
+    ) -> vx_status;
+}
+extern "C" {
+    #[doc = " \\brief Unmap and commit potential changes to a user data object subset that was previously mapped.\n Unmapping a user data object subset invalidates the memory location from which the subset could\n be accessed by the application. Accessing this memory location after the unmap function\n completes is implementation specific.\n \\param [in] user_data_object   The reference to the user data object to unmap.\n \\param [in] map_id             The unique map identifier that was returned when calling\n                                <tt>\\ref vxMapUserDataObject</tt> .\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_ERROR_INVALID_REFERENCE The user_data_object reference is not actually a user data object reference.\n \\retval VX_ERROR_INVALID_PARAMETERS Another parameter is incorrect.\n \\ingroup group_user_data_object\n \\pre <tt>\\ref vxMapUserDataObject</tt> returning the same map_id value"]
+    pub fn vxUnmapUserDataObject(
+        user_data_object: vx_user_data_object,
+        map_id: vx_map_id,
+    ) -> vx_status;
 }

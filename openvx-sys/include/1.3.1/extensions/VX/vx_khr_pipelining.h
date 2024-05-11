@@ -494,7 +494,7 @@ typedef struct _vx_event {
 VX_API_ENTRY vx_status VX_API_CALL vxWaitEvent(vx_context context, vx_event_t *event, vx_bool do_not_block);
 
 /*! \brief Enable event generation
- * 
+ *
  * Depending on the implementation, events may be either enabled or disabled by default.
  *
  * \param context [in] OpenVX context

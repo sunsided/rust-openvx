@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 #ifndef _OPENVX_SWAP_MOVE_H_
 #define _OPENVX_SWAP_MOVE_H_
 

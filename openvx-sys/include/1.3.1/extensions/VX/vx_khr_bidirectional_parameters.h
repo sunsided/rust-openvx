@@ -49,7 +49,7 @@ enum vx_bidirectional_enum_e
  * \param [in,out] accum The accumulation image in <tt>\ref VX_DF_IMAGE_S16</tt>.
  * \ingroup group_vision_function_accumulate
  * \return <tt>\ref vx_node</tt>.
- * \retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\ref vxGetStatus</tt>  
+ * \retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\ref vxGetStatus</tt>
  */
 VX_API_ENTRY vx_node VX_API_CALL vxAccumulateImageNode(vx_graph graph, vx_image input, vx_image accum);
 
@@ -60,7 +60,7 @@ VX_API_ENTRY vx_node VX_API_CALL vxAccumulateImageNode(vx_graph graph, vx_image 
  * \param [in,out] accum The <tt>\ref VX_DF_IMAGE_U8</tt> accumulation image.
  * \ingroup group_vision_function_accumulate_weighted
  * \return <tt>\ref vx_node</tt>.
- * \retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\ref vxGetStatus</tt>  
+ * \retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\ref vxGetStatus</tt>
  */
 VX_API_ENTRY vx_node VX_API_CALL vxAccumulateWeightedImageNodeX(vx_graph graph, vx_image input, vx_float32 alpha, vx_image accum);
 
@@ -71,7 +71,7 @@ VX_API_ENTRY vx_node VX_API_CALL vxAccumulateWeightedImageNodeX(vx_graph graph, 
  * \param [in,out] accum The accumulation image in <tt>\ref VX_DF_IMAGE_S16</tt>.
  * \ingroup group_vision_function_accumulate_square
  * \return <tt>\ref vx_node</tt>.
- * \retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\ref vxGetStatus</tt>  
+ * \retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\ref vxGetStatus</tt>
  */
 VX_API_ENTRY vx_node VX_API_CALL vxAccumulateSquareImageNodeX(vx_graph graph, vx_image input, vx_uint32 shift, vx_image accum);
 #endif

@@ -81,6 +81,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libclang-dev libopencv-dev ocl-icd-opencl-dev intel-opencl-icd
 
+      - name: Install LLVM and Clang
+        uses: KyleMayes/install-llvm-action@v2
+        with:
+          version: "16.0"
+
       - name: Build libraries and sample
         run: cargo build
 

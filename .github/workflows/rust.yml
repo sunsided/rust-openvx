@@ -21,7 +21,7 @@ jobs:
 
       - name: Get commit hash of submodule
         id: get-hash
-        run: echo "::set-output name=hash::$(git -C vendor/openvx-sample-impl rev-parse HEAD)"
+        run: echo "hash=$(git -C vendor/openvx-sample-impl rev-parse HEAD)" >> GITHUB_OUTPUT
 
       - name: Setup caching
         uses: actions/cache@v4
@@ -70,8 +70,11 @@ jobs:
       - name: Set OpenVX path
         run: |
           echo "OPENVX_DIR=${GITHUB_WORKSPACE}/vendor/openvx-sample-impl/install/Linux/x64/Release" >> $GITHUB_ENV
-          echo "LIBRARY_PATH=$LIBRARY_PATH:$OPENVX_DIR/bin" >> $GITHUB_ENV
-          echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$OPENVX_DIR/bin" >> $GITHUB_ENV
+
+      - name: Set OpenVX library paths
+        run: |
+          echo "LIBRARY_PATH=${OPENVX_DIR}/bin" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=${OPENVX_DIR}/bin" >> $GITHUB_ENV
 
       - name: Install OpenCL
         run: |

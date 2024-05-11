@@ -10,14 +10,64 @@ on:
       - main
 
 jobs:
+  openvx_setup:
+    name: Setup OpenVX
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup caching
+        uses: actions/cache@v4
+        id: cache
+        with:
+          path: OpenVX-samples
+          key: ${{ github.sha }}-OpenVXCacheKey
+
+      - name: Get OpenVX sample implementation
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: git clone --recursive https://github.com/KhronosGroup/OpenVX-sample-impl
+
+      - name: Build OpenVX
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          cd OpenVX-sample-impl
+          python Build.py \
+            --os=Linux --arch=64 --conf=Release \
+            --c=clang --cpp=clang \
+            --conf_vision --conf_nn \
+            --opencl_interop --enh_vision --ix \
+            --streaming --pipelining
+
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: openvx_artifacts
+          path: OpenVX-sample-impl/install/Linux
+
   test:
     name: Run tests
+    needs:
+      - openvx_setup
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Download OpenVX artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: openvx_artifacts
+
+      - name: Set OpenVX path
+        run: |
+          echo "OPENVX_DIR=${GITHUB_WORKSPACE}/openvx_artifacts/x64/Release" >> $GITHUB_ENV
+          echo "LIBRARY_PATH=$LIBRARY_PATH:${GITHUB_WORKSPACE}/openvx_artifacts/x64/Release/bin" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${GITHUB_WORKSPACE}/openvx_artifacts/x64/Release/bin" >> $GITHUB_ENV
+
       - name: Install OpenCV
         run: |
           sudo apt-get update
           sudo apt-get install -y libclang-dev libopencv-dev ocl-icd-opencl-dev intel-opencl-icd
+
       - name: Run Tests
         run: cargo test

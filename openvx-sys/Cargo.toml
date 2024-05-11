@@ -1,6 +1,6 @@
 [package]
 name = "openvx-sys"
-version = "0.1.1"
+version = "0.1.3"
 description = "Native bindings to the OpenVX library (1.3.1)"
 authors = ["Markus Mayer <widemeadows@gmail.com>"]
 edition = "2021"

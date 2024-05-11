@@ -19,17 +19,22 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install OpenCL
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ocl-icd-opencl-dev intel-opencl-icd cmake
+      - name: Get commit hash of submodule
+        id: get-hash
+        run: echo "::set-output name=hash::$(git -C vendor/openvx-sample-impl rev-parse HEAD)"
 
       - name: Setup caching
         uses: actions/cache@v4
         id: cache
         with:
           path: vendor/openvx-sample-impl/install
-          key: ${{ github.sha }}-OpenVXCacheKey
+          key: OpenVXCacheKey-${{ steps.get-hash.outputs.hash }}
+
+      - name: Install OpenCL
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ocl-icd-opencl-dev intel-opencl-icd cmake
 
       - name: Build OpenVX
         if: steps.cache.outputs.cache-hit != 'true'

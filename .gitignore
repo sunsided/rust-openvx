@@ -16,5 +16,6 @@
 **/*.rs.bk
 
 .idea/
+/lcov.info
 
 # End of https://www.toptal.com/developers/gitignore/api/rust,clion

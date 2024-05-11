@@ -64,7 +64,7 @@ Install the [Khronos OpenVX Sample Implementation](https://github.com/KhronosGro
 git clone --recursive https://github.com/KhronosGroup/OpenVX-sample-impl
 ```
 
-I built from commit [`63ced2f`](https://github.com/KhronosGroup/OpenVX-sample-impl/tree/63ced2ff8d359a74937dead88aa687103244177e) by using
+I built from commit [`9caba36`](https://github.com/KhronosGroup/OpenVX-sample-impl/tree/9caba36a541fa6480f9d65d9a78dde208ebe96f9) by using
 
 ```bash
 python Build.py \

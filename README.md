@@ -1,5 +1,9 @@
 # OpenVX 1.3 meets Rust
 
+![](https://img.shields.io/badge/OpenVX-1.3-blue)
+![](https://img.shields.io/badge/OpenCV-4.6-blue?logo=opencv)
+[![codecov](https://codecov.io/gh/sunsided/rust-openvx/graph/badge.svg?token=DURM37BW0T)](https://codecov.io/gh/sunsided/rust-openvx)
+
 This repo consists of the following parts:
 
 - [openvx-sys](openvx-sys) is the bindgen-generated Rust wrapper around OpenVX,

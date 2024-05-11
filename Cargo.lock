@@ -270,7 +270,7 @@ dependencies = [
 
 [[package]]
 name = "openvx"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "openvx-sys",
  "static_assertions",
@@ -278,7 +278,7 @@ dependencies = [
 
 [[package]]
 name = "openvx-sys"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "bindgen",
  "clang",

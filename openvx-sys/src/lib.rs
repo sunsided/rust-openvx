@@ -75,6 +75,8 @@ pub const vx_vendor_id_e_VX_ID_CADENCE: vx_vendor_id_e = 25;
 pub const vx_vendor_id_e_VX_ID_HUAWEI: vx_vendor_id_e = 26;
 #[doc = "< \\brief Socionext"]
 pub const vx_vendor_id_e_VX_ID_SOCIONEXT: vx_vendor_id_e = 27;
+#[doc = "< \\brief Robert Bosch GmbH"]
+pub const vx_vendor_id_e_VX_ID_BOSCH: vx_vendor_id_e = 28;
 #[doc = "< \\brief For use by vxAllocateUserKernelId and vxAllocateUserKernelLibraryId"]
 pub const vx_vendor_id_e_VX_ID_USER: vx_vendor_id_e = 4094;
 pub const vx_vendor_id_e_VX_ID_MAX: vx_vendor_id_e = 4095;
@@ -291,6 +293,8 @@ pub const vx_type_e_VX_TYPE_ENUM: vx_type_e = 12;
 pub const vx_type_e_VX_TYPE_SIZE: vx_type_e = 13;
 #[doc = "< \\brief A <tt>\\ref vx_df_image</tt>."]
 pub const vx_type_e_VX_TYPE_DF_IMAGE: vx_type_e = 14;
+#[doc = "< \\brief A <tt>\\ref vx_float16</tt>."]
+pub const vx_type_e_VX_TYPE_FLOAT16: vx_type_e = 15;
 #[doc = "< \\brief A <tt>\\ref vx_bool</tt>."]
 pub const vx_type_e_VX_TYPE_BOOL: vx_type_e = 16;
 #[doc = "< \\brief A <tt>\\ref vx_rectangle_t</tt>."]
@@ -2384,6 +2388,10 @@ pub const vx_kernel_e_VX_KERNEL_MAX: vx_kernel_e = 62;
 pub const vx_kernel_e_VX_KERNEL_MIN: vx_kernel_e = 63;
 #[doc = " \\brief The weigthed average kernel.\n \\see group_vision_function_weighted_average"]
 pub const vx_kernel_e_VX_KERNEL_WEIGHTED_AVERAGE: vx_kernel_e = 64;
+#[doc = " \\brief The data object swap kernel. (If implemented)\n \\see group_vision_function_swap"]
+pub const vx_kernel_e_VX_KERNEL_SWAP: vx_kernel_e = 65;
+#[doc = " \\brief The data object move kernel. (If implemented)\n \\see group_vision_function_move"]
+pub const vx_kernel_e_VX_KERNEL_MOVE: vx_kernel_e = 66;
 #[doc = " \\brief The standard list of available vision kernels.\n\n Each kernel listed here can be used with the <tt>\\ref vxGetKernelByEnum</tt> call.\n When programming the parameters, use\n \\arg <tt>\\ref VX_INPUT</tt> for [in]\n \\arg <tt>\\ref VX_OUTPUT</tt> for [out]\n\n When programming the parameters, use\n \\arg <tt>\\ref VX_TYPE_IMAGE</tt> for a <tt>\\ref vx_image</tt> in the size field of <tt>\\ref vxGetParameterByIndex</tt> or <tt>\\ref vxSetParameterByIndex</tt>  * \\arg <tt>\\ref VX_TYPE_ARRAY</tt> for a <tt>\\ref vx_array</tt> in the size field of <tt>\\ref vxGetParameterByIndex</tt> or <tt>\\ref vxSetParameterByIndex</tt>  * \\arg or other appropriate types in \\ref vx_type_e.\n \\ingroup group_kernel"]
 pub type vx_kernel_e = ::std::os::raw::c_uint;
 extern "C" {
@@ -2659,7 +2667,7 @@ extern "C" {
     pub fn vxReleaseKernel(kernel: *mut vx_kernel) -> vx_status;
 }
 extern "C" {
-    #[doc = " \\brief Allows users to add custom kernels to a context at run-time.\n \\param [in] context The reference to the context the kernel must be added to.\n \\param [in] name The string to use to match the kernel.\n \\param [in] enumeration The enumerated value of the kernel to be used by clients.\n \\param [in] func_ptr The process-local function pointer to be invoked.\n \\param [in] numParams The number of parameters for this kernel.\n \\param [in] validate The pointer to <tt>\\ref vx_kernel_validate_f</tt>, which validates\n parameters to this kernel.\n \\param [in] init The kernel initialization function.\n \\param [in] deinit The kernel de-initialization function.\n \\return A <tt>\\ref vx_kernel</tt> reference. Any possible errors\n preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>.\n \\ingroup group_user_kernels"]
+    #[doc = " \\brief Allows users to add custom kernels to a context at run-time.\n \\param [in] context The reference to the context the kernel must be added to.\n \\param [in] name The string to use to match the kernel.  The length of the string\n shall be lower than VX_MAX_KERNEL_NAME bytes.\n \\param [in] enumeration The enumerated value of the kernel to be used by clients.\n \\param [in] func_ptr The process-local function pointer to be invoked.\n \\param [in] numParams The number of parameters for this kernel.\n \\param [in] validate The pointer to <tt>\\ref vx_kernel_validate_f</tt>, which validates\n parameters to this kernel.\n \\param [in] init The kernel initialization function.\n \\param [in] deinit The kernel de-initialization function.\n \\return A <tt>\\ref vx_kernel</tt> reference. Any possible errors\n preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>.\n \\ingroup group_user_kernels"]
     pub fn vxAddUserKernel(
         context: vx_context,
         name: *const vx_char,
@@ -3631,7 +3639,7 @@ extern "C" {
     ) -> vx_node;
 }
 extern "C" {
-    #[doc = " \\brief [Graph] Creates a Table Lookup node. If a value from the input image is not present in the lookup table, the result is undefined.\n \\param [in] graph The reference to the graph.\n \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt>.\n \\param [in] lut The LUT which is of type <tt>\\ref VX_TYPE_UINT8</tt> if input image is <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_TYPE_INT16</tt> if input image is <tt>\\ref VX_DF_IMAGE_S16</tt>.\n \\param [out] output The output image of the same type and size as the input image.\n \\ingroup group_vision_function_lut\n \\return <tt>\\ref vx_node</tt>.\n \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
+    #[doc = " \\brief [Graph] Creates a Table Lookup node. If a value from the input image is not present in the lookup table, the result is undefined.\n \\param [in] graph The reference to the graph.\n \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt>.\n \\param [in] lut The LUT which is of type <tt>\\ref VX_TYPE_UINT8</tt> if input image is <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_TYPE_INT16</tt> if input image is <tt>\\ref VX_DF_IMAGE_S16</tt>.\n \\param [out] output The output image of the same size as the input image.\n \\ingroup group_vision_function_lut\n \\return <tt>\\ref vx_node</tt>.\n \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>."]
     pub fn vxTableLookupNode(
         graph: vx_graph,
         input: vx_image,
@@ -3870,7 +3878,7 @@ extern "C" {
     ) -> vx_node;
 }
 extern "C" {
-    #[doc = " \\brief [Graph] Creates an Affine Warp Node.\n \\param [in] graph The reference to the graph.\n \\param [in] input The input <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> image.\n \\param [in] matrix The affine matrix. Must be 2x3 of type \\ref VX_TYPE_FLOAT32.\n \\param [in] type The interpolation type from <tt>\\ref vx_interpolation_type_e</tt>.\n <tt>\\ref VX_INTERPOLATION_AREA</tt> is not supported.\n \\param [out] output The output <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> image with the same dimensions and type as the input image.\n \\ingroup group_vision_function_warp_affine\n \\note The border modes <tt>\\ref VX_NODE_BORDER</tt> value <tt>\\ref VX_BORDER_UNDEFINED</tt> and\n <tt>\\ref VX_BORDER_CONSTANT</tt> are supported.\n \\return <tt>\\ref vx_node</tt>.\n \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    #[doc = " \\brief [Graph] Creates an Affine Warp Node.\n \\param [in] graph The reference to the graph.\n \\param [in] input The input <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> image.\n \\param [in] matrix The affine matrix. Must be 2x3 of type \\ref VX_TYPE_FLOAT32.\n \\param [in] type The interpolation type from <tt>\\ref vx_interpolation_type_e</tt>.\n <tt>\\ref VX_INTERPOLATION_AREA</tt> is not supported.\n \\param [out] output The output <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> image with the same format as the input image.\n \\ingroup group_vision_function_warp_affine\n \\note The border modes <tt>\\ref VX_NODE_BORDER</tt> value <tt>\\ref VX_BORDER_UNDEFINED</tt> and\n <tt>\\ref VX_BORDER_CONSTANT</tt> are supported.\n \\return <tt>\\ref vx_node</tt>.\n \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
     pub fn vxWarpAffineNode(
         graph: vx_graph,
         input: vx_image,
@@ -3880,7 +3888,7 @@ extern "C" {
     ) -> vx_node;
 }
 extern "C" {
-    #[doc = " \\brief [Graph] Creates a Perspective Warp Node.\n \\param [in] graph The reference to the graph.\n \\param [in] input The input <tt>\\ref VX_DF_IMAGE_U8</tt> image.\n \\param [in] matrix The perspective matrix. Must be 3x3 of type <tt>\\ref VX_TYPE_FLOAT32</tt>.\n \\param [in] type The interpolation type from <tt>\\ref vx_interpolation_type_e</tt>.\n <tt>\\ref VX_INTERPOLATION_AREA</tt> is not supported.\n \\param [out] output The output <tt>\\ref VX_DF_IMAGE_U8</tt> image with the same dimensions as the input image.\n \\ingroup group_vision_function_warp_perspective\n \\note The border modes <tt>\\ref VX_NODE_BORDER</tt> value <tt>\\ref VX_BORDER_UNDEFINED</tt> and\n <tt>\\ref VX_BORDER_CONSTANT</tt> are supported.\n \\return <tt>\\ref vx_node</tt>.\n \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
+    #[doc = " \\brief [Graph] Creates a Perspective Warp Node.\n \\param [in] graph The reference to the graph.\n \\param [in] input The input <tt>\\ref VX_DF_IMAGE_U8</tt> image.\n \\param [in] matrix The perspective matrix. Must be 3x3 of type <tt>\\ref VX_TYPE_FLOAT32</tt>.\n \\param [in] type The interpolation type from <tt>\\ref vx_interpolation_type_e</tt>.\n <tt>\\ref VX_INTERPOLATION_AREA</tt> is not supported.\n \\param [out] output The output <tt>\\ref VX_DF_IMAGE_U8</tt> image.\n \\ingroup group_vision_function_warp_perspective\n \\note The border modes <tt>\\ref VX_NODE_BORDER</tt> value <tt>\\ref VX_BORDER_UNDEFINED</tt> and\n <tt>\\ref VX_BORDER_CONSTANT</tt> are supported.\n \\return <tt>\\ref vx_node</tt>.\n \\retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>\\ref vxGetStatus</tt>"]
     pub fn vxWarpPerspectiveNode(
         graph: vx_graph,
         input: vx_image,
@@ -4401,7 +4409,7 @@ extern "C" {
     ) -> vx_status;
 }
 extern "C" {
-    #[doc = " \\brief [Immediate] Processes the image through the LUT.\n \\param [in] context The reference to the overall context.\n \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt>.\n \\param [in] lut The LUT which is of type <tt>\\ref VX_TYPE_UINT8</tt> if input image is <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_TYPE_INT16</tt> if input image is <tt>\\ref VX_DF_IMAGE_S16</tt>.\n \\param [out] output The output image of the same type as the input image.\n \\ingroup group_vision_function_lut\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_SUCCESS Success\n \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    #[doc = " \\brief [Immediate] Processes the image through the LUT.\n \\param [in] context The reference to the overall context.\n \\param [in] input The input image in <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_S16</tt>.\n \\param [in] lut The LUT which is of type <tt>\\ref VX_TYPE_UINT8</tt> if input image is <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_TYPE_INT16</tt> if input image is <tt>\\ref VX_DF_IMAGE_S16</tt>.\n \\param [out] output The output image of the same size as the input image.\n \\ingroup group_vision_function_lut\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_SUCCESS Success\n \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
     pub fn vxuTableLookup(
         context: vx_context,
         input: vx_image,
@@ -4637,7 +4645,7 @@ extern "C" {
     ) -> vx_status;
 }
 extern "C" {
-    #[doc = " \\brief [Immediate] Performs an Affine warp on an image.\n \\param [in] context The reference to the overall context.\n \\param [in] input The input <tt>\\ref VX_DF_IMAGE_U1</tt> or <tt>\\ref VX_DF_IMAGE_U8</tt> image.\n \\param [in] matrix The affine matrix. Must be 2x3 of type \\ref VX_TYPE_FLOAT32.\n \\param [in] type The interpolation type from \\ref vx_interpolation_type_e.\n \\ref VX_INTERPOLATION_AREA is not supported.\n \\param [out] output The output <tt>\\ref VX_DF_IMAGE_U1</tt> or <tt>\\ref VX_DF_IMAGE_U8</tt> image of the same\n format and dimensions as the input image.\n \\ingroup group_vision_function_warp_affine\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_SUCCESS Success\n \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    #[doc = " \\brief [Immediate] Performs an Affine warp on an image.\n \\param [in] context The reference to the overall context.\n \\param [in] input The input <tt>\\ref VX_DF_IMAGE_U1</tt> or <tt>\\ref VX_DF_IMAGE_U8</tt> image.\n \\param [in] matrix The affine matrix. Must be 2x3 of type \\ref VX_TYPE_FLOAT32.\n \\param [in] type The interpolation type from \\ref vx_interpolation_type_e.\n \\ref VX_INTERPOLATION_AREA is not supported.\n \\param [out] output The output <tt>\\ref VX_DF_IMAGE_U1</tt> or <tt>\\ref VX_DF_IMAGE_U8</tt> image of the same\n format as the input image.\n \\ingroup group_vision_function_warp_affine\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_SUCCESS Success\n \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
     pub fn vxuWarpAffine(
         context: vx_context,
         input: vx_image,
@@ -4647,7 +4655,7 @@ extern "C" {
     ) -> vx_status;
 }
 extern "C" {
-    #[doc = " \\brief [Immediate] Performs an Perspective warp on an image.\n \\param [in] context The reference to the overall context.\n \\param [in] input The input <tt>\\ref VX_DF_IMAGE_U8</tt> image.\n \\param [in] matrix The perspective matrix. Must be 3x3 of type \\ref VX_TYPE_FLOAT32.\n \\param [in] type The interpolation type from \\ref vx_interpolation_type_e.\n \\ref VX_INTERPOLATION_AREA is not supported.\n \\param [out] output The output <tt>\\ref VX_DF_IMAGE_U8</tt> or <tt>\\ref VX_DF_IMAGE_U1</tt> image with the same\n dimensions and type as the input image.\n \\ingroup group_vision_function_warp_perspective\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_SUCCESS Success\n \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
+    #[doc = " \\brief [Immediate] Performs an Perspective warp on an image.\n \\param [in] context The reference to the overall context.\n \\param [in] input The input <tt>\\ref VX_DF_IMAGE_U8</tt> image.\n \\param [in] matrix The perspective matrix. Must be 3x3 of type \\ref VX_TYPE_FLOAT32.\n \\param [in] type The interpolation type from \\ref vx_interpolation_type_e.\n \\ref VX_INTERPOLATION_AREA is not supported.\n \\param [out] output The output <tt>\\ref VX_DF_IMAGE_U8</tt> image.\n \\ingroup group_vision_function_warp_perspective\n \\return A <tt>\\ref vx_status_e</tt> enumeration.\n \\retval VX_SUCCESS Success\n \\retval * An error occurred. See <tt>\\ref vx_status_e</tt>."]
     pub fn vxuWarpPerspective(
         context: vx_context,
         input: vx_image,

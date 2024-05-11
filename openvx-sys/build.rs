@@ -8,7 +8,7 @@ fn main() {
     // Tell cargo to invalidate the built crate whenever the wrapper changes
     println!("cargo:rerun-if-changed=wrapper.h");
 
-    let include_base = PathBuf::from("include").join("1.3");
+    let include_base = PathBuf::from("include").join("1.3.1");
     let standard_dir = include_base.join("standard");
     let extensions_dir = include_base.join("extensions");
 

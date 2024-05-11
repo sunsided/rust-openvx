@@ -29,8 +29,6 @@ fn main() {
         .allowlist_recursively(true)
         // Doesn't appear to work right now, but maybe some day ...
         .generate_comments(true)
-        // Bonus flavors.
-        .enable_cxx_namespaces()
         // Suppress linter warnings.
         .raw_line("#![allow(non_snake_case)]")
         .raw_line("#![allow(non_camel_case_types)]")
